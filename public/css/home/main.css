@@ -1,0 +1,29 @@
+body, h1, h2, h3, h4, h5, h6, hr, p, blockquote, dl, dt, dd, ul, ol, li, pre, form, fieldset, legend, button, input, textarea, th, td {
+    -webkit-tap-highlight-color:rgba(255,255,255,0);-webkit-appearance:none;}
+body{
+    background-color: #e2e2e2;
+}
+.am-tab-panel{
+    height: 40%;
+    width: 100%;
+}
+.thumb{
+    padding: 1.7rem 0.5rem 1.4rem 0.5rem;
+}
+.content{
+    color: #000;
+    padding: 1.5rem 0.5rem 1.6rem 0;
+}
+.thumb img{
+    border-radius: 50%;
+    width: 100%;
+}
+.boxes .box {
+    min-height: 100px;
+    color: #eee;
+    text-align: center;
+}
+.box-1,.box-2,.box-3,.box-4{
+    border:1px solid #f8f8f8;
+    background-color: #fff;
+}

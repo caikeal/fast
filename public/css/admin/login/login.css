@@ -1,0 +1,119 @@
+.navbar-default{
+    background-color: #fff;
+    border: none;
+    box-shadow: 0px 2px 8px 0px rgba(50,50,50,0.25);
+}
+.navbar-default .navbar-brand {
+    font-size: 30px;
+    font-weight: bold;
+    color: #40D2B1;
+    height: 70px;
+    line-height: 35px;
+}
+.navbar-default .navbar-nav>li>a {
+    font-size: 16px;
+    font-weight: bold;
+    color: #666;
+    height: 70px;
+    line-height: 35px;
+}
+.navbar-toggle{
+    margin-top: 17px;
+}
+.navbar-default .navbar-toggle:hover {
+    border-color: #40D2B1;
+    background-color: rgb(69, 210, 184);
+}
+.navbar-default .navbar-toggle .icon-bar {
+    background-color: #1C9982;
+}
+/*home*/
+#home{
+    // margin-top: 70px;
+    background: url("../../../images/back.png");
+    background-size: cover;
+    color: #ffffff;
+    text-align: center;
+    width: 100%;
+    margin-top: 50px;
+}
+.lvjing{
+    width: 100%;
+    height: 80%;
+    padding: 50px 0;
+}
+#home p{
+    font-weight: 400;
+    line-height: 35px;
+}
+#home img{
+    width:560px;
+    display: inline-block;
+
+}
+.login{
+    border-radius: 5px;
+    width: 500px;
+    border:1px solid #BDCFE4; 
+    margin-left: 10%;
+    margin-top: 10%;
+    background-color: #fff
+}
+#name{width: 80%;margin-left: 10%;margin-top: 6%}
+#password{width: 80%;margin-left: 10%;margin-top: 2%}
+.login .help-block{margin-left: 10%;text-align: left;}
+#vdspan{margin-left: 10%;float: left;color: black;margin-top: 3%;font-size: large;font-family: initial;}
+#vdcode{float: left;width: 20%;margin-top: 2%;margin-left: 2%}
+#vdimg{float: left;width: 50%;margin-top: 2%;margin-left: 5%}
+.remember{margin-left: 10%;float: left;color: black;}
+#errorMessage{font-size: large;color: red;margin-left:2%;text-align: center;display: none}
+.submit{width: 80%}
+.login label{
+    color: black;
+}
+/*bbs*/
+#bbs{
+    // padding: 80px 0;
+    text-align: center;
+}
+#bbs .col-md-4{
+    padding: 15px;
+}
+#bbs .col-md-4:hover{
+    background: #f1f1f1;
+    box-shadow: 1px 1px 4px #ccc;
+}
+#bbs a{
+    color: #212121;
+    text-decoration: none;
+}
+#bbs img{
+    margin: 0 auto;
+}
+#bbs h3{
+    font-weight: bold;   
+    font-family: inherit;
+    font-size: xx-large;
+}
+#bbs p{
+    font-weight: inherit;   
+    font-family: inherit;
+    font-size: large;
+}
+.sendSalary{
+    color: #009EEA;
+}
+.settlement{
+    color: #B6CA35;
+}
+.welfware{
+    color: #6ED6E6;
+}
+
+
+/*footer*/
+footer{
+    font-weight: 400;
+    text-align: center;
+    padding:10px ;
+}
