@@ -8,7 +8,8 @@
     <meta name="format-detection" content="telephone=no">
     <meta name="renderer" content="webkit">
     <meta http-equiv="Cache-Control" content="no-siteapp"/>
-    <!-- <link rel="alternate icon" type="image/png" href="../../assets/i/favicon.png"> -->
+    <link rel="apple-touch-icon-precomposed" href="{{env('APP_URL')}}/images/114.png" sizes="114x114" />
+    <link rel="shortcut icon" href="{{env('APP_URL')}}/images/32.ico" type="image/x-icon" />
     <link rel="stylesheet" href="http://cdn.amazeui.org/amazeui/2.5.2/css/amazeui.min.css"/>
     <style>
         body {
