@@ -71,7 +71,7 @@
 <script src="http://cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
 <!-- <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script> -->
 <!--<![endif]-->
-<script src=".http://cdn.amazeui.org/amazeui/2.5.2/js/amazeui.min.js"></script>
+<script src="http://cdn.amazeui.org/amazeui/2.5.2/js/amazeui.min.js"></script>
 <script>
     var initFooter = function () {
         height = (window.innerHeight > 0) ? window.innerHeight : screen.height;
