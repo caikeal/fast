@@ -255,10 +255,10 @@
                         <a href="{{url('admin/index')}}">
 									<span class="menu-content block">
 										<span class="menu-icon"><i class="block fa fa-home fa-lg"></i></span>
-										<span class="text m-left-sm">首&nbsp&nbsp页</span>
+										<span class="text m-left-sm">首&nbsp;&nbsp;页</span>
 									</span>
 									<span class="menu-content-hover block">
-										首&nbsp&nbsp页
+										首&nbsp;&nbsp;页
 									</span>
                         </a>
                     </li>

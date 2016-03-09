@@ -83,10 +83,18 @@ class SalaryController extends Controller
     }
 
     public function download(Request $request){
+        $ua = strtolower($_SERVER["HTTP_USER_AGENT"]);
         $base_id=$request->get('bid');
         $base=SalaryBase::find($base_id);
         $cats=$base->categories()->orderBy('place','asc')->get();
-        Excel::create($base['title'], function($excel) use($cats,$base) {
+
+        //解决不同浏览器下载excel时标题解析乱码问题
+        if (preg_match("/msie|edge|safari|firefox/", $ua)) {
+            $base_title=urlencode($base['title']);
+        }else{
+            $base_title=$base['title'];
+        }
+        Excel::create($base_title, function($excel) use($cats,$base) {
 
             // Set the title
             $excel->setTitle($base->id."");
