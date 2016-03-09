@@ -29,7 +29,6 @@
 }
 /*home*/
 #home{
-    // margin-top: 70px;
     background: url("../../../images/back.png");
     background-size: cover;
     color: #ffffff;
@@ -47,17 +46,24 @@
     line-height: 35px;
 }
 #home img{
-    width:560px;
+    width:100%;
+    max-width:560px;
     display: inline-block;
 
 }
 .login{
     border-radius: 5px;
-    width: 500px;
-    border:1px solid #BDCFE4; 
-    margin-left: 10%;
+    width:100%;
+    max-width: 500px;
+    border:1px solid #BDCFE4;
     margin-top: 10%;
     background-color: #fff
+}
+
+@media screen and (min-width: 650px) {
+    .login{
+        margin-left: 10%;
+    }
 }
 #name{width: 80%;margin-left: 10%;margin-top: 6%}
 #password{width: 80%;margin-left: 10%;margin-top: 2%}
