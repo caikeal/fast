@@ -32,11 +32,14 @@ Route::group(['namespace'=>'Admin','middleware' => ['web'],'prefix'=>'admin'], f
     Route::post('/login','AuthController@login');
     Route::get('/logout','AuthController@logout');
     Route::get('/index','HomeController@index');
+    //薪资模块
     Route::get('/timeline','SalaryController@timeline');
     Route::post('/salary/base','SalaryController@base');
     Route::get('/salary/download','SalaryController@download');
     Route::post('/salary/upload', 'SalaryController@upload');
     Route::resource('/salary/category','SalaryCategoryController');
+    //用户模块
+    Route::get('/super','ManagerController@super');
 });
 
 Route::group(['middleware' => 'web'], function () {

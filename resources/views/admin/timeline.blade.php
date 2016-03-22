@@ -120,16 +120,24 @@
                                                             class="fa fa-plus-circle"></i> 新建模版
                                                 </div>
                                             </div>
-                                        </div><!-- ./timeline-body -->
-                                    </div><!-- ./timeline-item-inner -->
-                                </div><!-- ./timeline-item -->
-                            </div><!-- ./timeline-row -->
+                                        </div>
+                                        <!-- ./timeline-body -->
+                                    </div>
+                                    <!-- ./timeline-item-inner -->
+                                </div>
+                                <!-- ./timeline-item -->
+                            </div>
+                            <!-- ./timeline-row -->
                         @endif
                     @endforeach
-                </div><!-- ./timeline-wrapper -->
-            </div><!-- ./col -->
-        </div><!-- ./row -->
-    </div><!-- ./padding-md -->
+                </div>
+                <!-- ./timeline-wrapper -->
+            </div>
+            <!-- ./col -->
+        </div>
+        <!-- ./row -->
+    </div>
+    <!-- ./padding-md -->
     @endsection
     @section('addition')
             <!-- Modal -->
@@ -229,11 +237,21 @@
                         </div>
                     </form>
                 </div>
-            </div><!-- /.modal-content -->
+            </div>
+            <!-- /.modal-content -->
         </div>
-    </div><!-- /.modal -->
+    </div>
+    <!-- /.modal -->
 @endsection
 @section('moreScript')
+    //侧边栏位置锁定
+    <script>
+        !(function () {
+            $(".main-menu .accordion>li").removeClass("active");
+            $(".lock-place2").addClass("active");
+        })($);
+    </script>
+    //文件上传
     <script src="{{env('APP_URL')}}/js/webuploader-0.1.5/webuploader.js"></script>
     <script>
         // 文件接收服务端。
