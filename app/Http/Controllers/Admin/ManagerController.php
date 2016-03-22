@@ -14,6 +14,10 @@ class ManagerController extends Controller
         $this->middleware('auth:admin');
     }
 
+    public function super(){
+        return view('admin.super');
+    }
+
     public function index(){
         return view();
     }
