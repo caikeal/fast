@@ -38,9 +38,11 @@ Route::group(['namespace'=>'Admin','middleware' => ['web'],'prefix'=>'admin'], f
     Route::get('/salary/download','SalaryController@download');
     Route::post('/salary/upload', 'SalaryController@upload');
     Route::resource('/salary/category','SalaryCategoryController');
-    //用户管理模块
+    //企业用户管理模块
     Route::get('/super','ManagerController@super');
-
+    Route::resource('/account','AccountController');
+    //前台用户管理模块
+    Route::resource('/user','UserController');
 });
 
 Route::group(['middleware' => 'web'], function () {

@@ -86,6 +86,10 @@
 @endsection
 @section('content')
     <div class="padding-md" id="super">
+        {{--<div class="alert alert-danger alert-dismissible" role="alert" v-if="systemErrors">--}}
+            {{--<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>--}}
+            {{--<strong>Warning!</strong> @{{systemErrors}}--}}
+        {{--</div>--}}
         <!-- 超级管理员 -->
         <div class="row base-backcolor">
             <div class="col-sm-12 col-md-12 col-lg-12">
@@ -289,36 +293,44 @@
                     <div class="modal-body">
                         <div class="container-fluid">
                             <form action="" class="form-horizontal">
-                                <div class="form-group">
+                                <div class="form-group" :class="{'has-error':is_managerName}">
                                     <label for="name" class="col-lg-2 control-label lable-xs-center">姓名:</label>
 
                                     <div class=" col-lg-10">
                                         <input type="text" class="form-control" id="name" name="name" placeholder="姓名"
                                                v-model="managerName">
                                     </div>
+
+                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display':is_managerName?'block':'none'}">@{{ managerNameErrors }}</p>
                                 </div>
-                                <div class="form-group">
+
+                                <div class="form-group" :class="{'has-error':is_managerAccount}">
                                     <label for="account" class="col-lg-2 control-label lable-xs-center">账号:</label>
 
                                     <div class=" col-lg-10">
-                                        <input type="text" class="form-control" id="account" name="account"
+                                        <input type="email" class="form-control" id="account" name="account"
                                                placeholder="账号" v-model="managerAccount">
                                     </div>
+
+                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display':is_managerAccount?'block':'none'}">@{{ managerAccountErrors }}</p>
                                 </div>
-                                <div class="form-group">
+
+                                <div class="form-group" :class="{'has-error':is_managerPassword}">
                                     <label for="password" class="col-lg-2 control-label lable-xs-center">密码:</label>
 
                                     <div class=" col-lg-10">
                                         <input type="text" class="form-control" id="password" name="password"
                                                placeholder="密码" v-model="managerPassword">
                                     </div>
+
+                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display':is_managerPassword?'block':'none'}">@{{ managerPasswordErrors }}</p>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group" :class="{'has-error':is_managerRoles}">
                                     <div class="col-lg-offset-2 col-lg-10">
                                         <div class="checkbox inline-block">
                                             <div class="custom-checkbox">
                                                 <input type="checkbox" id="salary" class="checkbox-blue" value=2
-                                                       v-model="manageRoles">
+                                                       v-model="managerRoles">
                                                 <label for="salary"></label>
                                             </div>
                                             <div class="inline-block vertical-top">
@@ -329,7 +341,7 @@
                                         <div class="checkbox inline-block">
                                             <div class="custom-checkbox">
                                                 <input type="checkbox" id="compensate" class="checkbox-blue" value=3
-                                                       v-model="manageRoles">
+                                                       v-model="managerRoles">
                                                 <label for="compensate"></label>
                                             </div>
                                             <div class="inline-block vertical-top">
@@ -340,7 +352,7 @@
                                         <div class="checkbox inline-block">
                                             <div class="custom-checkbox">
                                                 <input type="checkbox" id="benefit" class="checkbox-blue" value=4
-                                                       v-model="manageRoles">
+                                                       v-model="managerRoles">
                                                 <label for="benefit"></label>
                                             </div>
                                             <div class="inline-block vertical-top">
@@ -348,6 +360,7 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display':is_managerRoles?'block':'none'}">@{{ managerRolesErrors }}</p>
                                 </div>
                             </form>
                         </div>
@@ -431,10 +444,19 @@
                 userPhone: '13962175383',
                 userName: '蔡悦彰',
                 companyName: 'FESCO',
-                managerName: 'xxx',
-                managerAccount: 'ttt',
-                managerPassword: 'iuxfggg',
-                manageRoles: ['1'],
+                managerName: '',
+                managerAccount: '',
+                managerPassword: '',
+                managerRoles: [],
+                is_managerName:0,
+                is_managerAccount:0,
+                is_managerPassword:0,
+                is_managerRoles:0,
+                managerNameErrors:'',
+                managerAccountErrors:'',
+                managerPasswordErrors:'',
+                managerRolesErrors:'',
+                systemErrors:''
             },
             methods: {
                 searchPerson: function () {
@@ -444,14 +466,105 @@
                     });
                 },
                 newAccount: function () {
-                    var url = "http://www.sina.com";
-                    $.post(url, {
-                        name: this.managerName,
-                        account: this.managerAccount,
-                        pwd: this.managerPassword,
-                        role: this.manageRoles
-                    }, function (data) {
-                        console.log("1");
+                    var url = "{{url('admin/account')}}";
+                    var _this=this;
+                    _this.is_managerName=0;
+                    _this.is_managerAccount=0;
+                    _this.is_managerPassword=0;
+                    _this.is_managerRoles=0;
+                    _this.managerNameErrors='';
+                    _this.managerAccountErrors='';
+                    _this.managerPasswordErrors='';
+                    _this.managerRolesErrors='';
+                    if(!_this.managerName || typeof _this.managerName=='undefined'){
+                        _this.managerNameErrors='姓名必填！';
+                        _this.is_managerName=1;
+                        return false;
+                    }
+                    if(!_this.managerAccount || typeof _this.managerAccount=='undefined'){
+                        _this.managerAccountErrors='登录账户必填！';
+                        _this.is_managerAccount=1;
+                        return false;
+                    }
+                    if(!_this.managerAccount.match(/^(\w)+(\.\w+)*@(\w)+((\.\w+)+)$/)){
+                        _this.managerAccountErrors='登录账户必为邮箱！';
+                        _this.is_managerAccount=1;
+                        return false;
+                    }
+                    if(!_this.managerPassword || typeof _this.managerPassword=='undefined'){
+                        _this.managerPasswordErrors='初始密码必填！';
+                        _this.is_managerPassword=1;
+                        return false;
+                    }
+                    if(_this.managerPassword.length<6){
+                        _this.managerPasswordErrors='初始密码至少6位！';
+                        _this.is_managerPassword=1;
+                        return false;
+                    }
+                    if(!_this.managerPassword.match(/=|\+|-|@|_|\*|[a-zA-Z]/g)){
+                        _this.managerPasswordErrors='"A-Z" "a-z" "+" "_" "*" "=" "-" "@"至少存在1项！';
+                        _this.is_managerPassword=1;
+                        return false;
+                    }
+                    if(!_this.managerRoles.length || typeof _this.managerRoles=='undefined'){
+                        _this.managerRolesErrors='权限必选！';
+                        _this.is_managerRoles=1;
+                        return false;
+                    }
+                    $.ajax({
+                        url:url,
+                        dataType:'json',
+                        headers:{
+                            'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content'),
+                        },
+                        timeout:60000,
+                        data: {
+                            name: _this.managerName,
+                            account: _this.managerAccount,
+                            pwd: _this.managerPassword,
+                            role: _this.managerRoles
+                        },
+                        type:'POST'
+                    })
+                    .done(function(data){
+                        if(data.ret_num==0){
+                            _this.is_managerName=0;
+                            _this.is_managerAccount=0;
+                            _this.is_managerPassword=0;
+                            _this.is_managerRoles=0;
+                            _this.managerNameErrors='';
+                            _this.managerAccountErrors='';
+                            _this.managerPasswordErrors='';
+                            _this.managerRolesErrors='';
+                            _this.managerName= '';
+                            _this.managerAccount= '';
+                            _this.managerPassword= '';
+                            _this.managerRoles= [];
+                            alert(data.ret_msg);
+                            $('#create-manager').modal('hide')
+                        }else{
+                            _this.is_managerName=1;
+                            _this.managerNameErrors=data.ret_msg;
+                        }
+                    })
+                    .fail(function(data){
+                        var errs=JSON.parse(data.responseText);
+                        if(errs.name){
+                            _this.is_managerName=1;
+                            _this.managerNameErrors=errs.name[0];
+                        }
+                        if(errs.account){
+                            _this.is_managerAccount=1;
+                            _this.managerAccountErrors=errs.account[0];
+                        }
+                        if(errs.pwd){
+                            _this.is_managerPassword=1;
+                            _this.managerPasswordErrors=errs.pwd[0];
+                        }
+                        if(errs['role']){
+                            _this.is_managerRoles=1;
+                            _this.managerRolesErrors=errs['role'][0];
+                        }
                     });
                 }
             }
