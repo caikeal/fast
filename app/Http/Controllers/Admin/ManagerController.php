@@ -21,7 +21,7 @@ class ManagerController extends Controller
 //        if(Gate::denies('super')){
 //            return redirect('admin/index');
 //        }
-        $name=$request->input('name');
+        $name=trim($request->input('name'));
         if($name){
             $managers=Manager::whereHas("roles",function($query) use($name){
                 $query->where('label','like',"%".$name."%");

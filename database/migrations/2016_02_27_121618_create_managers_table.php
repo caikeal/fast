@@ -19,7 +19,6 @@ class CreateManagersTable extends Migration
             $table->string('phone',20);
             $table->string('password',60);
             $table->string('email',255)->index();
-            $table->integer('manager_id')->unsigned();
             $table->softDeletes();
             $table->rememberToken();
             $table->timestamps();
