@@ -198,15 +198,17 @@
                     <div class="modal-body">
                         <div class="seperator"></div>
                         <div class="container-fluid">
-                            <form action="">
+                            <form>
+                                <input type="hidden" name="id" v-model="userId">
                                 <div class="row">
-                                    <div class="col-sm-12">
+                                    <div class="col-sm-12"  :class="{'has-error':is_userPhone}">
                                         <div class="input-group">
                                             <input type="text" class="form-control" placeholder="搜索手机号" v-model="phone">
                                             <span class="input-group-btn">
                                                 <button class="btn btn-default" type="button" @click="searchPerson">搜索</button>
                                             </span>
                                         </div>
+                                        <p class="help-block col-lg-12" :style="{'display':is_userPhone?'block':'none'}">@{{ userPhoneErrors }}</p>
                                     </div>
                                 </div>
                                 <div class="seperator"></div>
@@ -229,32 +231,6 @@
                                 <div class="seperator"></div>
                                 <div class="row">
                                     <div class="col-sm-12">
-                                        <div class="checkbox inline-block">
-                                            <div class="custom-checkbox">
-                                                <input type="checkbox" id="maleCheckbox" class="checkbox-blue"
-                                                       v-model="male" disabled="disabled">
-                                                <label for="maleCheckbox"></label>
-                                            </div>
-                                            <div class="inline-block vertical-top">
-                                                男
-                                            </div>
-                                        </div>
-                                        &nbsp;&nbsp;&nbsp;
-                                        <div class="checkbox inline-block">
-                                            <div class="custom-checkbox">
-                                                <input type="checkbox" id="femaleCheckbox" class="checkbox-blue"
-                                                       v-model="female" disabled="disabled">
-                                                <label for="femaleCheckbox"></label>
-                                            </div>
-                                            <div class="inline-block vertical-top">
-                                                女
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="seperator"></div>
-                                <div class="row">
-                                    <div class="col-sm-12">
                                         <div class="input-group">
                                             <span class="input-group-addon">企业名</span>
                                             <input type="text" class="form-control none-left-border" disabled="disabled"
@@ -269,7 +245,7 @@
                     <div class="modal-footer">
                         <div class="row">
                             <div class="col-sm-offset-2 col-sm-8">
-                                <a class="btn btn-primary block">确认初始化</a>
+                                <a class="btn btn-primary block" @click="initAccount">确认初始化</a>
                             </div>
                         </div>
                     </div>
@@ -438,12 +414,13 @@
         new Vue({
             el: '#super',
             data: {
-                male: 1,
-                female: 0,
-                phone: '13328001915',
-                userPhone: '13962175383',
-                userName: '蔡悦彰',
-                companyName: 'FESCO',
+                phone: '',
+                userPhone: '',
+                userName: '',
+                userId:'',
+                companyName: '',
+                is_userPhone: 0,
+                userPhoneErrors: '',
                 managerName: '',
                 managerAccount: '',
                 managerPassword: '',
@@ -460,9 +437,93 @@
             },
             methods: {
                 searchPerson: function () {
-                    var url = "http://www.baidu.com";
-                    $.post(url, {phone: this.phone}, function (data) {
-                        console.log("1");
+                    var url = "{{url('admin/user')}}";
+                    var _this=this;
+                    _this.is_userPhone=0;
+                    _this.userPhoneErrors='';
+                    _this.userPhone='';
+                    _this.userName='';
+                    _this.companyName='';
+                    _this.userId='';
+                    if(!_this.phone|| typeof _this.phone=='undefined'){
+                        _this.userPhoneErrors='手机号必填！';
+                        _this.is_userPhone=1;
+                        return false;
+                    }
+                    if(!_this.phone.match(/^1[3456789][0-9]{9}$/)){
+                        _this.userPhoneErrors='手机号格式出错！';
+                        _this.is_userPhone=1;
+                        return false;
+                    }
+                    $.ajax({
+                        url:url,
+                        data:{phone: _this.phone},
+                        type:'GET',
+                        headers:{
+                            'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content'),
+                        },
+                        timeout:60000,
+                        dataType:'json'
+                    }).done(function(data){
+                        if(data.ret_num==0){
+                            if(data.ret_msg) {
+                                _this.userPhone = data.ret_msg.phone;
+                                _this.userName = data.ret_msg.name;
+                                _this.companyName = data.ret_msg.company.name;
+                                _this.userId = data.ret_msg.id;
+                            }else{
+                                _this.is_userPhone=1;
+                                _this.userPhoneErrors='不存在该手机号';
+                            }
+                        }else{
+                            _this.userPhoneErrors="网络错误";
+                            _this.is_userPhone=1;
+                        }
+                    }).fail(function (data) {
+                        var err=JSON.parse(data.responseText);
+                        if(err.phone){
+                            _this.userPhoneErrors=err.phone[0];
+                            _this.is_userPhone=1;
+                        }
+                    });
+                },
+                initAccount:function(){
+                    var _this=this;
+                    if(_this.is_userPhone ||  !_this.userId){
+                        _this.userPhoneErrors="未知用户不能初始化！";
+                        _this.is_userPhone=1;
+                    }
+                    var url = "{{url('admin/user')}}"+"/"+_this.userId;
+                    $.ajax({
+                        url:url,
+                        data:{phone: _this.userPhone,_method:'PUT'},
+                        type:'POST',
+                        headers:{
+                            'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content'),
+                        },
+                        timeout:60000,
+                        dataType:'json'
+                    }).done(function(data){
+                        if(data.ret_num==0){
+                            _this.phone = '';
+                            _this.userPhone = '';
+                            _this.userName = '';
+                            _this.companyName = '';
+                            _this.userId = '';
+                            _this.is_userPhone=0;
+                            _this.userPhoneErrors='';
+                            $("#init-user").modal('hide');
+                            alert(data.ret_msg);
+                        }else{
+                            _this.userPhoneErrors="网络错误";
+                            _this.is_userPhone=1;
+                        }
+                    }).fail(function (data) {
+                        var err=JSON.parse(data.responseText);
+                        if(err.phone){
+                            _this.userPhoneErrors=err.phone[0];
+                            _this.is_userPhone=1;
+                        }
                     });
                 },
                 newAccount: function () {
@@ -540,8 +601,8 @@
                             _this.managerAccount= '';
                             _this.managerPassword= '';
                             _this.managerRoles= [];
+                            $('#create-manager').modal('hide');
                             alert(data.ret_msg);
-                            $('#create-manager').modal('hide')
                         }else{
                             _this.is_managerName=1;
                             _this.managerNameErrors=data.ret_msg;
