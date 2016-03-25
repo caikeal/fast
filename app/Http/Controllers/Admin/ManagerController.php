@@ -22,8 +22,9 @@ class ManagerController extends Controller
 //            return redirect('admin/index');
 //        }
         $name=trim($request->input('name'));
+        //不能查询到自己，和超管(id=1)
         if($name){
-            $managers=Manager::where('id','!=',\Auth::guard('admin')->user()->id)
+            $managers=Manager::where('id','!=',\Auth::guard('admin')->user()->id)->where('id',"!=",1)
                 ->where(function($query) use ($name){
                     $query->where('name','like',"%".$name."%")
                         ->orWhere('email','like',"%".$name."%")
@@ -32,7 +33,8 @@ class ManagerController extends Controller
                         });
                 })->withTrashed()->paginate(15);
         }else{
-            $managers=Manager::with("roles")->where('id','!=',\Auth::guard('admin')->user()->id)->withTrashed()->paginate(15);
+            $managers=Manager::with("roles")->where('id','!=',\Auth::guard('admin')->user()->id)
+                ->where('id','!=',1)->withTrashed()->paginate(15);
         }
         return view('admin.super',['managers'=>$managers,'name'=>$name]);
     }
