@@ -69,7 +69,7 @@ class AccountController extends Controller
             $result['ret_msg']='保存失败，请重新再试！';
             DB::rollback();
         }
-        return $result;
+        return response()->json($result);
     }
 
     /**

@@ -169,13 +169,17 @@
                         <tr>
                             <td>{{$manager->name}}</td>
                             <td>{{$manager->email}}</td>
-                            <td>{{$manager->roles[0]->label}}</td>
+                            <td>
+                                @foreach($manager->roles as $roleInfo)
+                                    {{$roleInfo->label}}<br>
+                                @endforeach
+                            </td>
                             <td>{{$manager->roles[0]->level}}级管理员</td>
                             <td>
-                                <a class="btn btn-success" data-target="#rest-password" data-toggle="modal">重置密码</a>
+                                <reset-pwd-btn :manager-id={{$manager->id}}></reset-pwd-btn>
                             </td>
                             <td>
-                                <a class="btn btn-danger">停用</a>
+                                <toggle-manager :manager-id={{$manager->id}} manager-status={{$manager->deleted_at?"启用":"停用"}}></toggle-manager>
                             </td>
                         </tr>
                     @endforeach
@@ -354,7 +358,7 @@
         <!-- /modal createManager-->
 
         <!-- modal restPassword-->
-        <div class="modal fade" id="rest-password" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal fade" id="reset-password" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -367,19 +371,23 @@
                         <div class="seperator"></div>
                         <div class="container-fluid">
                             <form action="" class="form-horizontal">
-                                <div class="form-group">
-                                    <label for="" class="col-lg-2 control-label">新密码</label>
+                                <div class="form-group" :class="{'has-error':is_newPassword}">
+                                    <label for="new-pwd" class="col-lg-2 control-label" >新密码</label>
 
                                     <div class="col-lg-10">
-                                        <input type="text" class="form-control" placeholder="新密码">
+                                        <input type="text" class="form-control" id="new-pwd" placeholder="新密码" v-model="newPassword">
                                     </div>
+
+                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display':is_newPassword?'block':'none'}">@{{ newPasswordErrors }}</p>
                                 </div>
-                                <div class="form-group">
-                                    <label for="" class="col-lg-2 control-label">确认密码</label>
+                                <div class="form-group" :class="{'has-error':is_confirmPassword}">
+                                    <label for="confirm-pwd" class="col-lg-2 control-label">确认密码</label>
 
                                     <div class="col-lg-10">
-                                        <input type="text" class="form-control" placeholder="确认密码">
+                                        <input type="text" class="form-control" id="confirm-pwd" placeholder="确认密码" v-model="confirmPassword">
                                     </div>
+
+                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display':is_confirmPassword?'block':'none'}">@{{ confirmPasswordErrors }}</p>
                                 </div>
                                 <div style="padding-top: 40px;"></div>
                             </form>
@@ -388,7 +396,7 @@
                     <div class="modal-footer">
                         <div class="row">
                             <div class="col-sm-8 col-sm-offset-2">
-                                <a class="btn btn-primary block">确认重置</a>
+                                <a class="btn btn-primary block" @click="resetPassword">确认重置</a>
                             </div>
                         </div>
                     </div>
@@ -396,6 +404,14 @@
             </div>
         </div>
         <!-- /modal restPassword-->
+
+        <template id="reset-btn-template"  style="display: none">
+            <a class="btn btn-success" data-target="#reset-password" data-toggle="modal" @click="notify">重置密码</a>
+        </template>
+
+        <template id="toggle-manager-template" style="display: none">
+            <a class="btn" :class="(managerStatus=='停用')?'btn-danger':'btn-info'" @click="toggleManager">@{{managerStatus}}</a>
+        </template>
     </div>
     <!--/pdadding-md-->
 @endsection
@@ -411,7 +427,67 @@
         })($);
 
         //vue托管
-        new Vue({
+        Vue.component('reset-pwd-btn',{
+            template:'#reset-btn-template',
+            props:{
+                managerId:{
+                    type:Number,
+                    required: true
+                }
+            },
+            methods:{
+                notify:function(){
+                    var _this=this;
+                    if(_this.managerId){
+                        this.$dispatch('mg-id',_this.managerId);
+                    }
+                }
+            }
+        });
+        Vue.component('toggle-manager',{
+            template:'#toggle-manager-template',
+            props:{
+                managerId:{
+                    type:Number,
+                    required:true
+                },
+                managerStatus:{
+                    type:String,
+                    required:true
+                }
+            },
+            methods:{
+                toggleManager: function () {
+                    var _this=this;
+                    if(!_this.managerId){
+                        alert("数据格式错误！");
+                    }
+                    var url="{{url('admin/manager')}}"+"/"+_this.managerId;
+                    $.ajax({
+                        url:url,
+                        dataType:'json',
+                        headers:{
+                            'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content')
+                        },
+                        timeout:60000,
+                        type:'POST',
+                        data:{
+                            _method:'DELETE'
+                        }
+                    }).done(function (data) {
+                        if(data.ret_num==0){
+                            _this.managerStatus=data.ret_msg;
+                            alert("修改成功！");
+                        }else{
+                            alert("修改失败！");
+                        }
+                    }).fail(function (data) {
+                        alert("网络错误！");
+                    });
+                }
+            }
+        });
+        var vm=new Vue({
             el: '#super',
             data: {
                 phone: '',
@@ -421,6 +497,7 @@
                 companyName: '',
                 is_userPhone: 0,
                 userPhoneErrors: '',
+                managerId:'',
                 managerName: '',
                 managerAccount: '',
                 managerPassword: '',
@@ -433,7 +510,13 @@
                 managerAccountErrors:'',
                 managerPasswordErrors:'',
                 managerRolesErrors:'',
-                systemErrors:''
+                systemErrors:'',
+                newPassword:'',
+                confirmPassword:'',
+                is_newPassword:0,
+                is_confirmPassword:0,
+                newPasswordErrors:'',
+                confirmPasswordErrors:''
             },
             methods: {
                 searchPerson: function () {
@@ -627,6 +710,74 @@
                             _this.managerRolesErrors=errs['role'][0];
                         }
                     });
+                },
+                resetPassword: function () {
+                    var _this=this;
+                    _this.is_newPassword=0;
+                    _this.is_confirmPassword=0;
+                    _this.newPasswordErrors='';
+                    _this.confirmPasswordErrors='';
+                    if(!_this.newPassword || typeof _this.newPassword=='undefined'){
+                        _this.newPasswordErrors='密码必填！';
+                        _this.is_newPassword=1;
+                        return false;
+                    }
+                    if(_this.newPassword.length<6){
+                        _this.newPasswordErrors='新密码至少6位！';
+                        _this.is_newPassword=1;
+                        return false;
+                    }
+                    if(!_this.newPassword.match(/=|\+|-|@|_|\*|[a-zA-Z]/g)){
+                        _this.newPasswordErrors='"A-Z" "a-z" "+" "_" "*" "=" "-" "@"至少存在1项！';
+                        _this.is_newPassword=1;
+                        return false;
+                    }
+                    if((_this.newPassword)!==(_this.confirmPassword)){
+                        _this.confirmPasswordErrors='两次密码不一致！';
+                        _this.is_confirmPassword=1;
+                        return false;
+                    }
+                    var url = "{{url('admin/manager')}}"+"/"+_this.managerId;
+                    $.ajax({
+                        url:url,
+                        dataType:'json',
+                        headers:{
+                            'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content'),
+                        },
+                        timeout:60000,
+                        data: {
+                            pwd: _this.newPassword,
+                            pwd_confirmation: _this.confirmPassword,
+                            _method:'PUT'
+                        },
+                        type:'POST'
+                    }).done(function (data) {
+                        if(data.ret_num==0){
+                            _this.newPassword='';
+                            _this.confirmPassword='';
+                            _this.managerId='';
+                            $("#reset-password").modal('hide');
+                            alert(data.ret_msg);
+                        }else{
+                            _this.newPasswordErrors=data.ret_msg;
+                            _this.is_newPassword=1;
+                        }
+                    }).fail(function (data) {
+                        var errs=JSON.parse(data.responseText);
+                        if(errs.pwd){
+                            _this.is_newPassword=1;
+                            _this.newPasswordErrors=errs.pwd[0];
+                        }
+                        if(errs.pwd_confirmation){
+                            _this.is_confirmPassword=1;
+                            _this.confirmPasswordErrors=errs.pwd_confirmation[0];
+                        }
+                    });
+                }
+            },
+            events:{
+                'mg-id': function (managerId) {
+                    this.managerId=managerId;
                 }
             }
         });
