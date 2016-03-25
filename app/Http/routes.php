@@ -40,6 +40,7 @@ Route::group(['namespace'=>'Admin','middleware' => ['web'],'prefix'=>'admin'], f
     Route::resource('/salary/category','SalaryCategoryController');
     //企业用户管理模块
     Route::get('/super','ManagerController@super');
+    Route::resource('/manager','ManagerController');
     Route::resource('/account','AccountController');
     //前台用户管理模块
     Route::resource('/user','UserController');

@@ -2,11 +2,21 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Manager extends Authenticatable
 {
     protected $table="managers";
+    use SoftDeletes;
+
+    /**
+     * 应该被调整为日期的属性
+     *
+     * @var array
+     */
+    protected $dates = ['deleted_at'];
+
     /**
      * The attributes that are mass assignable.
      *
