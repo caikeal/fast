@@ -17,6 +17,7 @@ class CreateSalaryBaseTable extends Migration
             $table->string('title',60);
             $table->integer('manager_id')->unsigned()->index();
             $table->integer('company_id')->unsigned()->index();
+            $table->tinyInteger('type')->default(1);
             $table->text('memo');
             $table->softDeletes();
             $table->timestamps();

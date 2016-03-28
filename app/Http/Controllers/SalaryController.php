@@ -20,14 +20,19 @@ class SalaryController extends Controller
         return view('home.salary');
     }
 
+    public function insurance(){
+        return view('home.insurance');
+    }
+
     public function detail(Request $request){
-        $salary_day=$request->time;
+        $salary_day=$request->input('time');
+        $type=$request->input('type');
         if(!$salary_day||!is_numeric($salary_day)){
             return response()->json(["status"=>0],200);
         }
         $user_id=\Auth::user()->id;
         $detail=SalaryDetail::where("salary_day","=",$salary_day)
-            ->where("user_id","=",$user_id)->first();
+            ->where("user_id","=",$user_id)->where('type',$type)->first();
         if(!$detail){
             return response()->json(["status"=>0],200);
         }
