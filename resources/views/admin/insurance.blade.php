@@ -3,9 +3,9 @@
     <link rel="stylesheet" href="{{env("APP_URL")}}/css/admin/webuploader.css">
 @endsection
 @section('content')
-    <div class="padding-md" id="type" data-type="1">
+    <div class="padding-md" id="type" data-type="2">
         <h2 class="header-text">
-            工资上传
+            社保上传
 						<span class="sub-header">
 							{{--19 Updates--}}
 						</span>
@@ -52,7 +52,7 @@
                                                 @endif
                                                 <div class="col-lg-5 col-md-5 col-sm-5 timeline-select">
                                                     <select name="c{{$task->company_id}}" class="form-control">
-                                                        @foreach($task->salaryModels()->where("type",1)->get() as $salaryModel)
+                                                        @foreach($task->salaryModels()->where("type",2)->get() as $salaryModel)
                                                             <option value="{{$salaryModel->id}}">{{$salaryModel->title}}</option>
                                                         @endforeach
                                                     </select>
@@ -108,7 +108,7 @@
                                                 @endif
                                                 <div class="col-lg-5 col-md-5 col-sm-5 timeline-select">
                                                     <select name="c{{$task->company_id}}" class="form-control">
-                                                        @foreach($task->salaryModels()->where("type",1)->get() as $salaryModel2)
+                                                        @foreach($task->salaryModels()->where("type",2)->get() as $salaryModel2)
                                                             <option value="{{$salaryModel2->id}}">{{$salaryModel2->title}}</option>
                                                         @endforeach
                                                     </select>
@@ -166,7 +166,7 @@
                           method="post">
                         {!! csrf_field() !!}
                         <input type="hidden" name="cid" value="">
-                        <input type="hidden" name="type" value="1">
+                        <input type="hidden" name="type" value="2">
 
                         <div class="modle-form">
                             <div class="row creatCategroy">
@@ -249,7 +249,7 @@
     <script>
         !(function () {
             $(".main-menu .accordion>li").removeClass("active");
-            $(".lock-place2").addClass("active");
+            $(".lock-place3").addClass("active");
         })($);
     </script>
     //文件上传
@@ -296,7 +296,7 @@
                 type: 'get',
                 dataType: 'json',
                 timeout: '120000',
-                data: {cid: cp, bid: bi, type: 1},
+                data: {cid: cp, bid: bi, type:2},
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
@@ -331,7 +331,7 @@
                     type: 'post',
                     dataType: 'json',
                     timeout: '120000',
-                    data: {name: bigCategory, level: 1, type: 1},
+                    data: {name: bigCategory, level: 1, type:2},
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     }
@@ -360,7 +360,7 @@
                     type: 'post',
                     dataType: 'json',
                     timeout: '120000',
-                    data: {name: littleCategory, level: 2, type: 1},
+                    data: {name: littleCategory, level: 2 ,type:2},
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     }

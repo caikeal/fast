@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Gate;
 
 class AccountController extends Controller
 {
@@ -46,6 +47,9 @@ class AccountController extends Controller
      */
     public function store(Requests\Admin\AccountRequest $request)
     {
+        if(Gate::foruser(\Auth::guard('admin')->user())->denies('super')&& Gate::foruser(\Auth::guard('admin')->user())->denies('addEmploy')){
+            return redirect('admin/index');
+        }
         $name=$request->input('name');
         $account=$request->input('account');
         $password=$request->input('pwd');
@@ -55,6 +59,7 @@ class AccountController extends Controller
             $manager=new Manager();
             $manager->name=$name;
             $manager->email=$account;
+            $manager->pid=\Auth::guard('admin')->user()->id;
             $manager->password=bcrypt($password);
             $manager->save();
             $allRoles=Role::whereIn('id',$role)->get();

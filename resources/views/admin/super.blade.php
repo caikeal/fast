@@ -48,7 +48,7 @@
             width: 2rem;
             height: 2rem;
             text-align: center;
-            padding: .5rem;
+            padding: .5rem 0;
             margin-right: 10px;
         }
 
@@ -307,38 +307,19 @@
                                 </div>
                                 <div class="form-group" :class="{'has-error':is_managerRoles}">
                                     <div class="col-lg-offset-2 col-lg-10">
+                                    @foreach($memberRoles as $memberRole)
                                         <div class="checkbox inline-block">
                                             <div class="custom-checkbox">
-                                                <input type="checkbox" id="salary" class="checkbox-blue" value=2
-                                                       v-model="managerRoles">
-                                                <label for="salary"></label>
+                                                <input type="checkbox" id="{{$memberRole->name}}" class="checkbox-blue" value={{$memberRole->id}}
+                                                        v-model="managerRoles">
+                                                <label for="{{$memberRole->name}}"></label>
                                             </div>
                                             <div class="inline-block vertical-top">
-                                                理赔主管
+                                                {{$memberRole->label}}
                                             </div>
                                         </div>
                                         &nbsp;&nbsp;&nbsp;
-                                        <div class="checkbox inline-block">
-                                            <div class="custom-checkbox">
-                                                <input type="checkbox" id="compensate" class="checkbox-blue" value=3
-                                                       v-model="managerRoles">
-                                                <label for="compensate"></label>
-                                            </div>
-                                            <div class="inline-block vertical-top">
-                                                薪资主管
-                                            </div>
-                                        </div>
-                                        &nbsp;&nbsp;&nbsp;
-                                        <div class="checkbox inline-block">
-                                            <div class="custom-checkbox">
-                                                <input type="checkbox" id="benefit" class="checkbox-blue" value=4
-                                                       v-model="managerRoles">
-                                                <label for="benefit"></label>
-                                            </div>
-                                            <div class="inline-block vertical-top">
-                                                福利主管
-                                            </div>
-                                        </div>
+                                    @endforeach
                                     </div>
                                     <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display':is_managerRoles?'block':'none'}">@{{ managerRolesErrors }}</p>
                                 </div>
@@ -501,7 +482,7 @@
                 managerName: '',
                 managerAccount: '',
                 managerPassword: '',
-                managerRoles: [],
+                managerRoles: ['{{$memberRoles[0]->id}}'],
                 is_managerName:0,
                 is_managerAccount:0,
                 is_managerPassword:0,

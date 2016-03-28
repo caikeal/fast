@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Gate;
 
 class UserController extends Controller
 {
@@ -23,6 +24,9 @@ class UserController extends Controller
      */
     public function index(Requests\Admin\SearchUserRequest $request)
     {
+        if(Gate::foruser(\Auth::guard('admin')->user())->denies('super')){
+            return redirect('admin/index');
+        }
         $phone=$request->input('phone');
         $user=User::with('company')->where('phone',$phone)->first();
         $result['ret_num']=0;
@@ -82,6 +86,9 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
+        if(Gate::foruser(\Auth::guard('admin')->user())->denies('super')){
+            return redirect('admin/index');
+        }
         $user=User::where('id',$id)->where('phone',$request->input('phone'))->first();
         $user->phone='';
         $user->is_first=0;

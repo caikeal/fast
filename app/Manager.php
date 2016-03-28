@@ -45,4 +45,24 @@ class Manager extends Authenticatable
         }
         return !!$role->intersect($this->roles)->count();
     }
+
+    //收到的任务
+    public function tasks(){
+        return $this->hasMany('App\SalaryTask','receive_id');
+    }
+
+    //布置的任务
+    public function assignTasks(){
+        return $this->hasMany('App\SalaryTask','manager_id');
+    }
+
+    //上一层领导
+    public function leader(){
+        return $this->belongsTo('App\Manager','pid');
+    }
+
+    //创建的用户
+    public function ownMember(){
+        return $this->hasMany('App\Manager','pid');
+    }
 }

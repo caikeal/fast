@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Manager;
+use App\Role;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Gate;
+use Gate;
 
 class ManagerController extends Controller
 {
@@ -18,9 +19,9 @@ class ManagerController extends Controller
     }
 
     public function super(Request $request){
-//        if(Gate::denies('super')){
-//            return redirect('admin/index');
-//        }
+        if(Gate::foruser(\Auth::guard('admin')->user())->denies('super')){
+            return redirect('admin/index');
+        }
         $name=trim($request->input('name'));
         //不能查询到自己，和超管(id=1)
         if($name){
@@ -36,7 +37,8 @@ class ManagerController extends Controller
             $managers=Manager::with("roles")->where('id','!=',\Auth::guard('admin')->user()->id)
                 ->where('id','!=',1)->withTrashed()->paginate(15);
         }
-        return view('admin.super',['managers'=>$managers,'name'=>$name]);
+        $memberRoles=Role::where('level',1)->get();
+        return view('admin.super',['managers'=>$managers,'name'=>$name,'memberRoles'=>$memberRoles]);
     }
 
     /**
@@ -67,6 +69,9 @@ class ManagerController extends Controller
      */
     public function destroy($id)
     {
+        if(Gate::foruser(\Auth::guard('admin')->user())->denies('super')){
+            return redirect('admin/index');
+        }
         $manager=Manager::where("id",$id)->withTrashed()->first();
         if($manager['deleted_at']){
             $manager->restore();

@@ -32,7 +32,9 @@ class AuthServiceProvider extends ServiceProvider
                 return $manager->hasRole($permission->roles);
             });
         }
+//        dd($gate);
     }
+
 
     protected function getPermissions(){
         return Permission::with('roles')->get();
