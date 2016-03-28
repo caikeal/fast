@@ -17,8 +17,10 @@ class CreateSalaryTaskTable extends Migration
             $table->integer('manager_id')->unsigned()->index();
             $table->integer('company_id')->unsigned()->index();
             $table->integer('receive_id')->unsigned()->index();
+            $table->integer('by_id')->unsigned()->index();
             $table->text('memo');
             $table->tinyInteger('status')->default(0);
+            $table->tinyInteger('type')->default(1);
             $table->integer('deal_time')->unsigned()->index();
             $table->integer('salary_day')->unsigned()->index();
             $table->timestamps();

@@ -33,7 +33,8 @@ class SalaryController extends Controller
         $nextMonthTime=strtotime($next->year."-".$next->month."-1");
         $next2MonthTime=strtotime($next2->year."-".$next2->month."-1");
         $tasks=SalaryTask::where("deal_time",">=",$nowMonthTime)->where("deal_time","<",$next2MonthTime)
-            ->where("receive_id","=",\Auth::guard('admin')->user()->id)->orderBy("deal_time","asc")->get();
+            ->where("receive_id","=",\Auth::guard('admin')->user()->id)->where("type",1)
+            ->orderBy("deal_time","asc")->get();
         $data=[
             'tasks'=>$tasks,
             'now'=>$now,
@@ -44,10 +45,32 @@ class SalaryController extends Controller
         return view('admin.timeline',$data);
     }
 
+    public function insurance(){
+        //取2个月的薪资任务
+        $now=Carbon::now();
+        $next=Carbon::now()->addMonth();
+        $next2=Carbon::now()->addMonths(2);
+        $nowMonthTime=strtotime($now->year."-".$now->month."-1");
+        $nextMonthTime=strtotime($next->year."-".$next->month."-1");
+        $next2MonthTime=strtotime($next2->year."-".$next2->month."-1");
+        $tasks=SalaryTask::where("deal_time",">=",$nowMonthTime)->where("deal_time","<",$next2MonthTime)
+            ->where("receive_id","=",\Auth::guard('admin')->user()->id)->where("type",2)
+            ->orderBy("deal_time","asc")->get();
+        $data=[
+            'tasks'=>$tasks,
+            'now'=>$now,
+            'next'=>$next,
+            'nextMonthTime'=>$nextMonthTime,
+        ];
+
+        return view('admin.insurance',$data);
+    }
+
     public function base(SalaryBaseRequest $request){
         $cats=$request->input('category');
         $cid=$request->input('cid');
         $title=$request->input('title');
+        $type=$request->input('type');
         $mid=\Auth::guard('admin')->user()->id;
         $now=Carbon::now();
         \DB::beginTransaction();
@@ -56,6 +79,7 @@ class SalaryController extends Controller
                 'title'=>$title,
                 'manager_id'=>$mid,
                 'company_id'=>$cid,
+                'type'=>$type,
                 'created_at'=>$now,
                 'updated_at'=>$now,
             ]);
@@ -79,14 +103,26 @@ class SalaryController extends Controller
             \DB::rollBack();
 //            throw $e;
         }
-        return redirect('admin/timeline');
+        if($type==1){
+            return redirect('admin/timeline');
+        }else{
+            return redirect('admin/insurance');
+        }
     }
 
     public function download(Request $request){
+        $ua = strtolower($_SERVER["HTTP_USER_AGENT"]);
         $base_id=$request->get('bid');
         $base=SalaryBase::find($base_id);
         $cats=$base->categories()->orderBy('place','asc')->get();
-        Excel::create($base['title'], function($excel) use($cats,$base) {
+
+        //解决不同浏览器下载excel时标题解析乱码问题
+        if (preg_match("/msie|edge|safari|firefox/", $ua)) {
+            $base_title=urlencode($base['title']);
+        }else{
+            $base_title=$base['title'];
+        }
+        Excel::create($base_title, function($excel) use($cats,$base) {
 
             // Set the title
             $excel->setTitle($base->id."");
@@ -117,6 +153,7 @@ class SalaryController extends Controller
         }
         $task_id=$request->get('task_id');
         $nameFile=$request->get('name');
+        $type=$request->get('type');
         $extension=explode(".",$nameFile);
         $now=Carbon::now();
         if($extension[1]) {
@@ -159,7 +196,7 @@ class SalaryController extends Controller
         Cache::store('file')->put('admin_salaryUp:'.$base_id."|".$company_id, json_encode($content), 60);
         //todo will give a confirmation in future
 
-        $res=$this->store($content,$base_id,$company_id,$task_id);
+        $res=$this->store($content,$base_id,$company_id,$task_id,$type);
         if(!$res){
             return response("Again",404);//有实际数据出错
         }
@@ -167,7 +204,7 @@ class SalaryController extends Controller
         return json_encode($content);
     }
 
-    protected function store($content,$base_id,$company_id,$task_id){
+    protected function store($content,$base_id,$company_id,$task_id,$type){
         $fail=0;
         $now=Carbon::now();
         $manager_id=\Auth::guard('admin')->user()->id;
@@ -180,6 +217,7 @@ class SalaryController extends Controller
                     $is_exist_detail = SalaryDetail::where("user_id", "=", $is_exist_user->id)
                         ->where("company_id","=",$company_id)
                         ->where("salary_day","=",$v[2])
+                        ->where("type",$type)
                         ->first();
                 }
                 DB::beginTransaction();
@@ -213,6 +251,7 @@ class SalaryController extends Controller
                             'wages' => $wages,
                             'salary_day' => $v[2],
                             'manager_id' => $manager_id,
+                            'type' => $type,
                             'created_at' => $now,
                             'updated_at' => $now,
                         ]);
@@ -236,7 +275,7 @@ class SalaryController extends Controller
             }
         }
         if($fail!=1){
-            DB::table('salary_task')->where("company_id","=",$company_id)
+            DB::table('salary_task')->where("company_id","=",$company_id)->where("type",$type)
                 ->where("receive_id","=",$manager_id)->where("id","=",$task_id)
                 ->update(["status"=>1]);
         }else{

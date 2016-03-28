@@ -2,43 +2,36 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\User;
 use Illuminate\Http\Request;
 
-use App\SalaryCategory;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Gate;
 
-class SalaryCategoryController extends Controller
+class UserController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth:admin');
+        $this->middleware('throttle');
     }
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index(Requests\Admin\SearchUserRequest $request)
     {
-        $type=$request->input("type");
-        $allCats=SalaryCategory::where("type",$type)->get();
-        $big=array();
-        $small=array();
-        foreach($allCats as $cat){
-            if($cat['level']==1){
-                $big[]=$cat;
-            }else{
-                $small[]=$cat;
-            }
+        if(Gate::foruser(\Auth::guard('admin')->user())->denies('super')){
+            return redirect('admin/index');
         }
-        $data=[
-            'big'=>$big,
-            'small'=>$small,
-            'status'=>1,
-        ];
-        return $data;
+        $phone=$request->input('phone');
+        $user=User::with('company')->where('phone',$phone)->first();
+        $result['ret_num']=0;
+        $result['ret_msg']=$user;
+        return response()->json($result);
     }
 
     /**
@@ -59,18 +52,7 @@ class SalaryCategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $salaryCategory=new SalaryCategory();
-        $salaryCategory->name=$request->input('name');
-        $salaryCategory->level=$request->input('level');
-        $salaryCategory->type=$request->input('type');
-        $salaryCategory->manager_id=\Auth::guard('admin')->user()->id;
-        if($salaryCategory->save()){
-            $data['status']=1;
-            $data['cid']=$salaryCategory->id;
-        }else{
-            $data['status']=0;
-        }
-        return $data;
+        //
     }
 
     /**
@@ -104,7 +86,21 @@ class SalaryCategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        if(Gate::foruser(\Auth::guard('admin')->user())->denies('super')){
+            return redirect('admin/index');
+        }
+        $user=User::where('id',$id)->where('phone',$request->input('phone'))->first();
+        $user->phone='';
+        $user->is_first=0;
+        $user->remember_token='';
+        if($user->save()){
+            $result['ret_num']=0;
+            $result['ret_msg']='初始化成功！';
+        }else{
+            $result['ret_num']=110;
+            $result['ret_msg']='初始化失败！';
+        }
+        return response()->json($result);
     }
 
     /**

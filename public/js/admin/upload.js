@@ -7,7 +7,7 @@ $.extend(WebUploader.Uploader.options, {
     // 选择文件的按钮。可选。
 	// 内部根据当前运行是创建，可能是input元素，也可能是flash.
     pick:{
-    	label:'<i class="fa fa-cloud-upload"></i> 上传',
+		innerHTML:'<i class="fa fa-cloud-upload"></i> 上传',
     },
 	method:'POST',
 	//只允许一个文件
@@ -61,8 +61,10 @@ $(".upload-ctrl").each(function(index,eles){
 
 		//文件上传前加入头信息
 		window["uploader" + index].on('uploadBeforeSend', function (object, data, headers) {
-			$tid = $(eles).attr("data-task");
-			data['task_id'] = $tid;
+			var tid = $(eles).attr("data-task");
+			var type=$("type").attr("data-type")
+			data['task_id'] = tid;
+			data['type'] = type;
 			headers["X-CSRF-TOKEN"] = $('meta[name="csrf-token"]').attr('content');
 		});
 

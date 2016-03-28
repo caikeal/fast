@@ -19,6 +19,7 @@ class CreateUsersTable extends Migration
             $table->string('id_card')->unique();
             $table->string('password', 60);
             $table->integer('manager_id')->unsigned();
+            $table->integer('company_id')->unsigned();
             $table->tinyInteger('is_first')->unsigned()->default(0);
             $table->rememberToken();
             $table->softDeletes();
