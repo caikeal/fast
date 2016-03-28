@@ -20,9 +20,10 @@ class SalaryCategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $allCats=SalaryCategory::all();
+        $type=$request->input("type");
+        $allCats=SalaryCategory::where("type",$type)->get();
         $big=array();
         $small=array();
         foreach($allCats as $cat){
@@ -61,6 +62,7 @@ class SalaryCategoryController extends Controller
         $salaryCategory=new SalaryCategory();
         $salaryCategory->name=$request->input('name');
         $salaryCategory->level=$request->input('level');
+        $salaryCategory->type=$request->input('type');
         $salaryCategory->manager_id=\Auth::guard('admin')->user()->id;
         if($salaryCategory->save()){
             $data['status']=1;

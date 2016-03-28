@@ -57,16 +57,16 @@
         </a>
     </li>
     <li class="box box-4">
-        <a href="#">
+        <a href="{{url('insurance')}}">
             <div class="am-g">
                 <div class="am-u-sm-5 thumb">
-                    <img src="http://lorempixel.com/480/480/?40648" alt="基本信息图片">
+                    <img src="{{env('APP_URL')}}/images/insurance.png" alt="社保图片">
                 </div>
 
                 <div class=" am-u-sm-7 content">
-                    <div class="am-list-item-hd">基本信息</div>
+                    <div class="am-list-item-hd">社保查询</div>
 
-                    <div class="am-list-item-text">来看看你的信息吧</div>
+                    <div class="am-list-item-text">来看看你的社保吧</div>
                 </div>
             </div>
         </a>

@@ -52,7 +52,7 @@
                 idcard: idcard,
                 _token: $("meta[name=csrf-token]").attr("content")
             }, function (res) {
-                if (res.status==1) {
+                if (res.status==2) {
                     var data=res.data;
                     var categorylen = data.length;
                     for (var i = 0; i < categorylen; i++) {
@@ -109,7 +109,7 @@
             var salaryTime = $("#beginTime").val();
             var idcard = $("[name=idcard]").val();
             $.post(url, {
-                type:1,
+                type:2,
                 time: salaryTime,
                 idcard: idcard,
                 _token: $("meta[name=csrf-token]").attr("content")

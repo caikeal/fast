@@ -339,15 +339,15 @@
                         </a>
                     </li>
                     <li class="bg-palette3 lock-place3">
-                    <a href="#">
-                    <span class="menu-content block">
-                    <span class="menu-icon"><i class="block fa fa-medkit fa-lg"></i></span>
-                    <span class="text m-left-sm">社保发放</span>
-                    </span>
-                    <span class="menu-content-hover block">
-                    社保发放
-                    </span>
-                    </a>
+                        <a href="{{url('admin/insurance')}}">
+                            <span class="menu-content block">
+                                <span class="menu-icon"><i class="block fa fa-medkit fa-lg"></i></span>
+                                <span class="text m-left-sm">社保发放</span>
+                            </span>
+                        <span class="menu-content-hover block">
+                        社保发放
+                        </span>
+                        </a>
                     </li>
                     <li class="bg-palette4 lock-place4">
                         <a href="#">
@@ -382,8 +382,9 @@
                     </span>
                         </a>
                     </li>
+                    @if(\Auth::guard('admin')->user()->can('task'))
                     <li class="bg-palette3 lock-place7">
-                        <a href="#">
+                        <a href="{{url('admin/task')}}">
                     <span class="menu-content block">
                     <span class="menu-icon"><i class="block fa fa-link fa-lg"></i></span>
                     <span class="text m-left-sm">企业管理</span>
@@ -393,8 +394,10 @@
                     </span>
                         </a>
                     </li>
+                    @endif
+                    @if(\Auth::guard('admin')->user()->can('employ'))
                     <li class="bg-palette4 lock-place8">
-                        <a href="#">
+                        <a href="{{url('admin/employ')}}">
                     <span class="menu-content block">
                     <span class="menu-icon"><i class="block fa fa-user fa-lg"></i></span>
                     <span class="text m-left-sm">人员管理</span>
@@ -404,6 +407,8 @@
                     </span>
                         </a>
                     </li>
+                    @endif
+                    @if(\Auth::guard('admin')->user()->can('super'))
                     <li class="bg-palette1 lock-place9">
                         <a href="{{url('admin/super')}}">
                     <span class="menu-content block">
@@ -415,6 +420,7 @@
                     </span>
                         </a>
                     </li>
+                    @endif
                     {{--<li class="menu-header">--}}
                         {{--Others--}}
                     {{--</li>--}}

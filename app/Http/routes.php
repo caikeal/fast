@@ -38,12 +38,19 @@ Route::group(['namespace'=>'Admin','middleware' => ['web'],'prefix'=>'admin'], f
     Route::get('/salary/download','SalaryController@download');
     Route::post('/salary/upload', 'SalaryController@upload');
     Route::resource('/salary/category','SalaryCategoryController');
+    //社保模块
+    Route::get('/insurance','SalaryController@insurance');
     //企业用户管理模块
     Route::get('/super','ManagerController@super');
     Route::resource('/manager','ManagerController');
     Route::resource('/account','AccountController');
     //前台用户管理模块
     Route::resource('/user','UserController');
+    //人员管理模块
+    Route::resource('/employ','EmployController');
+    //企业任务模块
+    Route::resource('/task','SalaryTaskController');
+    Route::resource('/company','CompanyController');
 });
 
 Route::group(['middleware' => 'web'], function () {
@@ -59,6 +66,8 @@ Route::group(['middleware' => 'web'], function () {
     //薪资模块
     Route::get('/salary','SalaryController@index');
     Route::post('/salary/details','SalaryController@detail');
+    //社保模块
+    Route::get('/insurance','SalaryController@insurance');
     //账号绑定
     Route::get('/binding','AccountController@showBindingForm');
     Route::post('/binding','AccountController@binding');

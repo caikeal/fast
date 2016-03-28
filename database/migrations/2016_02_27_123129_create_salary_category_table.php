@@ -17,6 +17,7 @@ class CreateSalaryCategoryTable extends Migration
             $table->string('name',60);
             $table->tinyInteger('level');
             $table->integer('manager_id')->unsigned();
+            $table->tinyInteger('type')->default(1);
             $table->softDeletes();
             $table->timestamps();
         });

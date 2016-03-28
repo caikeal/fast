@@ -19,4 +19,8 @@ class SalaryTask extends Model
     public function salaryModels(){
         return $this->hasMany(SalaryBase::class,'company_id','company_id');
     }
+
+    public function receiver(){
+        return $this->belongsTo('App\Manager','receive_id');
+    }
 }
