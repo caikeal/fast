@@ -17,6 +17,7 @@ class CreateSalaryDetailsTable extends Migration
             $table->integer('user_id')->unsigned()->index();
             $table->integer('base_id')->unsigned()->index();
             $table->integer('company_id')->unsigned()->index();
+            $table->tinyInteger('type')->unsigned()->default(1);
             $table->text('wages');
             $table->text('memo');
             $table->integer('salary_day');
