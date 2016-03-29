@@ -47,7 +47,7 @@
             var idcard = $("[name=idcard]").val();
             var url = "{{url('salary/details')}}";
             $.post(url, {
-                type:1,
+                type:2,
                 time: str,
                 idcard: idcard,
                 _token: $("meta[name=csrf-token]").attr("content")
@@ -97,7 +97,7 @@
                     $("table").addClass("am-table-striped");
                     $("table").addClass("am-table-hover");
                 } else {
-                    alert("没有该月工资记录！");
+                    alert("没有该月社保记录！");
                 }
             }, 'json');
             //添加点击绑定事件
@@ -161,7 +161,7 @@
                     $("table").addClass("am-table-striped");
                     $("table").addClass("am-table-hover");
                 } else {
-                    alert("没有该月工资记录！");
+                    alert("没有该月社保记录！");
                 }
             }, 'json');
         });
