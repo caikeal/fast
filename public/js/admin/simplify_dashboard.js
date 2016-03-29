@@ -106,41 +106,41 @@ $(function	()	{
     icons.play();
 
 	//Scrollable Chat Widget
-	$('#chatScroll').slimScroll({
-		height:'230px'
-	});
+	//$('#chatScroll').slimScroll({
+	//	height:'230px'
+	//});
 
 	//Chat notification
-	setTimeout(function() {
-		$('.chat-notification').find('.badge').addClass('active');
-		$('.chat-alert').addClass('active');
-	}, 3000);
-
-	setTimeout(function() {
-		$('.chat-alert').removeClass('active');
-	}, 8000);
-	
-	$(window).resize(function(e)	{
-		// Redraw All Chart
-		setTimeout(function() {
-			totalVisitChart.redraw();
-			plotWithOptions();
-		},500);
-	});
-
-	$('#sidebarToggleLG').click(function()	{
-		// Redraw All Chart
-		setTimeout(function() {
-			totalVisitChart.redraw();
-			plotWithOptions();
-		},500);
-	});
-
-	$('#sidebarToggleSM').click(function()	{
-		// Redraw All Chart
-		setTimeout(function() {
-			totalVisitChart.redraw();
-			plotWithOptions();
-		},500);
-	});
+	//setTimeout(function() {
+	//	$('.chat-notification').find('.badge').addClass('active');
+	//	$('.chat-alert').addClass('active');
+	//}, 3000);
+    //
+	//setTimeout(function() {
+	//	$('.chat-alert').removeClass('active');
+	//}, 8000);
+	//
+	//$(window).resize(function(e)	{
+	//	// Redraw All Chart
+	//	setTimeout(function() {
+	//		totalVisitChart.redraw();
+	//		plotWithOptions();
+	//	},500);
+	//});
+    //
+	//$('#sidebarToggleLG').click(function()	{
+	//	// Redraw All Chart
+	//	setTimeout(function() {
+	//		totalVisitChart.redraw();
+	//		plotWithOptions();
+	//	},500);
+	//});
+    //
+	//$('#sidebarToggleSM').click(function()	{
+	//	// Redraw All Chart
+	//	setTimeout(function() {
+	//		totalVisitChart.redraw();
+	//		plotWithOptions();
+	//	},500);
+	//});
 });
