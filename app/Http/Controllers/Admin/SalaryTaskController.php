@@ -79,9 +79,9 @@ class SalaryTaskController extends Controller
         $tasks=SalaryTask::where("company_id",$name)
         ->where(function($query) use($salaryDay,$insuranceDay){
             $query->where(function($query) use($salaryDay) {
-                $query->where("deal_time",strtotime($salaryDay))->where("type",1);
+                $query->where("salary_day",date("Ym",strtotime($salaryDay)))->where("type",1);
             })->orWhere(function($query) use($insuranceDay){
-                $query->where("deal_time",strtotime($insuranceDay))->where("type",2);
+                $query->where("salary_day",date("Ym",strtotime($insuranceDay)))->where("type",2);
             });
         })->first();
         if($tasks){
