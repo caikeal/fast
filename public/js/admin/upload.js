@@ -62,7 +62,7 @@ $(".upload-ctrl").each(function(index,eles){
 		//文件上传前加入头信息
 		window["uploader" + index].on('uploadBeforeSend', function (object, data, headers) {
 			var tid = $(eles).attr("data-task");
-			var type=$("type").attr("data-type")
+			var type=$("#type").attr("data-type");
 			data['task_id'] = tid;
 			data['type'] = type;
 			headers["X-CSRF-TOKEN"] = $('meta[name="csrf-token"]').attr('content');
