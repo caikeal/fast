@@ -541,17 +541,17 @@
 <script src="http://cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
 <!-- Flot -->
-<script src="//cdn.bootcss.com/flot/0.8.3/jquery.flot.min.js"></script>
+{{--<script src="//cdn.bootcss.com/flot/0.8.3/jquery.flot.min.js"></script>--}}
 
 <!-- Slimscroll -->
 <script src="//cdn.bootcss.com/jQuery-slimScroll/1.3.7/jquery.slimscroll.min.js"></script>
 
 <!-- Morris -->
-<script src="//cdn.bootcss.com/raphael/2.1.4/raphael-min.js"></script>
-<script src="//cdn.bootcss.com/morris.js/0.5.1/morris.min.js"></script>
+{{--<script src="//cdn.bootcss.com/raphael/2.1.4/raphael-min.js"></script>--}}
+{{--<script src="//cdn.bootcss.com/morris.js/0.5.1/morris.min.js"></script>--}}
 
 <!-- Datepicker -->
-<script src='{{env('APP_URL')}}/js/uncompressed/datepicker.js'></script>
+{{--<script src='{{env('APP_URL')}}/js/uncompressed/datepicker.js'></script>--}}
 
 <!-- Sparkline -->
 <script src="//cdn.bootcss.com/jquery-sparklines/2.1.2/jquery.sparkline.min.js"></script>
@@ -563,7 +563,7 @@
 <script src='{{env('APP_URL')}}/js/jquery.popupoverlay.min.js'></script>
 
 <!-- Easy Pie Chart -->
-<script src="//cdn.bootcss.com/easy-pie-chart/2.1.6/jquery.easypiechart.min.js"></script>
+{{--<script src="//cdn.bootcss.com/easy-pie-chart/2.1.6/jquery.easypiechart.min.js"></script>--}}
 
 <!-- Sortable -->
 <script src="//cdn.bootcss.com/Sortable/1.4.2/Sortable.min.js"></script>
