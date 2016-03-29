@@ -167,9 +167,20 @@ class SalaryTaskController extends Controller
 
         $manager_id=\Auth::guard('admin')->user()->id;
         $task=SalaryTask::where("id",$tid)->where("company_id",$name)->first();
+
         if(!$task){
             $result['ret_num']=111;
             $result['ret_msg']='该任务不存在！';
+            return response()->json($result);
+        }
+        if($task['type']==1&&$insuranceDay){
+            $result['ret_num']=122;
+            $result['ret_msg']='该任务为薪资任务，社保任务请新建！';
+            return response()->json($result);
+        }
+        if($task['type']==2&&$salaryDay){
+            $result['ret_num']=132;
+            $result['ret_msg']='该任务为社保任务，薪资任务请新建！';
             return response()->json($result);
         }
 
