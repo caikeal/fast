@@ -205,6 +205,16 @@
                             <br>
 
                             <div class="row addCategory well">
+                                <div>
+                                    <span class="help-block" style="color: red">
+                                        <span style="font-weight: 800">*</span>
+                                        模版中自动包含
+                                        <span style="font-weight: 800">'姓名'、'身份证'、'发薪日'</span>，
+                                        <span style="font-weight: 800"> 请勿</span>
+                                        再次
+                                        <span style="font-weight: 800">创建</span>
+                                    </span>
+                                </div>
                                 <div style="margin-top: 15px;">
                                     <lagre class="text-muted">选择大类:</lagre>
                                     <select class="bigCategorySelect text-muted" name="category[]">
