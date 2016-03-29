@@ -209,9 +209,10 @@ class SalaryController extends Controller
         $now=Carbon::now();
         $manager_id=\Auth::guard('admin')->user()->id;
         foreach($content as $k=>$v){
+            $v1_type=is_string($v[1])?$v[1]:sprintf('%0.0f',$v[1]);
             if($k>0){
                 //开启事务
-                $is_exist_user=User::where("id_card","=",$v[1])->first();
+                $is_exist_user=User::where("id_card","=",$v1_type)->first();
                 $is_exist_detail="";
                 if($is_exist_user) {
                     $is_exist_detail = SalaryDetail::where("user_id", "=", $is_exist_user->id)
@@ -226,8 +227,8 @@ class SalaryController extends Controller
                     if(!$is_exist_user) {
                         $user_id=DB::table('users')->insertGetId([
                             'name' => $v[0],
-                            'id_card'=>$v[1],
-                            'password'=>bcrypt(substr($v[1],-6)),
+                            'id_card'=>$v1_type,
+                            'password'=>bcrypt(substr($v1_type,-6)),
                             'manager_id'=>$manager_id,
                             'created_at'=>$now,
                             'updated_at'=>$now,
