@@ -22,11 +22,11 @@
     <!-- ionicons -->
     <link href="//cdn.bootcss.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet">
 
-    <!-- Morris -->
-    <link href="//cdn.bootcss.com/morris.js/0.5.1/morris.css" rel="stylesheet">
+    {{--<!-- Morris -->--}}
+    {{--<link href="//cdn.bootcss.com/morris.js/0.5.1/morris.css" rel="stylesheet">--}}
 
-    <!-- Datepicker -->
-    <link href="{{env('APP_URL')}}/css/datepicker.css" rel="stylesheet"/>
+    {{--<!-- Datepicker -->--}}
+    {{--<link href="{{env('APP_URL')}}/css/datepicker.css" rel="stylesheet"/>--}}
 
     <!-- Animate -->
     <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
@@ -36,7 +36,8 @@
     <link href="//cdn.bootcss.com/owl-carousel/1.32/owl.theme.css" rel="stylesheet">
 
     <!-- Simplify -->
-    <link href="{{env('APP_URL')}}/css/admin/simplify.min.css" rel="stylesheet">
+    {{--<link href="{{env('APP_URL')}}/css/admin/simplify.min.css" rel="stylesheet">--}}
+    <link href="http://7xqxb2.com2.z0.glb.qiniucdn.com/simplify.min.css" rel="stylesheet">
 
     @yield('moreCss')
 </head>
@@ -581,17 +582,7 @@
 @yield('moreScript')
 <script>
     $(function () {
-        $('.chart').easyPieChart({
-            easing: 'easeOutBounce',
-            size: '140',
-            lineWidth: '7',
-            barColor: '#7266ba',
-            onStep: function (from, to, percent) {
-                $(this.el).find('.percent').text(Math.round(percent));
-            }
-        });
-
-        $('.sortable-list').sortable();
+//        $('.sortable-list').sortable();
 
         $('.todo-checkbox').click(function () {
 
