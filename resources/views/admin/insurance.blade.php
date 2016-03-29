@@ -26,7 +26,8 @@
                                     <div class="timeline-item-inner">
                                         <div class="timeline-body">
                                             <div class="timeline-avatar">
-                                                <img src="{{env("APP_URL")}}/{{$task->company->poster}}" alt="" class="img-circle">
+                                                <img src="{{env("APP_URL")}}/{{$task->company->poster}}" alt=""
+                                                     class="img-circle">
                                             </div>
                                             <div class="timeline-content">
                                                 <div class="font-16 font-semi-bold"><a
@@ -82,7 +83,8 @@
                                     <div class="timeline-item-inner">
                                         <div class="timeline-body">
                                             <div class="timeline-avatar">
-                                                <img src="{{env("APP_URL")}}/{{$task->company->poster}}" alt="" class="img-circle">
+                                                <img src="{{env("APP_URL")}}/{{$task->company->poster}}" alt=""
+                                                     class="img-circle">
                                             </div>
                                             <div class="timeline-content">
                                                 <div class="font-16 font-semi-bold"><a
@@ -220,15 +222,30 @@
                                     <select class="bigCategorySelect text-muted" name="category[]">
                                     </select>
                                     <a class="addSmall text-muted" type="button"
-                                       style="margin-left: 25px;color: #0BC10E;cursor: pointer;"><i
-                                                class="fa fa-plus-circle"></i> 新增小类</a>
+                                       style="margin-left: 25px;color: #0BC10E;cursor: pointer;">
+                                        <i class="fa fa-plus-circle"></i> 新增小类
+                                    </a>
+                                    <a class="delete-big text-muted" type="button"
+                                       style="margin-left: 25px;color: #e36159;cursor: pointer;">
+                                        <i class="fa fa-minus-circle"></i> 删除分组
+                                    </a>
                                 </div>
 
                                 <div class="addsmallSelect" style="margin-top: 15px;margin-left: 1px;">
                                     <small class="text-muted">选择小类:</small>
-                                    <select class="smallCategorySelect text-muted" name="category[]"
-                                            style="margin-left: 4px;">
-                                    </select>
+                                    <span class="small-select-btn" style="display:inline-block;margin: 10px 10px;">
+                                        <span style="position: relative">
+                                        <select class="smallCategorySelect text-muted" name="category[]"
+                                                style="margin-left: 4px;">
+                                        </select>
+                                        <div class="delete-small" style="position: absolute;top: -12px;right: -8px;
+                                        color: #fff;border-radius: 50%;width: 1.5rem;height: 1.5rem;
+                                        text-align: center;border-radius: 50%;background-color: #00a2d4;cursor: pointer;">
+                                            <i class="fa fa-times"></i>
+                                        </div>
+                                        </span>
+                                    </span>
+
                                 </div>
                             </div>
                         </div>
@@ -307,7 +324,7 @@
                 type: 'get',
                 dataType: 'json',
                 timeout: '120000',
-                data: {cid: cp, bid: bi, type:2},
+                data: {cid: cp, bid: bi, type: 2},
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
@@ -342,7 +359,7 @@
                     type: 'post',
                     dataType: 'json',
                     timeout: '120000',
-                    data: {name: bigCategory, level: 1, type:2},
+                    data: {name: bigCategory, level: 1, type: 2},
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     }
@@ -371,7 +388,7 @@
                     type: 'post',
                     dataType: 'json',
                     timeout: '120000',
-                    data: {name: littleCategory, level: 2 ,type:2},
+                    data: {name: littleCategory, level: 2, type: 2},
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     }
@@ -394,19 +411,34 @@
         $("#addBig").on("click", function () {
             var bigThis = $(this);
             $(".modle-form").append($(".addCategory:first").clone());
-            //给新增的添加绑定事件
-            $(".addSmall").last().on("click", function () {
-                var _this = $(this);
-                _this.next().append($(".smallCategorySelect:first").clone());
-            });
             //删除多余的smallCateforySelect
-            $(".addCategory").last().find(".smallCategorySelect:first").nextAll().remove();
+            $(".addCategory").last().find(".small-select-btn:first").nextAll().remove();
         });
 
         //点击添加小分类按钮
         $(".modal-content").on("click", ".addSmall", function () {
             var _this = $(this);
-            _this.parent().next().append($(".smallCategorySelect:first").clone());
+            _this.parent().next().append($(".small-select-btn:first").clone());
+        });
+
+        //点击删除大分类按钮
+        $(".modal-content").on("click",".delete-big",function(){
+            var _this = $(this);
+            if($(".delete-big").length==1){
+                alert("只有1个分组不能删除！");
+                return false;
+            }
+            _this.parent().parent().remove();
+        });
+
+        //点击删除小分类按钮
+        $(".modal-content").on("click",".delete-small",function(){
+            var _this = $(this);
+            if($(_this).parent().parent().parent().find(".small-select-btn").length==1){
+                alert("只有1个分组不能删除！");
+                return false;
+            }
+            _this.parent().parent().remove();
         });
     </script>
 @endsection
