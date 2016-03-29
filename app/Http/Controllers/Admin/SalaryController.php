@@ -114,7 +114,7 @@ class SalaryController extends Controller
         $ua = strtolower($_SERVER["HTTP_USER_AGENT"]);
         $base_id=$request->get('bid');
         $base=SalaryBase::find($base_id);
-        $cats=$base->categories()->orderBy('place','asc')->get();
+        $cats=$base->categories()->where("level",2)->orderBy('place','asc')->get();
 
         //解决不同浏览器下载excel时标题解析乱码问题
         if (preg_match("/msie|edge|safari|firefox/", $ua)) {
