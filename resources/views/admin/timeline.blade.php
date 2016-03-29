@@ -203,9 +203,8 @@
                                 </div>
                             </div>
                             <br>
-
-                            <div class="row addCategory well">
-                                <div>
+                            
+                            <div>
                                     <span class="help-block" style="color: red">
                                         <span style="font-weight: 800">*</span>
                                         模版中自动包含
@@ -214,7 +213,8 @@
                                         再次
                                         <span style="font-weight: 800">创建</span>
                                     </span>
-                                </div>
+                            </div>
+                            <div class="row addCategory well">
                                 <div style="margin-top: 15px;">
                                     <lagre class="text-muted">选择大类:</lagre>
                                     <select class="bigCategorySelect text-muted" name="category[]">
