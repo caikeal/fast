@@ -52,7 +52,7 @@
                 idcard: idcard,
                 _token: $("meta[name=csrf-token]").attr("content")
             }, function (res) {
-                if (res.status==2) {
+                if (res.status==1) {
                     var data=res.data;
                     var categorylen = data.length;
                     for (var i = 0; i < categorylen; i++) {
