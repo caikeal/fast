@@ -263,7 +263,8 @@
         })($);
     </script>
     //文件上传
-    <script src="{{env('APP_URL')}}/js/webuploader-0.1.5/webuploader.js"></script>
+    {{--<script src="{{env('APP_URL')}}/js/webuploader-0.1.5/webuploader.min.js"></script>--}}
+    <script src="http://7xqxb2.com2.z0.glb.qiniucdn.com/webuploader.min.js"></script>
     <script>
         // 文件接收服务端。
         $.extend(WebUploader.Uploader.options, {
