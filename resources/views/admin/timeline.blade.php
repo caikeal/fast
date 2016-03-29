@@ -69,7 +69,7 @@
                                     </div><!-- ./timeline-item-inner -->
                                 </div><!-- ./timeline-item -->
                             </div><!-- ./timeline-row -->
-                        @elseif($task->deal_time>=$nextMonthTime && $tasks[$k-1]['deal_time']<$nextMonthTime)
+                        @elseif(($k-1>=0) && $task->deal_time>=$nextMonthTime && $tasks[$k-1]['deal_time']<$nextMonthTime)
                             <div class="timeline-year bg-purple">
                                 {{$next->year.".".$next->month}}
                             </div>
