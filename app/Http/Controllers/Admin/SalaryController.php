@@ -230,6 +230,7 @@ class SalaryController extends Controller
                             'id_card'=>$v1_type,
                             'password'=>bcrypt(substr($v1_type,-6)),
                             'manager_id'=>$manager_id,
+                            'company_id'=>$company_id,
                             'created_at'=>$now,
                             'updated_at'=>$now,
                         ]);
