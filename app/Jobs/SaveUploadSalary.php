@@ -45,7 +45,7 @@ class SaveUploadSalary extends Job implements ShouldQueue
      */
     public function handle()
     {
-        DB::reconnect('fast');
+        DB::reconnect();
         $now = Carbon::now();
         //开启事务
         DB::beginTransaction();
@@ -125,7 +125,7 @@ class SaveUploadSalary extends Job implements ShouldQueue
             DB::rollBack();
             throw $e;
         }
-        DB::disconnect('fast');
+        DB::disconnect();
     }
     /**
      * 处理失败任务
