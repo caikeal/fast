@@ -76,6 +76,7 @@ $(".upload-ctrl").each(function(index,eles){
 		});
 
 		window["uploader" + index].on('uploadError', function (file, reason) {
+			console.log(reason);
 			$('#' + file.id).find('p.state').text("上传失败");
 			if ($(this.options.pick.list + " >.item").length > 2) {
 				$($(this.options.pick.list + " >.item")[0]).remove();
