@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Company;
+use App\Jobs\SaveUploadSalary;
 use App\SalaryBase;
 use App\SalaryDetail;
 use App\SalaryTask;
@@ -148,6 +149,7 @@ class SalaryController extends Controller
     }
 
     public function upload(Request $request){
+        set_time_limit(1800) ;
         if(!$request->file('excel')->isValid()){
             return response("failed",404);
         }
@@ -170,9 +172,11 @@ class SalaryController extends Controller
          * 读取excel
          */
         $workExcel=Excel::selectSheetsByIndex(0)->load(storage_path('app/'.$name));
-        $workSheet=$workExcel->sheet(0);
         $base_id=$workExcel->getTitle();
+
+        $workSheet=$workExcel->getSheet(0);
         $company_id=$workSheet->getTitle();
+
         $companyExist=SalaryTask::where("company_id","=",$company_id)
             ->where("receive_id","=",\Auth::guard('admin')->user()->id)
             ->where("status","=","0")->where("id","=",$task_id)->count();//工资任务存在,且未完成
@@ -193,59 +197,77 @@ class SalaryController extends Controller
             \Storage::delete($name);
             return response("No Data",404);//必须有实际数据
         }
+
+        //将数据存入缓存
         Cache::store('file')->put('admin_salaryUp:'.$base_id."|".$company_id, json_encode($content), 60);
-        //todo will give a confirmation in future
 
-        $res=$this->store($content,$base_id,$company_id,$task_id,$type);
-        if(!$res){
-            return response("Again",404);//有实际数据出错
-        }
+        unset($content);
+        $manager_id=\Auth::guard('admin')->user()->id;
 
-        return json_encode($content);
+        SalaryTask::where("company_id", "=", $company_id)->where("type", $type)
+            ->where("receive_id", "=", $manager_id)->where("id", "=", $task_id)
+            ->update(["status" => 2]);
+
+        //推送至队列异步执行插入
+        $this->dispatch(new SaveUploadSalary($base_id,$company_id,$task_id,$type,$manager_id));
+
+        /**
+         * 同步更新到数据库，考虑到性能问题舍弃
+         */
+//        $res=$this->store($base_id,$company_id,$task_id,$type,$manager_id);
+//        if(!$res){
+//            return response("Again",404);//有实际数据出错
+//        }
+        return response("success");
     }
 
-    protected function store($content,$base_id,$company_id,$task_id,$type){
-        $fail=0;
-        $now=Carbon::now();
-        $manager_id=\Auth::guard('admin')->user()->id;
-        foreach($content as $k=>$v){
-            $v1_type=is_string($v[1])?$v[1]:sprintf('%0.0f',$v[1]);
-            if($k>0){
-                //开启事务
-                $is_exist_user=User::where("id_card","=",$v1_type)->first();
-                $is_exist_detail="";
-                if($is_exist_user) {
-                    $is_exist_detail = SalaryDetail::where("user_id", "=", $is_exist_user->id)
-                        ->where("company_id","=",$company_id)
-                        ->where("salary_day","=",$v[2])
-                        ->where("type",$type)
-                        ->first();
-                }
-                DB::beginTransaction();
-                try{
+    /*
+     * 用户数据存入数据库
+     */
+    protected function store($base_id,$company_id,$task_id,$type,$manager_id){
+        $fail = 0;
+        $now = Carbon::now();
+        $content = (Cache::store('file')->get('admin_salaryUp:' . $base_id . "|" . $company_id));
+        //开启事务
+        DB::beginTransaction();
+        try {
+            $all_content = json_decode($content, true);
+            foreach ($all_content as $k => $v) {
+                $v1_type = is_string($v[1]) ? $v[1] : sprintf('%0.0f', $v[1]);
+                if ($k > 0) {
+                    $is_exist_user = User::where("id_card", "=", $v1_type)->first();
+                    $is_exist_detail = "";
+                    if ($is_exist_user) {
+                        $is_exist_detail = SalaryDetail::where("user_id", "=", $is_exist_user->id)
+                            ->where("company_id", "=", $company_id)
+                            ->where("salary_day", "=", $v[2])
+                            ->where("type", $type)
+                            ->first();
+                    }
+
                     //用户创建
-                    if(!$is_exist_user) {
-                        $user_id=DB::table('users')->insertGetId([
+                    if (!$is_exist_user) {
+                        $user_id = DB::table('users')->insertGetId([
                             'name' => $v[0],
-                            'id_card'=>$v1_type,
-                            'password'=>bcrypt(substr($v1_type,-6)),
-                            'manager_id'=>$manager_id,
-                            'company_id'=>$company_id,
-                            'created_at'=>$now,
-                            'updated_at'=>$now,
+                            'id_card' => $v1_type,
+                            'password' => bcrypt(substr($v1_type, -6)),
+                            'manager_id' => $manager_id,
+                            'company_id' => $company_id,
+                            'created_at' => $now,
+                            'updated_at' => $now,
                         ]);
-                    }else{
-                        $user_id=$is_exist_user->id;
+                    } else {
+                        $user_id = $is_exist_user->id;
                     }
                     //薪资数据保存
-                    $wages="";
-                    foreach($v as $kk=>$vv){
-                        if($kk>2){
-                            $wages.=$vv.",";
+                    $wages = "";
+                    foreach ($v as $kk => $vv) {
+                        if ($kk > 2) {
+                            $wages .= $vv . ",";
                         }
                     }
-                    $wages=trim($wages,",");
-                    if(!$is_exist_detail) {
+                    $wages = trim($wages, ",");
+                    if (!$is_exist_detail) {
                         DB::table('salary_details')->insert([
                             'user_id' => $user_id,
                             'base_id' => $base_id,
@@ -257,29 +279,31 @@ class SalaryController extends Controller
                             'created_at' => $now,
                             'updated_at' => $now,
                         ]);
-                    }else{
-                        DB::table('salary_details')->where('company_id',"=", $company_id)
-                            ->where('salary_day',"=",$v[2])
-                            ->where('user_id',"=",$user_id)->update([
-                            'base_id' => $base_id,
-                            'wages' => $wages,
-                            'manager_id' => $manager_id,
-                            'created_at' => $now,
-                            'updated_at' => $now,
-                        ]);
+                    } else {
+                        DB::table('salary_details')->where('company_id', "=", $company_id)
+                            ->where('salary_day', "=", $v[2])
+                            ->where('user_id', "=", $user_id)->update([
+                                'base_id' => $base_id,
+                                'wages' => $wages,
+                                'manager_id' => $manager_id,
+                                'created_at' => $now,
+                                'updated_at' => $now,
+                            ]);
                     }
-                    //提交事务
-                    DB::commit();
-                }catch (\Exception $e){
-                    $fail=1;
-                    DB::rollBack();
                 }
             }
+            //提交事务
+            DB::commit();
+        } catch (\Exception $e) {
+            $fail = 1;
+            DB::rollBack();
+            throw $e;
         }
-        if($fail!=1){
-            DB::table('salary_task')->where("company_id","=",$company_id)->where("type",$type)
-                ->where("receive_id","=",$manager_id)->where("id","=",$task_id)
-                ->update(["status"=>1]);
+        if ($fail != 1) {
+            DB::table('salary_task')->where("company_id", "=", $company_id)->where("type", $type)
+                ->where("receive_id", "=", $manager_id)->where("id", "=", $task_id)
+                ->update(["status" => 1]);
+            unset($all_content);
         }else{
             return false;
         }
