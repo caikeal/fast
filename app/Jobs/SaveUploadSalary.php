@@ -69,7 +69,6 @@ class SaveUploadSalary extends Job implements ShouldQueue
                         $user_id = DB::table('users')->insertGetId([
                             'name' => $v[0],
                             'id_card' => $v1_type,
-                            'password' => bcrypt(substr($v1_type, -6)),
                             'manager_id' => $this->manager_id,
                             'company_id' => $this->company_id,
                             'created_at' => $now,
