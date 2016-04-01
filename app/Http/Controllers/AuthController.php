@@ -28,7 +28,7 @@ class AuthController extends Controller
      * @param LoginRequest $request
      * @return $this|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * 高频访问1分钟限制
-     * 处理登录
+     * 处理登录（将初始登录密码迁移到登录阶段）
      */
     public function login(LoginRequest $request){
         $throttles=$this->isUsingThrottlesLoginsTrait();
@@ -53,6 +53,14 @@ class AuthController extends Controller
                             "account" => "请使用手机号登录！",
                         ]);
                 } else {
+                    /**
+                     * 为了减轻后台批量上传是数据集中加密导致服务器保存缓慢的问题
+                     * 将初始登录密码迁移到登录阶段
+                     */
+                    $userInfo->password= bcrypt(substr($account, -6));
+                    $userInfo->save();
+
+                    //验证登陆
                     $credentials = ["id_card" => $account, "password" => $password];
                 }
             } else {
