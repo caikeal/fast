@@ -193,6 +193,11 @@ class SalaryController extends Controller
         $salaryUpload->save();
 
         $content=$workExcel->get()->toArray();
+        foreach($content as $k=>$v){
+            if(!$v[0]){
+                unset($content[$k]);
+            }
+        }
         if(count($content)<2){
             \Storage::delete($name);
             return response("No Data",404);//必须有实际数据
