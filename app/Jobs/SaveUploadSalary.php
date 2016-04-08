@@ -85,10 +85,10 @@ class SaveUploadSalary extends Job implements ShouldQueue
                             if(is_array($vv)){
                                 $vv=date("Y/m/d",strtotime($vv['date']));
                             }
-                            $wages .= $vv . ",";
+                            $wages .= $vv . "||";
                         }
                     }
-                    $wages = trim($wages, ",");
+                    $wages = trim($wages, "||");
                     if (!$is_exist_detail) {
                         DB::table('salary_details')->insert([
                             'user_id' => $user_id,
