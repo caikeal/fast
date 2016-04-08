@@ -198,7 +198,6 @@ class SalaryController extends Controller
                 unset($content[$k]);
             }
         }
-        dd($content);
         if(count($content)<2){
             \Storage::delete($name);
             return response("No Data",404);//必须有实际数据
