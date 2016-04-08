@@ -60,7 +60,7 @@ class SalaryController extends Controller
             }
         }
         $count_arr=0;
-        $wages=explode(",",$detail->wages);
+        $wages=explode("||",$detail->wages);
         foreach($tpl_detail as $kt=>$vt){
             foreach($vt as $kd=>$vd){
                 $tpl_detail[$kt][$kd]['v']=$wages[$count_arr]?$wages[$count_arr]:"";
