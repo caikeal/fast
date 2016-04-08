@@ -204,7 +204,7 @@ class SalaryController extends Controller
         }
 
         //将数据存入缓存
-        Cache::store('file')->put('admin_salaryUp:'.$base_id."|".$company_id, json_encode($content), 60);
+        Cache::store('file')->put('admin_salaryUp:'.$base_id."|".$company_id."|".$task_id, json_encode($content), 60);
 
         unset($content);
         $manager_id=\Auth::guard('admin')->user()->id;
