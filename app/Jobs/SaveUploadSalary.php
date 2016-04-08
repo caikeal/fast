@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\DB;
 class SaveUploadSalary extends Job implements ShouldQueue
 {
     use InteractsWithQueue, SerializesModels;
-    protected $content;
     protected $base_id;
     protected $company_id;
     protected $task_id;
@@ -30,7 +29,6 @@ class SaveUploadSalary extends Job implements ShouldQueue
      */
     public function __construct($base_id, $company_id, $task_id, $type, $manager_id)
     {
-        $this->content = (Cache::store('file')->get('admin_salaryUp:' . $base_id . "|" . $company_id));
         $this->base_id = $base_id;
         $this->company_id = $company_id;
         $this->task_id = $task_id;
@@ -47,10 +45,11 @@ class SaveUploadSalary extends Job implements ShouldQueue
     {
         DB::reconnect();
         $now = Carbon::now();
+        $contents=Cache::store('file')->get('admin_salaryUp:' . $this->base_id . "|" . $this->company_id."|".$this->task_id);
         //开启事务
         DB::beginTransaction();
         try {
-            $all_content = json_decode($this->content,true);
+            $all_content = json_decode($contents,true);
             foreach ($all_content as $k => $v) {
                 if ($k > 0 && $v[0]) {
                     $v1_type = is_string($v[1]) ? $v[1] : sprintf('%0.0f', $v[1]);
