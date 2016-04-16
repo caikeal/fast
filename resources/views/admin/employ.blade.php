@@ -261,7 +261,6 @@
 @section('addition')
 @endsection
 @section('moreScript')
-    <script src="//cdn.bootcss.com/vue/1.0.17/vue.js"></script>
     <script>
         //侧边栏位置锁定
         !(function () {

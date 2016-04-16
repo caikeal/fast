@@ -492,7 +492,6 @@
 @section('moreScript')
     <script src="{{env('APP_URL')}}/js/bootstrap-datetimepicker.min.js"></script>
     <script src="{{env('APP_URL')}}/js/bootstrap-datetimepicker.zh-CN.js"></script>
-    <script src="//cdn.bootcss.com/vue/1.0.17/vue.js"></script>
     <script>
         //侧边栏位置锁定
         !(function () {
