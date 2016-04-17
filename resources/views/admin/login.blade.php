@@ -153,5 +153,6 @@
 <script src="http://cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 <script src="{{env('APP_URL')}}/js/jquery.singlePageNav.min.js"></script>
 <script src="{{env('APP_URL')}}/js/wow.min.js"></script>
+<script src="//cdn.bootcss.com/vue/1.0.17/vue.js"></script>
 </body>
 </html>
