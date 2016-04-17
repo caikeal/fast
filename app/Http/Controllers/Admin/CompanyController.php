@@ -37,6 +37,7 @@ class CompanyController extends Controller
         $company->save();
         $result['ret_num']=0;
         $result['ret_msg']="新增成功！";
+        $result['data']=$company;
         return response()->json($result);
     }
 }

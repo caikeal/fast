@@ -91,6 +91,19 @@
             display: inline;
             margin-bottom:0;
         }
+
+        .new-list{
+            background-color: #D7FFD0;
+            color: #0006FF;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+
+        .table>tbody>tr>td{
+            vertical-align: middle;
+        }
     </style>
 @endsection
 @section('content')
@@ -181,6 +194,28 @@
                     </tr>
                     </thead>
                     <tbody id="tbody">
+                    <!-- new task start -->
+                    <tr class="new-list" v-for="task in taskList" v-cloak>
+                        <td>
+                            <img class="thumbnail thumbnail-radius" :src="task['company']['poster']">
+                            <span>@{{task['company']['name']}}</span>
+                        </td>
+                        <td>@{{task['deal_time']}}</td>
+                        <td>
+                            @{{task.type==1?'薪资':'社保'}}
+                        </td>
+                        <td>@{{task['receiver']['name']}}</td>
+                        <td>@{{task.status?'已提交':'进行中'}}</td>
+                        <td>@{{task.updated_at}}</td>
+                        <td v-if="task.status==0">
+                            <reset-task-btn :task-id="task['id']"></reset-task-btn>
+                        </td>
+                        <td v-else>
+                            <a class="btn btn-danger">已完成</a>
+                        </td>
+                    </tr>
+                    <!-- new task end -->
+
                     @foreach($tasks as $task)
                         <tr>
                             <td>
@@ -272,6 +307,10 @@
                                             @foreach($companys as $company)
                                             <option value="{{$company->id}}">{{$company->name}}</option>
                                             @endforeach
+                                                    
+                                            <!-- new company start -->
+                                            <option v-for="company in allCompany" :value="company.id" v-cloak>@{{ company.name }}</option>
+                                            <!-- new company end -->
                                         </select>
                                     </div>
 
@@ -387,6 +426,10 @@
                                             @foreach($companys as $company)
                                                 <option value="{{$company->id}}">{{$company->name}}</option>
                                             @endforeach
+
+                                                <!-- new company start -->
+                                                <option v-for="company in allCompany" :value="company.id" v-cloak>@{{ company.name }}</option>
+                                                <!-- new company end -->
                                         </select>
                                     </div>
 
@@ -566,6 +609,8 @@
         new Vue({
             el: "#company",
             data:{
+                taskList:[],
+                allCompany:[],
                 is_companyName:0,
                 companyNameErrors:'',
                 is_receiver:0,
@@ -708,6 +753,9 @@
                                     _this.insuranceDay='';
                                     _this.taskType=[];
                                     _this.memo='';
+                                    for(var i =0;i<data.data.length;i++){
+                                        _this.taskList.push(data.data[i]);
+                                    }
                                     $('#create-task').modal('hide');
                                     alert(data.ret_msg);
                                 }else{
@@ -868,7 +916,7 @@
                                     _this.is_newCompany=0;
                                     _this.newCompanyErrors='';
                                     _this.newCompany='';
-
+                                    _this.allCompany.push(data.data);
                                     $('#create-company').modal('hide');
                                     alert(data.ret_msg);
                                 }else{

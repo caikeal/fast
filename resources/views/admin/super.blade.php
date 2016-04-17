@@ -694,7 +694,6 @@
                             _this.managerPassword= '';
                             _this.managerRoles= [];
                             _this.managerList.push(data.data);
-                            console.log(data.data);
                             $('#create-manager').modal('hide');
                             alert(data.ret_msg);
                         }else{

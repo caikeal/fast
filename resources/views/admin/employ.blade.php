@@ -82,6 +82,15 @@
         .col-xs-2.lable-xs-center {
             padding-top: 7px;
         }
+
+        .new-list{
+            background-color: #D7FFD0;
+            color: #0006FF;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
     </style>
 @endsection
 @section('content')
@@ -160,6 +169,18 @@
                     </tr>
                     </thead>
                     <tbody id="tbody">
+                    <!--new manager start-->
+                    <tr class="new-list" v-for="manager in managerList" v-cloak>
+                        <td>@{{manager.name}}</td>
+                        <td>@{{manager.email}}</td>
+                        <td>
+                            0
+                        </td>
+                        <td>{{\Auth::guard('admin')->user()->name}}</td>
+                        <td>@{{manager.updated_at}}</td>
+                    </tr>
+                    <!--new manager end-->
+
                     @foreach($managers as $manager)
                         <tr>
                             <td>{{$manager->name}}</td>
@@ -272,6 +293,7 @@
         new Vue({
             el: "#employ",
             data:{
+                managerList:[],
                 is_managerName:0,
                 managerNameErrors:'',
                 is_managerAccount:0,
@@ -283,7 +305,7 @@
                 managerName:'',
                 managerAccount:'',
                 managerPassword:'',
-                managerRoles:['{{$memberRoles[0]->id}}']
+                managerRoles:['{{$memberRoles->first()->id}}']
             },
             methods:{
                 newAccount: function () {
@@ -361,6 +383,8 @@
                                     _this.managerAccount= '';
                                     _this.managerPassword= '';
                                     _this.managerRoles= [];
+                                    console.log(data.data);
+                                    _this.managerList.push(data.data);
                                     $('#create-manager').modal('hide');
                                     alert(data.ret_msg);
                                 }else{
