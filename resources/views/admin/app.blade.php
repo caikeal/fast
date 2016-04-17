@@ -579,6 +579,8 @@
 <script src="{{env('APP_URL')}}/js/admin/simplify.js"></script>
 <script src="{{env('APP_URL')}}/js/admin/simplify_dashboard.js"></script>
 
+<!-- vue -->
+<script src="//cdn.bootcss.com/vue/1.0.17/vue.js"></script>
 @yield('moreScript')
 <script>
     $(function () {
