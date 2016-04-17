@@ -68,6 +68,7 @@ class AccountController extends Controller
             }
             $result['ret_num']=0;
             $result['ret_msg']='保存成功！';
+            $result['data']=$manager::with('roles')->find($manager->id);
             DB::commit();
         } catch (Exception $e){
             $result['ret_num']=110;

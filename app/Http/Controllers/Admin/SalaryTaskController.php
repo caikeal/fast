@@ -112,8 +112,25 @@ class SalaryTaskController extends Controller
             $task2->salary_day=date("Ym",strtotime($insuranceDay));
             $task2->save();
         }
+        $data=SalaryTask::with('company')->with('receiver')->where("company_id",$name)
+            ->where(function($query) use($salaryDay,$insuranceDay){
+                $query->where(function($query) use($salaryDay) {
+                    $query->where("salary_day",date("Ym",strtotime($salaryDay)))->where("type",1);
+                })->orWhere(function($query) use($insuranceDay){
+                    $query->where("salary_day",date("Ym",strtotime($insuranceDay)))->where("type",2);
+                });
+            })->get()->toArray();
+        foreach ($data as $k=>$v){
+            if ($v['deal_time']){
+                $data[$k]['deal_time'] = date("Y-m-d", $v['deal_time']);
+            }
+            if($v['company']['poster']){
+                $data[$k]['company']['poster']=env('APP_URL')."/".$v['company']['poster'];
+            }
+        }
         $result['ret_num']=0;
         $result['ret_msg']='保存成功！';
+        $result['data']=$data;
         return response()->json($result);
     }
 
@@ -171,6 +188,11 @@ class SalaryTaskController extends Controller
         if(!$task){
             $result['ret_num']=111;
             $result['ret_msg']='该任务不存在！';
+            return response()->json($result);
+        }
+        if($task['status']!=0){
+            $result['ret_num']=121;
+            $result['ret_msg']='该任务正在处理中！';
             return response()->json($result);
         }
         if($task['type']==1&&$insuranceDay){

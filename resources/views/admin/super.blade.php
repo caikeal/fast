@@ -82,6 +82,15 @@
         .col-xs-2.lable-xs-center {
             padding-top: 7px;
         }
+
+        .new-list{
+            background-color: #D7FFD0;
+            color: #0006FF;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
     </style>
 @endsection
 @section('content')
@@ -165,6 +174,25 @@
                     </tr>
                     </thead>
                     <tbody id="tbody">
+                    <!--new add managers start-->
+                    <tr v-for="manager in managerList" class="new-list" v-cloak>
+                        <td>@{{manager.name}}</td>
+                        <td>@{{manager.email}}</td>
+                        <td>
+                            <span v-for="roleInfo in manager['roles']">
+                                @{{roleInfo.label}}<br>
+                            </span>
+                        </td>
+                        <td>@{{manager['roles'][0]['level']}}级管理员</td>
+                        <td>
+                            <reset-pwd-btn :manager-id="manager.id"></reset-pwd-btn>
+                        </td>
+                        <td>
+                            <toggle-manager :manager-id="manager.id" :manager-status='manager.deleted_at?"启用":"停用"'></toggle-manager>
+                        </td>
+                    </tr>
+                    <!--new add managers end-->
+
                     @foreach($managers as $manager)
                         <tr>
                             <td>{{$manager->name}}</td>
@@ -174,7 +202,7 @@
                                     {{$roleInfo->label}}<br>
                                 @endforeach
                             </td>
-                            <td>{{$manager->roles[0]->level}}级管理员</td>
+                            <td>{{$manager->roles->first()->level}}级管理员</td>
                             <td>
                                 <reset-pwd-btn :manager-id={{$manager->id}}></reset-pwd-btn>
                             </td>
@@ -399,7 +427,6 @@
 @section('addition')
 @endsection
 @section('moreScript')
-    <script src="//cdn.bootcss.com/vue/1.0.17/vue.js"></script>
     <script>
         //侧边栏位置锁定
         !(function () {
@@ -471,6 +498,7 @@
         var vm=new Vue({
             el: '#super',
             data: {
+                managerList:[],
                 phone: '',
                 userPhone: '',
                 userName: '',
@@ -482,7 +510,7 @@
                 managerName: '',
                 managerAccount: '',
                 managerPassword: '',
-                managerRoles: ['{{$memberRoles[0]->id}}'],
+                managerRoles: ['{{$memberRoles->first()->id}}'],
                 is_managerName:0,
                 is_managerAccount:0,
                 is_managerPassword:0,
@@ -665,6 +693,7 @@
                             _this.managerAccount= '';
                             _this.managerPassword= '';
                             _this.managerRoles= [];
+                            _this.managerList.push(data.data);
                             $('#create-manager').modal('hide');
                             alert(data.ret_msg);
                         }else{
