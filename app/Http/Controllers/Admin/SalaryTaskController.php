@@ -76,6 +76,7 @@ class SalaryTaskController extends Controller
         $memo=$request->input('memo');
 
         $manager_id=\Auth::guard('admin')->user()->id;
+        /*
         $tasks=SalaryTask::where("company_id",$name)
         ->where(function($query) use($salaryDay,$insuranceDay){
             $query->where(function($query) use($salaryDay) {
@@ -89,7 +90,7 @@ class SalaryTaskController extends Controller
             $result['ret_msg']='该日任务已经存在！';
             return response()->json($result);
         }
-
+        */
         if($salaryDay){
             $task=new SalaryTask();
             $task->company_id=$name;
@@ -112,14 +113,26 @@ class SalaryTaskController extends Controller
             $task2->salary_day=date("Ym",strtotime($insuranceDay));
             $task2->save();
         }
-        $data=SalaryTask::with('company')->with('receiver')->where("company_id",$name)
-            ->where(function($query) use($salaryDay,$insuranceDay){
-                $query->where(function($query) use($salaryDay) {
-                    $query->where("salary_day",date("Ym",strtotime($salaryDay)))->where("type",1);
-                })->orWhere(function($query) use($insuranceDay){
-                    $query->where("salary_day",date("Ym",strtotime($insuranceDay)))->where("type",2);
-                });
-            })->get()->toArray();
+        
+        if($salaryDay && $insuranceDay){
+            $data=SalaryTask::with('company')->with('receiver')->where("company_id",$name)
+                ->where(function($query) use($task,$task2){
+                    $query->where(function($query) use($task) {
+                        $query->where("id",$task['id']);
+                    })->orWhere(function($query) use($task2){
+                        $query->where("id",$task2['id']);
+                    });
+                })->get()->toArray();
+        }elseif($salaryDay && !$insuranceDay){
+            $data=SalaryTask::with('company')->with('receiver')
+                ->where("company_id",$name)->where("id",$task['id'])
+                ->get()->toArray();
+        }else{
+            $data=SalaryTask::with('company')->with('receiver')
+                ->where("company_id",$name)->where("id",$task2['id'])
+                ->get()->toArray();
+        }
+
         foreach ($data as $k=>$v){
             if ($v['deal_time']){
                 $data[$k]['deal_time'] = date("Y-m-d", $v['deal_time']);
