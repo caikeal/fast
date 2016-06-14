@@ -329,14 +329,14 @@
                     {{--</li>--}}
                     <li class="bg-palette2 lock-place2">
                         <a href="{{url('admin/timeline')}}">
-									<span class="menu-content block">
-										<span class="menu-icon"><i class="block fa fa-jpy fa-lg"></i></span>
-										<span class="text m-left-sm">工资发放</span>
-                                        {{--<small class="badge badge-warning badge-square bounceIn animation-delay6 m-left-xs pull-right">7</small>--}}
-									</span>
-									<span class="menu-content-hover block">
-										工资发放
-									</span>
+                            <span class="menu-content block">
+                                <span class="menu-icon"><i class="block fa fa-jpy fa-lg"></i></span>
+                                <span class="text m-left-sm">工资发放</span>
+                                {{--<small class="badge badge-warning badge-square bounceIn animation-delay6 m-left-xs pull-right">7</small>--}}
+                            </span>
+                            <span class="menu-content-hover block">
+                                工资发放
+                            </span>
                         </a>
                     </li>
                     <li class="bg-palette3 lock-place3">
@@ -352,73 +352,73 @@
                     </li>
                     <li class="bg-palette4 lock-place4">
                         <a href="#">
-                    <span class="menu-content block">
-                    <span class="menu-icon"><i class="block fa fa-clock-o fa-lg"></i></span>
-                    <span class="text m-left-sm">历史查询</span>
-                    </span>
-                    <span class="menu-content-hover block">
-                    历史查询
-                    </span>
+                            <span class="menu-content block">
+                                <span class="menu-icon"><i class="block fa fa-clock-o fa-lg"></i></span>
+                                <span class="text m-left-sm">历史查询</span>
+                            </span>
+                            <span class="menu-content-hover block">
+                                历史查询
+                            </span>
                         </a>
                     </li>
                     <li class="bg-palette1 lock-place5">
                         <a href="#">
-                    <span class="menu-content block">
-                    <span class="menu-icon"><i class="block fa fa-bar-chart fa-lg"></i></span>
-                    <span class="text m-left-sm">数据统计</span>
-                    </span>
-                    <span class="menu-content-hover block">
-                    数据统计
-                    </span>
+                            <span class="menu-content block">
+                                <span class="menu-icon"><i class="block fa fa-bar-chart fa-lg"></i></span>
+                                <span class="text m-left-sm">数据统计</span>
+                            </span>
+                            <span class="menu-content-hover block">
+                                数据统计
+                            </span>
                         </a>
                     </li>
                     <li class="bg-palette2 lock-place6">
                         <a href="#">
-                    <span class="menu-content block">
-                    <span class="menu-icon"><i class="block fa fa-question-circle fa-lg"></i></span>
-                    <span class="text m-left-sm">解惑答疑</span>
-                    </span>
-                    <span class="menu-content-hover block">
-                    解惑答疑
-                    </span>
+                            <span class="menu-content block">
+                                <span class="menu-icon"><i class="block fa fa-question-circle fa-lg"></i></span>
+                                <span class="text m-left-sm">解惑答疑</span>
+                            </span>
+                            <span class="menu-content-hover block">
+                                解惑答疑
+                            </span>
                         </a>
                     </li>
                     @if(\Auth::guard('admin')->user()->can('task'))
                     <li class="bg-palette3 lock-place7">
                         <a href="{{url('admin/task')}}">
-                    <span class="menu-content block">
-                    <span class="menu-icon"><i class="block fa fa-link fa-lg"></i></span>
-                    <span class="text m-left-sm">企业管理</span>
-                    </span>
-                    <span class="menu-content-hover block">
-                    企业管理
-                    </span>
+                            <span class="menu-content block">
+                                <span class="menu-icon"><i class="block fa fa-link fa-lg"></i></span>
+                                <span class="text m-left-sm">企业管理</span>
+                            </span>
+                            <span class="menu-content-hover block">
+                                企业管理
+                            </span>
                         </a>
                     </li>
                     @endif
                     @if(\Auth::guard('admin')->user()->can('employ'))
                     <li class="bg-palette4 lock-place8">
                         <a href="{{url('admin/employ')}}">
-                    <span class="menu-content block">
-                    <span class="menu-icon"><i class="block fa fa-user fa-lg"></i></span>
-                    <span class="text m-left-sm">人员管理</span>
-                    </span>
-                    <span class="menu-content-hover block">
-                    人员管理
-                    </span>
+                            <span class="menu-content block">
+                                <span class="menu-icon"><i class="block fa fa-user fa-lg"></i></span>
+                                <span class="text m-left-sm">人员管理</span>
+                            </span>
+                            <span class="menu-content-hover block">
+                                人员管理
+                            </span>
                         </a>
                     </li>
                     @endif
                     @if(\Auth::guard('admin')->user()->can('super'))
                     <li class="bg-palette1 lock-place9">
                         <a href="{{url('admin/super')}}">
-                    <span class="menu-content block">
-                    <span class="menu-icon"><i class="block fa fa-user-md fa-lg"></i></span>
-                    <span class="text m-left-sm">超级管理</span>
-                    </span>
-                    <span class="menu-content-hover block">
-                    超级管理
-                    </span>
+                            <span class="menu-content block">
+                                <span class="menu-icon"><i class="block fa fa-user-md fa-lg"></i></span>
+                                <span class="text m-left-sm">超级管理</span>
+                            </span>
+                            <span class="menu-content-hover block">
+                                超级管理
+                            </span>
                         </a>
                     </li>
                     @endif
@@ -498,9 +498,9 @@
     </div><!-- /main-container -->
 
     <footer class="footer">
-				<span class="footer-brand">
-					<strong class="text-danger">Fast</strong> For FESCO
-				</span>
+        <span class="footer-brand">
+            <strong class="text-danger">Fast</strong> For FESCO
+        </span>
 
         <p class="no-margin">
             &copy; 2016-2017 <strong>FESCO</strong>. ALL Rights Reserved.
