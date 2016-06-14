@@ -42,6 +42,7 @@ Route::group(['namespace'=>'Admin','middleware' => ['web'],'prefix'=>'admin'], f
     Route::get('/insurance','SalaryController@insurance');
     //企业用户管理模块
     Route::get('/super','ManagerController@super');
+    Route::put('/super/reset_password/{id}','ManagerController@reset');
     Route::resource('/manager','ManagerController');
     Route::resource('/account','AccountController');
     //前台用户管理模块
