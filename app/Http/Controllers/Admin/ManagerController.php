@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Gate;
+use Illuminate\Support\Facades\Auth;
 
 class ManagerController extends Controller
 {
@@ -44,11 +45,59 @@ class ManagerController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Requests\Admin\ManagerRequest  $request
      * @param  int  $id
+     * 
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id){
+    public function update(Requests\Admin\ManagerRequest $request, $id){
+        $phone = $request->input('phone');
+        $email = $request->input('email');
+        $user_id = $request->get('user_id');
+
+        //重新登录参数
+        $needReLogin = 0;
+        $url = '';
+
+        if ($id != Auth::guard('admin')->user()->id && $user_id != $id){
+            return response()->json(['invalid'=>'您无权限！'])->setStatusCode(422);
+        }
+
+        //更新用户信息
+        $manager = Manager::findOrFail($id);
+        if ($phone) {
+            $manager->phone = $phone;
+        }
+
+        if ($email) {
+            //判断是否要重新登录
+            if ($manager->email != $email){
+                $needReLogin = 1;
+            }
+            $manager->email = $email;
+        }
+
+        //用户已完成首次登录
+        $manager->is_first = 1;
+
+        //返回成功
+        if ($manager->update()){
+            //返回要需要重新登录的信息
+            if ($needReLogin){
+                Auth::guard('admin')->logout();
+                $url = url('admin/login');
+            }
+
+            $result['ret_num'] = 0;
+            $result['ret_msg'] = '保存成功！';
+            $result['reLogin'] = $needReLogin;
+            $result['reUrl'] = $url;
+        }else{
+            $result['ret_num'] = 230;
+            $result['ret_msg'] = '保存失败！';
+        }
+
+        return response()->json($result);
     }
 
     /**
@@ -90,7 +139,7 @@ class ManagerController extends Controller
         if(Gate::foruser(\Auth::guard('admin')->user())->denies('super')){
             return redirect('admin/index');
         }
-        
+
         $manager=Manager::where('id',$id)->first();
         $manager->password=bcrypt($request->input('pwd'));
         if($manager->save()){
