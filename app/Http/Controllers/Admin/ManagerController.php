@@ -48,17 +48,7 @@ class ManagerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Requests\Admin\ManagerPasswordRequest $request, $id){
-        $manager=Manager::where('id',$id)->first();
-        $manager->password=bcrypt($request->input('pwd'));
-        if($manager->save()){
-            $result['ret_num']=0;
-            $result['ret_msg']='保存成功！';
-        }else{
-            $result['ret_num']=110;
-            $result['ret_msg']='修改失败！';
-        }
-        return response()->json($result);
+    public function update(Request $request, $id){
     }
 
     /**
@@ -81,10 +71,36 @@ class ManagerController extends Controller
             $result['ret_msg']="启用";
         }
         $result['ret_num']=0;
+
         return response()->json($result);
     }
 
     public function index(){
         return view();
+    }
+
+    /**
+     * 针对超级管理员重新设置后台用户密码.
+     *
+     * @param Requests\Admin\ManagerPasswordRequest $request
+     * @param $id
+     * @return mixed
+     */
+    public function reset(Requests\Admin\ManagerPasswordRequest $request, $id){
+        if(Gate::foruser(\Auth::guard('admin')->user())->denies('super')){
+            return redirect('admin/index');
+        }
+        
+        $manager=Manager::where('id',$id)->first();
+        $manager->password=bcrypt($request->input('pwd'));
+        if($manager->save()){
+            $result['ret_num']=0;
+            $result['ret_msg']='保存成功！';
+        }else{
+            $result['ret_num']=110;
+            $result['ret_msg']='修改失败！';
+        }
+
+        return response()->json($result);
     }
 }
