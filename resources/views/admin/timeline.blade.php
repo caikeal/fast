@@ -269,14 +269,14 @@
     <!-- /.modal -->
 @endsection
 @section('moreScript')
-    //侧边栏位置锁定
+    {{--侧边栏位置锁定--}}
     <script>
         !(function () {
             $(".main-menu .accordion>li").removeClass("active");
             $(".lock-place2").addClass("active");
         })($);
     </script>
-    //文件上传
+    {{--文件上传--}}
     {{--<script src="{{env('APP_URL')}}/js/webuploader-0.1.5/webuploader.min.js"></script>--}}
     <script src="http://7xqxb2.com2.z0.glb.qiniucdn.com/webuploader.min.js"></script>
     <script>
