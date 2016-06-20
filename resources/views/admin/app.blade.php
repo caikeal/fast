@@ -13,8 +13,14 @@
     <meta name="author" content="Keal">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    <!-- select 2 -->
+    <link href="http://cdn.bootcss.com/select2/4.0.3/css/select2.min.css" rel="stylesheet">
+
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+    <!-- select2 Bootstrap core CSS -->
+    <link href="http://cdn.bootcss.com/select2-bootstrap-theme/0.1.0-beta.7/select2-bootstrap.min.css" rel="stylesheet">
 
     <!-- Font Awesome -->
     <link href="//cdn.bootcss.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
@@ -604,6 +610,10 @@
 <!-- Bootstrap -->
 <script src="http://cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
+<script src="http://cdn.bootcss.com/select2/4.0.3/js/select2.min.js"></script>
+<script src="http://cdn.bootcss.com/select2/4.0.3/js/i18n/en.js"></script>
+<script src="http://cdn.bootcss.com/select2/4.0.3/js/i18n/zh-CN.js"></script>
+
 <!-- Flot -->
 {{--<script src="//cdn.bootcss.com/flot/0.8.3/jquery.flot.min.js"></script>--}}
 
@@ -643,7 +653,7 @@
 <script src="{{env('APP_URL')}}/js/admin/simplify_dashboard.js"></script>
 
 <!-- vue -->
-<script src="//cdn.bootcss.com/vue/1.0.17/vue.js"></script>
+<script src="//cdn.bootcss.com/vue/1.0.24/vue.js"></script>
 @yield('moreScript')
 
 {{-- 修改个人信息 --}}

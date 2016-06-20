@@ -167,15 +167,16 @@
         });
 
         $("#accordion").on("click", ".am-accordion-title", function () {
-            $(".am-active").removeClass('am-active');
-            $(".am-in").removeClass('am-in');
-            $(this).siblings().addClass('am-in');
-            $(this).parent().addClass('am-active');
+            if (!$(this).parent().hasClass('am-active')){
+                var hasIt = true;
+            }
 
-            // $(".am-active").removeClass('am-active');
-            // $(".am-in").removeClass('am-in');
-            // $(this).parent().addClass('am-active');
-            // $(this).siblings().collapse('toggle');
+            $(".am-active").removeClass('am-active');
+
+            $(this).siblings().collapse('toggle');
+            if (hasIt){
+                $(this).parent().addClass('am-active');
+            }
         });
 
 

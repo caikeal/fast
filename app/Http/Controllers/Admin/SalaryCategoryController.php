@@ -23,7 +23,7 @@ class SalaryCategoryController extends Controller
     public function index(Request $request)
     {
         $type=$request->input("type");
-        $allCats=SalaryCategory::where("type",$type)->get();
+        $allCats=SalaryCategory::where("type",$type)->get(['id', 'name as text', 'level']);
         $big=array();
         $small=array();
         foreach($allCats as $cat){

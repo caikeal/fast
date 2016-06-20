@@ -405,7 +405,7 @@
         </div>
         <!-- /modal createTask-->
 
-        <!-- modal restTask-->
+        <!-- modal resetTask-->
         <div class="modal fade" id="reset-task" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -522,7 +522,7 @@
                 </div>
             </div>
         </div>
-        <!-- /modal restTask-->
+        <!-- /modal resetTask-->
 
         <template id="task-btn-template"  style="display: none">
             <a class="btn btn-success" data-target="#reset-task" data-toggle="modal" @click="notify">修改信息</a>
