@@ -7,6 +7,14 @@ body{
     height: 40%;
     width: 100%;
 }
+.am-table>tbody>tr>td,
+.am-table>tbody>tr>th,
+.am-table>tfoot>tr>td,
+.am-table>tfoot>tr>th,
+.am-table>thead>tr>td,
+.am-table>thead>tr>th{
+    max-width: 220px;
+}
 .thumb{
     padding: 1.7rem 0.5rem 1.4rem 0.5rem;
 }

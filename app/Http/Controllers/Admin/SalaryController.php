@@ -15,6 +15,7 @@ use App\Http\Requests\Admin\SalaryBaseRequest;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -72,11 +73,11 @@ class SalaryController extends Controller
         $cid=$request->input('cid');
         $title=$request->input('title');
         $type=$request->input('type');
-        $mid=\Auth::guard('admin')->user()->id;
+        $mid=Auth::guard('admin')->user()->id;
         $now=Carbon::now();
-        \DB::beginTransaction();
+        DB::beginTransaction();
         try{
-            $base_id=\DB::table('salary_base')->insertGetId([
+            $base_id=DB::table('salary_base')->insertGetId([
                 'title'=>$title,
                 'manager_id'=>$mid,
                 'company_id'=>$cid,
@@ -84,9 +85,15 @@ class SalaryController extends Controller
                 'created_at'=>$now,
                 'updated_at'=>$now,
             ]);
+            $count = SalaryBase::where('title', $title)
+                ->where('type', $type)
+                ->where('company_id', $cid)->count();
+            if ($count > 1){
+                throw new \Exception('标题重复！', 100);
+            }
             foreach($cats as $k=>$cat) {
                 if ($cat) {
-                    \DB::table('salary_base_category')->insert([
+                    DB::table('salary_base_category')->insert([
                         'base_id' => $base_id,
                         'category_id' => $cat,
                         'place' => $k,
@@ -95,20 +102,27 @@ class SalaryController extends Controller
                     ]);
                 }
             }
-            \DB::commit();
+            DB::commit();
         }
         catch(\Exception $e){
-            \DB::rollBack();
-//            throw $e;
-        } catch (\Throwable $e) {
-            \DB::rollBack();
-//            throw $e;
+            if ($e->getCode() == 100){
+                return response()->json(['title'=>$e->getMessage()])->setStatusCode(422);
+            }else{
+                return response()->json(['network'=>'网络错误！'])->setStatusCode(500);
+            }
+            DB::rollBack();
         }
+
         if($type==1){
-            return redirect('admin/timeline');
+            $data['url'] = url('admin/timeline');
         }else{
-            return redirect('admin/insurance');
+            $data['url'] = url('admin/insurance');
         }
+
+        $result['ret_num']=0;
+        $result['ret_msg']='保存成功！';
+        $result['data']=$data;
+        return response()->json($result);
     }
 
     public function download(Request $request){
