@@ -173,10 +173,12 @@
 
             $(".am-active").removeClass('am-active');
 
-            $(this).siblings().collapse('toggle');
             if (hasIt){
+                $(".am-in").removeClass('am-in');
                 $(this).parent().addClass('am-active');
             }
+
+            $(this).siblings().collapse('toggle');
         });
 
 
