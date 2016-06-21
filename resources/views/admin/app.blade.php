@@ -369,6 +369,18 @@
                         </a>
                     </li>
                     @endif
+                    <li class="bg-palette4 lock-place10">
+                        <a href="{{url('admin/compensation')}}">
+                            <span class="menu-content block">
+                                <span class="menu-icon"><i class="block fa fa-lock fa-lg"></i></span>
+                                <span class="text m-left-sm">理赔上传</span>
+                                {{--<small class="badge badge-warning badge-square bounceIn animation-delay6 m-left-xs pull-right">7</small>--}}
+                            </span>
+                            <span class="menu-content-hover block">
+                                理赔上传
+                            </span>
+                        </a>
+                    </li>
                     {{--<li class="menu-header">--}}
                         {{--Others--}}
                     {{--</li>--}}

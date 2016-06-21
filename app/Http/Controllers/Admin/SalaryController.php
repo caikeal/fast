@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Company;
+use App\Fast\Service\Excel\SalaryExcel;
 use App\Jobs\SaveUploadSalary;
 use App\SalaryBase;
 use App\SalaryDetail;
@@ -21,9 +22,12 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class SalaryController extends Controller
 {
-    public function __construct()
+    protected $excel;
+
+    public function __construct(SalaryExcel $excel)
     {
         $this->middleware('auth:admin');
+        $this->excel = $excel;
     }
 
     public function timeline(){
@@ -58,11 +62,16 @@ class SalaryController extends Controller
         $tasks=SalaryTask::where("deal_time",">=",$nowMonthTime)->where("deal_time","<",$next2MonthTime)
             ->where("receive_id","=",\Auth::guard('admin')->user()->id)->where("type",2)
             ->orderBy("deal_time","asc")->get();
+
+        //社保进度模版
+        $bases = SalaryBase::where('type',4)->get(['id', 'title']);
+
         $data=[
             'tasks'=>$tasks,
             'now'=>$now,
             'next'=>$next,
             'nextMonthTime'=>$nextMonthTime,
+            'bases'=>$bases
         ];
 
         return view('admin.insurance',$data);
@@ -115,8 +124,14 @@ class SalaryController extends Controller
 
         if($type==1){
             $data['url'] = url('admin/timeline');
-        }else{
+        }elseif($type==2){
             $data['url'] = url('admin/insurance');
+        }elseif($type==3){
+            $data['url'] = url('admin/compensation');
+        }elseif($type==4){
+            $data['url'] = url('admin/insurance');
+        }else{
+            $data['url'] = '';
         }
 
         $result['ret_num']=0;
@@ -125,6 +140,13 @@ class SalaryController extends Controller
         return response()->json($result);
     }
 
+    /**
+     * 下载模板.
+     * type=1表示工资模板，
+     * type=2表示社保模板，
+     * type=3表示理赔模板
+     * @param Request $request
+     */
     public function download(Request $request){
         $ua = strtolower($_SERVER["HTTP_USER_AGENT"]);
         $base_id=$request->get('bid');
@@ -150,7 +172,11 @@ class SalaryController extends Controller
             $excel->setDescription('A Base For Salary Made By Keal');
 
             $data=array();
-            $datum=array("姓名","身份证号","发薪日（格式如：201601）");
+            if ($base['type'] == 3){
+                $datum=array("姓名","身份证号","查询日（格式如：20160102）");
+            }else{
+                $datum=array("姓名","身份证号","发薪日（格式如：201601）");
+            }
             foreach($cats as $cat) {
                 $datum[]=$cat['name'];
             }
@@ -162,59 +188,68 @@ class SalaryController extends Controller
         })->download('xlsx');
     }
 
+    /**
+     * 上传模板数据.
+     * @param Request $request
+     * @return mixed
+     */
     public function upload(Request $request){
         set_time_limit(1800) ;
+        //验证excel格式是否正确
         if(!$request->file('excel')->isValid()){
-            return response("failed",404);
+            return response("failed",422);
         }
+
         $task_id=$request->get('task_id');
         $nameFile=$request->get('name');
         $type=$request->get('type');
+        
         $extension=explode(".",$nameFile);
-        $now=Carbon::now();
         if($extension[1]) {
-            $name = 'import/excel/'.$now->year . "-" . $now->month . "/" . time().".".$extension[1];
+            $fileName = "/" . time().".".$extension[1];
         }else{
-            $name = 'import/excel/'.$now->year . "-" . $now->month . "/" . time().".xls";
+            $fileName = "/" . time().".xls";
         }
-        $way=\Storage::put($name,file_get_contents($request->file('excel')->getRealPath()));
-        if(!$way){
+
+        //保存excel
+        $isStore = $this->excel->store($fileName, file_get_contents($request->file('excel')->getRealPath()));
+
+        if(!$isStore){
+            $this->excel->delete();
             return response("failed",404);
         }
 
-        /*
-         * 读取excel
-         */
-        $workExcel=Excel::selectSheetsByIndex(0)->load(storage_path('app/'.$name));
-        $base_id=$workExcel->getTitle();
+        //读取excel基础数据
+        $workExcel = $this->excel->read();
+        $base_id = $this->excel->getWorkTitle();
+        $workSheet = $this->excel->getSheet(0);
+        $company_id=$this->excel->getSheetTitle();
 
-        $workSheet=$workExcel->getSheet(0);
-        $company_id=$workSheet->getTitle();
-
+        //验证基础数据正确性
         $companyExist=SalaryTask::where("company_id","=",$company_id)
             ->where("receive_id","=",\Auth::guard('admin')->user()->id)
             ->where("status","=","0")->where("id","=",$task_id)->count();//工资任务存在,且未完成
-        $baseExist=SalaryBase::where("id","=",$base_id)->count();//工资模版存在
+        $baseExist=SalaryBase::where("id", $base_id)
+            ->where('company_id', $company_id)
+            ->where('type', $type)->count();//工资模版存在
         if(!$base_id||!$company_id||!is_numeric($base_id)||!is_numeric($company_id)||!$companyExist||!$baseExist){
-            \Storage::delete($name);
-            return response("liner",404);//格式不正确
+            $this->excel->delete();
+            return response("liner",422);//格式不正确
         }
-        //记录上传者
-        $salaryUpload=new SalaryUpload();
-        $salaryUpload->manager_id=\Auth::guard('admin')->user()->id;
-        $salaryUpload->base_id=$base_id;
-        $salaryUpload->upload='app/'.$name;
-        $salaryUpload->save();
 
-        $content=$workExcel->formatDates(true,"Y-m-d")->get()->toArray();
+        //读取excel内容
+        $content=$this->excel->content();
         foreach($content as $k=>$v){
+            //去除excel空姓名行
             if(!$v[0]){
                 unset($content[$k]);
             }
         }
+
+        //空格数据表验证
         if(count($content)<2){
-            \Storage::delete($name);
-            return response("No Data",404);//必须有实际数据
+            $this->excel->delete();
+            return response("No Data",422);//必须有实际数据
         }
 
         //将数据存入缓存
@@ -223,109 +258,32 @@ class SalaryController extends Controller
         unset($content);
         $manager_id=\Auth::guard('admin')->user()->id;
 
-        SalaryTask::where("company_id", "=", $company_id)->where("type", $type)
-            ->where("receive_id", "=", $manager_id)->where("id", "=", $task_id)
-            ->update(["status" => 2]);
+        DB::beginTransaction();
+        try{
+            //记录上传者
+            $salaryUpload=new SalaryUpload();
+            $salaryUpload->manager_id=$manager_id;
+            $salaryUpload->base_id=$base_id;
+            $salaryUpload->type=$type;
+            $salaryUpload->upload='app/'.$this->excel->getPath();
+            $salaryUpload->save();
+
+            //更新任务状态
+            SalaryTask::where("company_id", "=", $company_id)->where("type", $type)
+                ->where("receive_id", "=", $manager_id)->where("id", "=", $task_id)
+                ->update(["status" => 2]);
+
+            DB::commit();
+        }catch (\Exception $e){
+            DB::rollBack();
+            $this->excel->delete();
+            return response("Save Wrong",422);//保存失败
+        }
 
         //推送至队列异步执行插入
         $this->dispatch(new SaveUploadSalary($base_id,$company_id,$task_id,$type,$manager_id));
-
-        /**
-         * 同步更新到数据库，考虑到性能问题舍弃
-         */
-//        $res=$this->store($base_id,$company_id,$task_id,$type,$manager_id);
-//        if(!$res){
-//            return response("Again",404);//有实际数据出错
-//        }
+        
         return response("success");
     }
 
-    /*
-     * 用户数据存入数据库
-     */
-    protected function store($base_id,$company_id,$task_id,$type,$manager_id){
-        $fail = 0;
-        $now = Carbon::now();
-        $content = (Cache::store('file')->get('admin_salaryUp:' . $base_id . "|" . $company_id));
-        //开启事务
-        DB::beginTransaction();
-        try {
-            $all_content = json_decode($content, true);
-            foreach ($all_content as $k => $v) {
-                $v1_type = is_string($v[1]) ? $v[1] : sprintf('%0.0f', $v[1]);
-                if ($k > 0) {
-                    $is_exist_user = User::where("id_card", "=", $v1_type)->first();
-                    $is_exist_detail = "";
-                    if ($is_exist_user) {
-                        $is_exist_detail = SalaryDetail::where("user_id", "=", $is_exist_user->id)
-                            ->where("company_id", "=", $company_id)
-                            ->where("salary_day", "=", $v[2])
-                            ->where("type", $type)
-                            ->first();
-                    }
-
-                    //用户创建
-                    if (!$is_exist_user) {
-                        $user_id = DB::table('users')->insertGetId([
-                            'name' => $v[0],
-                            'id_card' => $v1_type,
-                            'password' => bcrypt(substr($v1_type, -6)),
-                            'manager_id' => $manager_id,
-                            'company_id' => $company_id,
-                            'created_at' => $now,
-                            'updated_at' => $now,
-                        ]);
-                    } else {
-                        $user_id = $is_exist_user->id;
-                    }
-                    //薪资数据保存
-                    $wages = "";
-                    foreach ($v as $kk => $vv) {
-                        if ($kk > 2) {
-                            $wages .= $vv . ",";
-                        }
-                    }
-                    $wages = trim($wages, ",");
-                    if (!$is_exist_detail) {
-                        DB::table('salary_details')->insert([
-                            'user_id' => $user_id,
-                            'base_id' => $base_id,
-                            'company_id' => $company_id,
-                            'wages' => $wages,
-                            'salary_day' => $v[2],
-                            'manager_id' => $manager_id,
-                            'type' => $type,
-                            'created_at' => $now,
-                            'updated_at' => $now,
-                        ]);
-                    } else {
-                        DB::table('salary_details')->where('company_id', "=", $company_id)
-                            ->where('salary_day', "=", $v[2])
-                            ->where('user_id', "=", $user_id)->update([
-                                'base_id' => $base_id,
-                                'wages' => $wages,
-                                'manager_id' => $manager_id,
-                                'created_at' => $now,
-                                'updated_at' => $now,
-                            ]);
-                    }
-                }
-            }
-            //提交事务
-            DB::commit();
-        } catch (\Exception $e) {
-            $fail = 1;
-            DB::rollBack();
-            throw $e;
-        }
-        if ($fail != 1) {
-            DB::table('salary_task')->where("company_id", "=", $company_id)->where("type", $type)
-                ->where("receive_id", "=", $manager_id)->where("id", "=", $task_id)
-                ->update(["status" => 1]);
-            unset($all_content);
-        }else{
-            return false;
-        }
-        return true;
-    }
 }
