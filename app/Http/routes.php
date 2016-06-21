@@ -40,6 +40,7 @@ Route::group(['namespace'=>'Admin','middleware' => ['web'],'prefix'=>'admin'], f
     Route::resource('/salary/category','SalaryCategoryController');
     //社保模块
     Route::get('/insurance','SalaryController@insurance');
+    Route::post('/insurance/upload', 'InsuranceController@upload');
     //企业用户管理模块
     Route::get('/super','ManagerController@super');
     Route::put('/super/reset_password/{id}','ManagerController@reset');
@@ -52,6 +53,9 @@ Route::group(['namespace'=>'Admin','middleware' => ['web'],'prefix'=>'admin'], f
     //企业任务模块
     Route::resource('/task','SalaryTaskController');
     Route::resource('/company','CompanyController');
+    //理赔模块
+    Route::resource('/compensation','CompensationController');
+    Route::post('/compensation/upload', 'CompensationController@upload');
 });
 
 Route::group(['middleware' => 'web'], function () {

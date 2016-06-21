@@ -5,219 +5,58 @@
         .select-gap{
             margin-bottom: 5px;
         }
-        .line{
-            margin: 20px 0px;
-            border: 1px solid #e2e2e2;
-        }
-        .section-box{
-            background-color: #fff;
-            border: 1px solid #e2e2e2;
-            border-radius: 10px;
-            padding: 15px;
-        }
-        .section-box .line{
-            margin: 5px 0 15px 0;
-            border: 1px solid #e2e2e2;
-        }
     </style>
 @endsection
 @section('content')
-    <div class="padding-md" id="type" data-type="2">
-        <h2 class="header-text">
-            社保上传
-            <span class="sub-header">
-                {{--19 Updates--}}
-            </span>
+    <div class="padding-md" id="compensation">
+        {{--<div class="alert alert-danger alert-dismissible" role="alert" v-if="systemErrors">--}}
+        {{--<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>--}}
+        {{--<strong>Warning!</strong> @{{systemErrors}}--}}
+        {{--</div>--}}
+        <!-- 企业管理 -->
+        <h2 class="header-text" id="type" data-type="3">
+            理赔上传
+            <span class="sub-header"></span>
         </h2>
 
-        <!--社保进度-->
-        <section class="section-box">
-            <div class="row">
-                <div class="col-md-8">
-                    <h4>进度上传</h4>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="line"></div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-8">
-                    <div id="uploader_pro" class="upload-ctrl" data-task="0">
-                        <!--用来存放文件信息-->
-                        <div id="thelist_pro" class="uploader-list"></div>
-                        <div class="btns">
-                            <div id="picker_pro">选择文件</div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-5 col-sm-5 timeline-select select-gap">
-                            <select name="c1" class="form-control">
-                                @foreach($bases as $base)
-                                    <option value="{{ $base->id }}">{{ $base->title }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-2 col-sm-2 select-gap">
-                            <a class="btn btn-success timeline-btn download-progress-base" data-company="c1">下载模版
-                            </a>
-                        </div>
-                        <div class="col-md-2 col-sm-2 select-gap">
-                            <progress-base-btn :company-id=0 type="4" @click="initModal"></progress-base-btn>
-                        </div>
-                        <div class="clearfix"></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <!--/社保进度-->
-
         <div class="row">
-            <div class="col-md-12">
-                <div class="line"></div>
+            <div class="col-md-8">
+                <div id="uploader_pro" class="upload-ctrl" data-task="0">
+                    <!--用来存放文件信息-->
+                    <div id="thelist_pro" class="uploader-list"></div>
+                    <div class="btns">
+                        <div id="picker_pro">选择文件</div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-5 col-sm-5 timeline-select select-gap">
+                        <select name="c1" class="form-control">
+                            @foreach($bases as $base)
+                            <option value="{{ $base->id }}">{{ $base->title }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2 col-sm-2 select-gap">
+                        <a class="btn btn-success timeline-btn download-base">下载模版
+                        </a>
+                    </div>
+                    <div class="col-md-2 col-sm-2 select-gap">
+                        <new-base-btn :company-id=0 @click="initModal"></new-base-btn>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+
+
             </div>
         </div>
-
-        <div class="row">
-            <div class="col-md-10">
-                <div class="timeline-wrapper clearfix">
-                    <div class="timeline-year">
-                        {{$now->year.".".$now->month}}
-                    </div>
-                    @foreach($tasks as $k=>$task)
-                        @if($task->deal_time<$nextMonthTime)
-                            <div class="timeline-row alt">
-                                <div class="timeline-item">
-                                    <div class="timeline-icon">
-                                    </div><!-- ./timeline-icon -->
-                                    <div class="timeline-item-inner">
-                                        <div class="timeline-body">
-                                            <div class="timeline-avatar">
-                                                <img src="{{env("APP_URL")}}/{{$task->company->poster}}" alt=""
-                                                     class="img-circle">
-                                            </div>
-                                            <div class="timeline-content">
-                                                <div class="font-16 font-semi-bold"><a
-                                                            href="#">{{$task->company->name}}</a></div>
-                                                <small class="block text-muted m-bottom-xs">{{date("Y-m-d",$task->deal_time)}}</small>
-                                            </div>
-                                            <div class="timeline-ctrl">
-                                                @if($task->status==0)
-                                                    <div id="uploader{{$k}}" class="upload-ctrl"
-                                                         data-task="{{$task->id}}">
-                                                        <!--用来存放文件信息-->
-                                                        <div id="thelist{{$k}}" class="uploader-list"></div>
-                                                        <div class="btns">
-                                                            <div id="picker{{$k}}">选择文件</div>
-                                                        </div>
-                                                    </div>
-                                                @else
-                                                    <div class="webuploader-container upload-ctrl">
-                                                        <div class="webuploader-pick webuploader-pick-disable">
-                                                            <i class="fa fa-cloud-upload"></i> 上传
-                                                        </div>
-                                                    </div>
-                                                @endif
-                                                <div class="col-lg-5 col-md-5 col-sm-5 timeline-select">
-                                                    <select name="c{{$task->company_id}}" class="form-control">
-                                                        @foreach($task->salaryModels()->where("type",2)->get() as $salaryModel)
-                                                            <option value="{{$salaryModel->id}}">{{$salaryModel->title}}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                                <a class="btn btn-success timeline-btn download-base"
-                                                   data-company="c{{$task->company_id}}">下载模版
-                                                </a>
-
-                                                <new-base-btn :company-id={{ $task->company_id }} type="2" @click="initModal"></new-base-btn>
-                                            </div>
-                                        </div><!-- ./timeline-body -->
-                                    </div><!-- ./timeline-item-inner -->
-                                </div><!-- ./timeline-item -->
-                            </div><!-- ./timeline-row -->
-                        @elseif($task->deal_time>=$nextMonthTime)
-                            <div class="timeline-year bg-purple">
-                                {{$next->year.".".$next->month}}
-                            </div>
-                        @endif
-                        @if($task->deal_time>=$nextMonthTime)
-                            <div class="timeline-row alt">
-                                <div class="timeline-item">
-                                    <div class="timeline-icon">
-                                    </div><!-- ./timeline-icon -->
-                                    <div class="timeline-item-inner">
-                                        <div class="timeline-body">
-                                            <div class="timeline-avatar">
-                                                <img src="{{env("APP_URL")}}/{{$task->company->poster}}" alt=""
-                                                     class="img-circle">
-                                            </div>
-                                            <div class="timeline-content">
-                                                <div class="font-16 font-semi-bold"><a
-                                                            href="#">{{$task->company->name}}</a></div>
-                                                <small class="block text-muted m-bottom-xs">{{date("Y-m-d",$task->deal_time)}}</small>
-                                            </div>
-                                            <div class="timeline-ctrl">
-                                                @if($task->status==0)
-                                                    <div id="uploader{{$k}}" class="upload-ctrl"
-                                                         data-task="{{$task->id}}">
-                                                        <!--用来存放文件信息-->
-                                                        <div id="thelist{{$k}}" class="uploader-list"></div>
-                                                        <div class="btns">
-                                                            <div id="picker{{$k}}">选择文件</div>
-                                                        </div>
-                                                    </div>
-                                                @else
-                                                    <div class="webuploader-container upload-ctrl">
-                                                        <div class="webuploader-pick webuploader-pick-disable">
-                                                            <i class="fa fa-cloud-upload"></i> 上传
-                                                        </div>
-                                                    </div>
-                                                @endif
-                                                <div class="col-lg-5 col-md-5 col-sm-5 timeline-select">
-                                                    <select name="c{{$task->company_id}}" class="form-control">
-                                                        @foreach($task->salaryModels()->where("type",2)->get() as $salaryModel2)
-                                                            <option value="{{$salaryModel2->id}}">{{$salaryModel2->title}}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                                <div class="btn btn-success timeline-btn download-base"
-                                                     data-company="c{{$task->company_id}}">下载模版
-                                                </div>
-                                                <new-base-btn :company-id={{ $task->company_id }} type="2" @click="initModal"></new-base-btn>
-                                            </div>
-                                        </div>
-                                        <!-- ./timeline-body -->
-                                    </div>
-                                    <!-- ./timeline-item-inner -->
-                                </div>
-                                <!-- ./timeline-item -->
-                            </div>
-                            <!-- ./timeline-row -->
-                        @endif
-                    @endforeach
-                </div>
-                <!-- ./timeline-wrapper -->
-            </div>
-            <!-- ./col -->
-        </div>
-        <!-- ./row -->
 
         <!-- timeline-base-template -->
         <template id="timeline-btn-template"  style="display: none">
-            <div class="timeline-new" @click="notify">
-                <i class="fa fa-plus-circle"></i> 新建模版
+            <div class="btn btn-success" @click="notify">
+                新建模版
             </div>
         </template>
         <!-- ./timeline-base-template -->
-
-        <!-- progress-base-template -->
-        <template id="progress-btn-template"  style="display: none">
-         <div class="btn btn-success" @click="notify">
-            新建模版
-            </div>
-        </template>
-        <!-- /progress-base-template -->
 
         <!-- Modal -->
         <div class="modal fade" id="myModal" role="dialog"
@@ -237,11 +76,11 @@
                         <div class="container-fluid">
                             <div class="row creatCategroy">
                                 <div class="col-md-12">
-                                    <vue-input input-name="大类选项创建" :new-category.sync="bigCategorys" level="1" :type="type"></vue-input>
+                                    <vue-input input-name="大类选项创建" :new-category.sync="bigCategorys" type="1"></vue-input>
                                 </div>
                                 <div class="clearfix" style="margin: 10px 0;"></div>
                                 <div class="col-md-12">
-                                    <vue-input input-name="小类选项创建" :new-category.sync="smallCategorys" level="2" :type="type"></vue-input>
+                                    <vue-input input-name="小类选项创建" :new-category.sync="smallCategorys" type="2"></vue-input>
                                 </div>
                             </div>
                             <div class="clearfix" style="margin: 10px 0;"></div>
@@ -255,14 +94,14 @@
                             <br>
 
                             <div>
-                                        <span class="help-block" style="color: red">
-                                            <span style="font-weight: 800">*</span>
-                                            模版中自动包含
-                                            <span style="font-weight: 800">'姓名'、'身份证'、'发薪日'</span>，
-                                            <span style="font-weight: 800"> 请勿</span>
-                                            再次
-                                            <span style="font-weight: 800">创建</span>
-                                        </span>
+                                <span class="help-block" style="color: red">
+                                    <span style="font-weight: 800">*</span>
+                                    模版中自动包含
+                                    <span style="font-weight: 800">'姓名'、'身份证'、'查询日'</span>，
+                                    <span style="font-weight: 800"> 请勿</span>
+                                    再次
+                                    <span style="font-weight: 800">创建</span>
+                                </span>
                             </div>
 
                             <dynamic-selectors :dynamic-selectors.sync="selectors"
@@ -404,9 +243,9 @@
         <script type="text/x-template" id="vue-input-template">
             <div class="input-group open">
                 <input type="text" v-model="newText | nospace" v-el:need-input @input="findList(newText)" @blur="clearSearch" class="form-control">
-                <span class="input-group-btn">
-                    <button @click="addToTexts" class="btn btn-primary">@{{ inputName }}</button>
-                </span>
+                            <span class="input-group-btn">
+                                <button @click="addToTexts" class="btn btn-primary">@{{ inputName }}</button>
+                            </span>
                 <ul class="dropdown-menu" aria-labelledby="dLabel" v-if="searchArr.length!=0">
                     <li>
                         <a herf="javascript:void(0);" style="color:#f8547a">存在如下类似：</a>
@@ -419,37 +258,27 @@
             </div>
         </script>
         <!-- /template -->
+
     </div>
-    <!-- ./padding-md -->
+    <!--/pdadding-md-->
 @endsection
 @section('moreScript')
     {{--侧边栏位置锁定--}}
     <script>
         !(function () {
             $(".main-menu .accordion>li").removeClass("active");
-            $(".lock-place3").addClass("active");
+            $(".lock-place10").addClass("active");
         })($);
     </script>
-    {{--文件上传--}}
-    {{--<script src="{{env('APP_URL')}}/js/webuploader-0.1.5/webuploader.min.js"></script>--}}
     <script src="http://7xqxb2.com2.z0.glb.qiniucdn.com/webuploader.min.js"></script>
     <script>
         // 文件接收服务端。
         $.extend(WebUploader.Uploader.options, {
-            server: "{{url('admin/salary/upload')}}"
+            server: "{{url('admin/compensation/upload')}}"
         });
     </script>
-    <script src="{{env('APP_URL')}}/js/admin/upload.js"></script>
-    <script src="{{env('APP_URL')}}/js/admin/upload_insurance_progress.js"></script>
+    <script src="{{env('APP_URL')}}/js/admin/upload_compensation.js"></script>
     <script src="{{env('APP_URL')}}/js/admin/search.js"></script>
-
-    <script type="text/javascript">
-        // 进度文件接收服务端。
-        $.extend(picker_pro.options,{
-            server: "{{url('admin/insurance/upload')}}"
-        });
-    </script>
-
     <script type="text/javascript">
         //修复双层modal的bug
         $(document).ready(function(){
@@ -460,16 +289,6 @@
 
         //下载
         $(".download-base").on("click", function () {
-            var bid = $(this).prev().children("select").val();
-            if (bid == null) {
-                alert("未选择模版！");
-                return false;
-            }
-            var url = "{{url('admin/salary/download')}}?bid=" + bid;
-            window.location.href = "{{url('admin/salary/download')}}?bid=" + bid;
-        });
-
-        $(".download-progress-base").on("click", function () {
             var bid = $(this).parent().prev().children("select").val();
             if (bid == null) {
                 alert("未选择模版！");
@@ -491,14 +310,11 @@
         });
 
         //vue组件
-        Vue.component('progress-base-btn', {
-            template: '#progress-btn-template',
+        Vue.component('new-base-btn', {
+            template: '#timeline-btn-template',
             props: {
                 companyId: {
                     type: Number,
-                    required: true
-                },
-                type: {
                     required: true
                 }
             },
@@ -506,58 +322,12 @@
                 notify: function(){
                     var _this=this;
                     this.$dispatch('company-id', _this.companyId);
-                    if(_this.type){
-                        this.$dispatch('type', _this.type);
-                    }
                     var url = "{{url('admin/salary/category')}}";
                     $.ajax(url, {
                         type: 'get',
                         dataType: 'json',
                         timeout: '120000',
-                        data: {type: _this.type},
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        }
-                    }).done(function (data) {
-                        if (data.status) {
-                            _this.$dispatch('big-category', data.big);
-                            _this.$dispatch('small-category', data.small);
-                        } else {
-                            alert("网络错误！");
-                        }
-                    }).fail(function () {
-                        alert("网络错误！");
-                    });
-                }
-            }
-        });
-
-        Vue.component('new-base-btn', {
-            template: '#timeline-btn-template',
-            props: {
-                companyId: {
-                    type: Number,
-                    required: true
-                },
-                type: {
-                    required: true
-                }
-            },
-            methods: {
-                notify: function(){
-                    var _this=this;
-                    if(_this.companyId){
-                        this.$dispatch('company-id', _this.companyId);
-                    }
-                    if(_this.type){
-                        this.$dispatch('type', _this.type);
-                    }
-                    var url = "{{url('admin/salary/category')}}";
-                    $.ajax(url, {
-                        type: 'get',
-                        dataType: 'json',
-                        timeout: '120000',
-                        data: {type: _this.type},
+                        data: {type: 3},
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         }
@@ -586,9 +356,6 @@
                 },
                 type: {
                     required: true
-                },
-                level: {
-                    required: true
                 }
             },
             data: function(){
@@ -598,7 +365,7 @@
                     solidInclude: [
                         {id: 0, text: '姓名'},
                         {id: 0, text: '身份证'},
-                        {id: 0, text: '发薪日'}
+                        {id: 0, text: '查询日'}
                     ]
                 }
             },
@@ -620,13 +387,13 @@
                         type: 'post',
                         dataType: 'json',
                         timeout: '120000',
-                        data: {name: self.newText, level: self.level, type: self.type},
+                        data: {name: self.newText, level: self.type, type: 3},
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         }
                     }).done(function (data) {
                         if (data.status) {
-                            var datum = {id: data.cid, text: self.newText, level: self.level};
+                            var datum = {id: data.cid, text: self.newText, level: self.type};
                             self.newCategory.push(datum);
                             self.newText = '';
                             alert("添加成功！");
@@ -971,7 +738,7 @@
         });
 
         var vm = new Vue({
-            el: '#type',
+            el: '#compensation',
             data: {
                 companyId: 0,
                 bigCategorys: [],
@@ -983,7 +750,7 @@
                 },
                 rehearsal: [],
                 baseTitle: '',
-                type: 0
+                type: 3
             },
             methods: {
                 initModal: function () {
@@ -1155,11 +922,10 @@
                 },
                 'small-category': function (smallCategory){
                     this.smallCategorys=smallCategory;
-                },
-                'type': function(type){
-                    this.type=type;
                 }
             }
         });
+
     </script>
+
 @endsection
