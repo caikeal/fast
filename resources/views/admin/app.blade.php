@@ -65,7 +65,7 @@
                         <span class="badge badge-danger bounceIn">10</span>
                         <ul class="dropdown-menu dropdown-sm pull-right user-dropdown">
                             <li class="user-avatar">
-                                <img src="{{ \Auth::guard('admin')->user()->poster }}" alt="图片" class="img-circle">
+                                <img src="{{ env('APP_URL') }}{{ \Auth::guard('admin')->user()->poster }}" alt="图片" class="img-circle">
                                 <div class="user-content">
                                     <h5 class="no-m-bottom">{{ \Auth::guard('admin')->user()->name }}</h5>
                                     <div class="m-top-xs">
@@ -107,7 +107,7 @@
                 <div class="pull-right m-right-sm">
                     <div class="user-block hidden-xs">
                         <a href="#" id="userToggle" data-toggle="dropdown">
-                            <img src="{{ \Auth::guard('admin')->user()->poster }}" alt=""
+                            <img src="{{env('APP_URL')}}{{ \Auth::guard('admin')->user()->poster }}" alt=""
                                  class="img-circle inline-block user-profile-pic">
 
                             <div class="user-detail inline-block">
@@ -298,7 +298,7 @@
                         </a>
                     </li>
                     <li class="bg-palette4 lock-place4">
-                        <a href="#">
+                        <a href="{{url('admin/history')}}">
                             <span class="menu-content block">
                                 <span class="menu-icon"><i class="block fa fa-clock-o fa-lg"></i></span>
                                 <span class="text m-left-sm">历史查询</span>
@@ -369,7 +369,7 @@
                         </a>
                     </li>
                     @endif
-                    <li class="bg-palette4 lock-place10">
+                    <li class="bg-palette3 lock-place10">
                         <a href="{{url('admin/compensation')}}">
                             <span class="menu-content block">
                                 <span class="menu-icon"><i class="block fa fa-lock fa-lg"></i></span>
