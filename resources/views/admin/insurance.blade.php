@@ -23,12 +23,12 @@
 @endsection
 @section('content')
     <div class="padding-md" id="type" data-type="2">
-        <h2 class="header-text">
+        <h3 class="header-text">
             社保上传
             <span class="sub-header">
                 {{--19 Updates--}}
             </span>
-        </h2>
+        </h3>
 
         <!--社保进度-->
         <section class="section-box">
