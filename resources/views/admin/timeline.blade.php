@@ -4,12 +4,12 @@
 @endsection
 @section('content')
     <div class="padding-md" id="type" data-type="1">
-        <h2 class="header-text">
+        <h3 class="header-text">
             工资上传
             <span class="sub-header">
                 {{--19 Updates--}}
             </span>
-        </h2>
+        </h3>
 
         <div class="row">
             <div class="col-md-10">

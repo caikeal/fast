@@ -14,10 +14,10 @@
         {{--<strong>Warning!</strong> @{{systemErrors}}--}}
         {{--</div>--}}
         <!-- 企业管理 -->
-        <h2 class="header-text" id="type" data-type="3">
+        <h3 class="header-text" id="type" data-type="3">
             理赔上传
             <span class="sub-header"></span>
-        </h2>
+        </h3>
 
         <div class="row">
             <div class="col-md-8">
