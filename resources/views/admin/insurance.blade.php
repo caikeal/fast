@@ -1061,6 +1061,9 @@
                         if (!selectors[i]['bigSelect']) {
                             tplBigErrors = {isInvalid: true, msg: '必须选择！'};
                             errorsNum++;
+                        }else if(selectors[i]['smallSelect'].length==0){
+                            tplBigErrors = {isInvalid: true, msg: '小类至少一项！'};
+                            errorsNum++;
                         }else if(this.checkRepeat(selectors[i]['bigSelect'], selectors)){
                             tplBigErrors = {isInvalid: true, msg: '有重复选项！'};
                             errorsNum++;
