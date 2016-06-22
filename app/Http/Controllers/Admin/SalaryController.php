@@ -77,6 +77,11 @@ class SalaryController extends Controller
         return view('admin.insurance',$data);
     }
 
+    /**
+     * 模版的创建。
+     * @param SalaryBaseRequest $request
+     * @return mixed
+     */
     public function base(SalaryBaseRequest $request){
         $cats=$request->input('category');
         $cid=$request->input('cid');
@@ -114,12 +119,12 @@ class SalaryController extends Controller
             DB::commit();
         }
         catch(\Exception $e){
+            DB::rollBack();
             if ($e->getCode() == 100){
                 return response()->json(['title'=>$e->getMessage()])->setStatusCode(422);
             }else{
                 return response()->json(['network'=>'网络错误！'])->setStatusCode(500);
             }
-            DB::rollBack();
         }
 
         if($type==1){
@@ -144,7 +149,8 @@ class SalaryController extends Controller
      * 下载模板.
      * type=1表示工资模板，
      * type=2表示社保模板，
-     * type=3表示理赔模板
+     * type=3表示理赔模板，
+     * type=4表示社保进度模版
      * @param Request $request
      */
     public function download(Request $request){
@@ -232,7 +238,7 @@ class SalaryController extends Controller
         $baseExist=SalaryBase::where("id", $base_id)
             ->where('company_id', $company_id)
             ->where('type', $type)->count();//工资模版存在
-        if(!$base_id||!$company_id||!is_numeric($base_id)||!is_numeric($company_id)||!$companyExist||!$baseExist){
+        if(($type!=1 && $type!=2)||!$base_id||!$company_id||!is_numeric($base_id)||!is_numeric($company_id)||!$companyExist||!$baseExist){
             $this->excel->delete();
             return response("liner",422);//格式不正确
         }

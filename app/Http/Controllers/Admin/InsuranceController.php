@@ -62,7 +62,7 @@ class InsuranceController extends Controller
         $baseExist=SalaryBase::where("id", $base_id)
             ->where('company_id', $company_id)
             ->where('type', $type)->count();//工资模版存在
-        if($type!=4||!$base_id||$company_id!=0||!is_numeric($base_id)||!is_numeric($company_id)||!$baseExist){
+        if($type!=4||!$base_id||!$company_id||!is_numeric($base_id)||!is_numeric($company_id)||!$baseExist){
             $this->excel->delete();
             return response("liner",422);//格式不正确
         }
