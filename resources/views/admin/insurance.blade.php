@@ -245,6 +245,16 @@
                                 </div>
                             </div>
                             <div class="clearfix" style="margin: 10px 0;"></div>
+
+                            <div :class="['company-selector',{'has-error':errors.companyErrors.isInvalid}]" v-if="companyShow">
+                                <vue-select class="vue-select3" name="select0"
+                                            :options="allCompany" :model.sync="companyId"
+                                            :searchable="true" language="zh-CN" drop-node="body">
+                                </vue-select>
+                                <span class="help-block">@{{ errors.companyErrors.msg }}</span>
+                            </div>
+
+                            <div class="clearfix" style="margin: 10px 0;"></div>
                             <div class="row">
                                 <div :class="['col-md-12',{'has-error':errors.titleErrors.isInvalid}]">
                                     <input type="text" name="base-title" v-model="baseTitle | nospace" class="form-control" placeholder="模版标题">
@@ -505,7 +515,28 @@
             methods: {
                 notify: function(){
                     var _this=this;
-                    this.$dispatch('company-id', _this.companyId);
+                    _this.$dispatch('company-id', _this.companyId);
+                    _this.$dispatch('company-show', 1);
+                    //不存在企业，需要获取所有企业让用户选择
+                    if (_this.companyId == 0){
+                        $.ajax("{{ url('admin/company') }}", {
+                            type: 'get',
+                            dataType: 'json',
+                            timeout: '120000',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            }
+                        }).done(function (data) {
+                            if (data.ret_num==0) {
+                                _this.$dispatch('all-company', data.data);
+                            } else {
+                                alert("网络错误！");
+                            }
+                        }).fail(function () {
+                            alert("网络错误！");
+                        });
+                    }
+
                     if(_this.type){
                         this.$dispatch('type', _this.type);
                     }
@@ -546,6 +577,7 @@
             methods: {
                 notify: function(){
                     var _this=this;
+                    _this.$dispatch('company-show', 0);
                     if(_this.companyId){
                         this.$dispatch('company-id', _this.companyId);
                     }
@@ -976,14 +1008,17 @@
                 companyId: 0,
                 bigCategorys: [],
                 smallCategorys: [],
+                allCompany: [],
                 selectors: [],
                 errors: {
                     dynamicErrors: [],
-                    titleErrors: {isInvalid: false, msg: ''}
+                    titleErrors: {isInvalid: false, msg: ''},
+                    companyErrors: {isInvalid: false, msg: ''}
                 },
                 rehearsal: [],
                 baseTitle: '',
-                type: 0
+                type: 0,
+                companyShow: 0
             },
             methods: {
                 initModal: function () {
@@ -1036,11 +1071,18 @@
                     var errorsNum = 0;
                     this.errors.dynamicErrors = [];
                     this.errors.titleErrors = {isInvalid: false, msg: ''};
+                    this.errors.companyErrors = {isInvalid: false, msg: ''};
                     var self = this;
 
                     if (this.baseTitle == '') {
                         this.errors.titleErrors.isInvalid = true;
                         this.errors.titleErrors.msg = '模板标题必填！';
+                        errorsNum++;
+                    }
+
+                    if (this.companyId == 0){
+                        this.errors.companyErrors.isInvalid = true;
+                        this.errors.companyErrors.msg = '企业必填！';
                         errorsNum++;
                     }
 
@@ -1161,6 +1203,12 @@
                 },
                 'type': function(type){
                     this.type=type;
+                },
+                'all-company': function (allCompany){
+                    this.allCompany=allCompany;
+                },
+                'company-show': function (companyShow) {
+                    this.companyShow=companyShow;
                 }
             }
         });
