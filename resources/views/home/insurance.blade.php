@@ -171,11 +171,10 @@
                 var hasIt = true;
             }
 
-            $(".am-active").removeClass('am-active');
-
             if (hasIt){
-                $(".am-in").removeClass('am-in');
                 $(this).parent().addClass('am-active');
+            }else{
+                $(this).parent().removeClass('am-active');
             }
 
             $(this).siblings().collapse('toggle');

@@ -171,19 +171,13 @@
                 var hasIt = true;
             }
 
-            $(".am-active").removeClass('am-active');
-
             if (hasIt){
-                $(".am-in").removeClass('am-in');
                 $(this).parent().addClass('am-active');
+            }else{
+                $(this).parent().removeClass('am-active');
             }
 
             $(this).siblings().collapse('toggle');
-
-            // $(".am-active").removeClass('am-active');
-            // $(".am-in").removeClass('am-in');
-            // $(this).parent().addClass('am-active');
-            // $(this).siblings().collapse('toggle');
         });
 
 
