@@ -40,9 +40,9 @@ class InsuranceController extends Controller
 
         $extension=explode(".",$nameFile);
         if($extension[1]) {
-            $fileName = "/" . time().".".$extension[1];
+            $fileName = time().".".$extension[1];
         }else{
-            $fileName = "/" . time().".xls";
+            $fileName = time().".xls";
         }
 
         //保存excel
