@@ -11,7 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
+use DB;
 
 class SaveUploadSalary extends Job implements ShouldQueue
 {
@@ -37,9 +37,7 @@ class SaveUploadSalary extends Job implements ShouldQueue
     }
 
     /**
-     * Execute the job.
-     *
-     * @return void
+     * @throws \Exception
      */
     public function handle()
     {

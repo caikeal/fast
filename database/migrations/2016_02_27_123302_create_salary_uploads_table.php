@@ -16,6 +16,8 @@ class CreateSalaryUploadsTable extends Migration
             $table->increments('id');
             $table->integer('manager_id')->unsigned()->index();
             $table->integer('base_id')->unsigned()->index();
+            $table->integer('company_id')->unsigned()->index();
+            $table->tinyInteger('type')->unsigned()->index();
             $table->string('upload');
             $table->timestamps();
         });
