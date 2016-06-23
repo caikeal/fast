@@ -91,6 +91,7 @@ class InsuranceController extends Controller
             $salaryUpload=new SalaryUpload();
             $salaryUpload->manager_id=$manager_id;
             $salaryUpload->base_id=$base_id;
+            $salaryUpload->company_id=$company_id;
             $salaryUpload->type=$type;
             $salaryUpload->upload='app/'.$this->excel->getPath();
             $salaryUpload->save();
