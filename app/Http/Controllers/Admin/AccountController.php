@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Fast\Service\Manager\Poster;
 use App\Manager;
 use App\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use DB;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
@@ -20,8 +21,11 @@ use Illuminate\Support\Facades\Hash;
  */
 class AccountController extends Controller
 {
-    public function __construct()
+    protected $poster;
+
+    public function __construct(Poster $poster)
     {
+        $this->poster = $poster;
         $this->middleware('auth:admin');
         $this->middleware('throttle');
     }
@@ -66,6 +70,7 @@ class AccountController extends Controller
             $manager=new Manager();
             $manager->name=$name;
             $manager->email=$account;
+            $manager->poster=$this->poster->randomPoster();
             $manager->pid=\Auth::guard('admin')->user()->id;
             $manager->password=bcrypt($password);
             $manager->save();
@@ -78,10 +83,10 @@ class AccountController extends Controller
             $result['ret_msg']='保存成功！';
             $result['data']=$manager::with('roles')->find($manager->id);
             DB::commit();
-        } catch (Exception $e){
+        } catch (\Exception $e){
+            DB::rollBack();
             $result['ret_num']=110;
             $result['ret_msg']='保存失败，请重新再试！';
-            DB::rollback();
         }
         return response()->json($result);
     }
