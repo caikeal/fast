@@ -17,7 +17,7 @@ class CreateReuploadApplicationTable extends Migration
             $table->integer('applier',false,true)->comment('申请者id')->index();
             $table->integer('receiver',false,true)->comment('接受者id')->index();
             $table->integer('upload_id',false,true)->comment('上传id')->index();
-            $table->tinyInteger('status',false,true)->comment('申请状态, 1:ok,2:fail,3:wait');
+            $table->tinyInteger('status',false,true)->comment('申请状态, 1:ok,2:fail,3:wait,4:finish');
             $table->integer('expiration',false,true)->comment('有效期')->default(7);
             $table->timestamps();
         });
