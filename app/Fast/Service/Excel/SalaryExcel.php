@@ -39,6 +39,6 @@ class SalaryExcel extends Excel
 
     public function content()
     {
-        return $this->excel->formatDates(true)->get()->toArray();
+        return $this->excel->formatDates(true, 'Y-m-d')->get()->toArray();
     }
 }
