@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Company;
 use App\Fast\Service\Excel\SalaryExcel;
+use App\Fast\Service\Tools\UserAgentTrait;
 use App\Jobs\SaveUploadSalary;
 use App\SalaryBase;
 use App\SalaryTask;
@@ -20,6 +21,8 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class SalaryController extends Controller
 {
+    use UserAgentTrait;
+
     protected $excel;
 
     public function __construct(SalaryExcel $excel)
@@ -158,11 +161,8 @@ class SalaryController extends Controller
         $cats=$base->categories()->where("level",2)->orderBy('place','asc')->get();
 
         //解决不同浏览器下载excel时标题解析乱码问题
-        if (preg_match("/msie|edge|safari|firefox/", $ua)) {
-            $base_title=urlencode($base['title']);
-        }else{
-            $base_title=$base['title'];
-        }
+        $base_title = $this->beautyFileName($base['title'], $ua);
+
         Excel::create($base_title, function($excel) use($cats,$base) {
 
             // Set the title

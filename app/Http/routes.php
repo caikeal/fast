@@ -56,6 +56,9 @@ Route::group(['namespace'=>'Admin','middleware' => ['web'],'prefix'=>'admin'], f
     //理赔模块
     Route::resource('/compensation','CompensationController');
     Route::post('/compensation/upload', 'CompensationController@upload');
+    //历史查询模块
+    Route::get('/history/download', 'HistoryController@download');
+    Route::resource('/history', 'HistoryController');
 });
 
 Route::group(['middleware' => 'web'], function () {
