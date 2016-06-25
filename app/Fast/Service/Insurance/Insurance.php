@@ -20,8 +20,8 @@ class Insurance
         $now = Carbon::now();
 
         foreach ($all_content as $k => $v) {
-            $v1_type = is_string($v[1]) ? $v[1] : sprintf('%0.0f', $v[1]);
-            if ($k > 0) {
+            if ($k > 0 && $v[0]) {
+                $v1_type = is_string($v[1]) ? $v[1] : sprintf('%0.0f', $v[1]);
                 $is_exist_user = User::where("id_card", "=", $v1_type)->first();
                 $is_exist_detail = "";
                 if ($is_exist_user) {
@@ -49,6 +49,10 @@ class Insurance
                 $wages = "";
                 foreach ($v as $kk => $vv) {
                     if ($kk > 2) {
+                        //由于是日期格式excel会以数组返回
+                        if(is_array($vv)){
+                            $vv=date("Y/m/d",strtotime($vv['date']));
+                        }
                         $wages .= $vv . "||";
                     }
                 }
