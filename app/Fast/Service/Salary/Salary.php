@@ -2,31 +2,22 @@
 /**
  * Created by PhpStorm.
  * User: Odeen
- * Date: 2016/6/21
- * Time: 16:43
+ * Date: 2016/6/25
+ * Time: 22:56
  */
 
-namespace App\Fast\Service\Compensation;
+namespace App\Fast\Service\Salary;
 
 
-use App\CompensationDetail;
+use App\SalaryDetail;
 use App\User;
 use Carbon\Carbon;
 use DB;
 
-class Compensation
+class Salary
 {
-    /**
-     * 保存理赔记录到数据库
-     *
-     * @param $base_id
-     * @param $company_id
-     * @param $type
-     * @param $manager_id
-     * @param $all_content
-     * @return bool
-     */
-    public function storeCompensation($base_id,$company_id,$type,$manager_id,$all_content){
+    public function storeSalary($base_id,$company_id,$type,$manager_id,$all_content)
+    {
         $now = Carbon::now();
 
         foreach ($all_content as $k => $v) {
@@ -35,9 +26,9 @@ class Compensation
                 $is_exist_user = User::where("id_card", "=", $v1_type)->first();
                 $is_exist_detail = "";
                 if ($is_exist_user) {
-                    $is_exist_detail = CompensationDetail::where("user_id", "=", $is_exist_user->id)
+                    $is_exist_detail = SalaryDetail::where("user_id", "=", $is_exist_user->id)
                         ->where("company_id", "=", $company_id)
-                        ->where("compensation_day", "=", $v[2])
+                        ->where("salary_day", "=", $v[2])
                         ->where("type", $type)
                         ->first();
                 }
@@ -64,20 +55,20 @@ class Compensation
                 }
                 $wages = trim($wages, "||");
                 if (!$is_exist_detail) {
-                    DB::table('compensation_details')->insert([
+                    DB::table('salary_details')->insert([
                         'user_id' => $user_id,
                         'base_id' => $base_id,
                         'company_id' => $company_id,
                         'wages' => $wages,
-                        'compensation_day' => $v[2],
+                        'salary_day' => $v[2],
                         'manager_id' => $manager_id,
                         'type' => $type,
                         'created_at' => $now,
                         'updated_at' => $now,
                     ]);
                 } else {
-                    DB::table('compensation_details')->where('company_id', "=", $company_id)
-                        ->where('compensation_day', "=", $v[2])
+                    DB::table('salary_details')->where('company_id', "=", $company_id)
+                        ->where('salary_day', "=", $v[2])
                         ->where('user_id', "=", $user_id)->update([
                             'base_id' => $base_id,
                             'wages' => $wages,
@@ -88,7 +79,6 @@ class Compensation
                 }
             }
         }
-        
-    }
 
+    }
 }
