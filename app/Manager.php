@@ -36,7 +36,7 @@ class Manager extends Authenticatable
     ];
 
     public function roles(){
-        return $this->belongsToMany(Role::class,'role_manager');
+        return $this->belongsToMany('App\Role', 'role_manager');
     }
 
     public function hasRole($role){

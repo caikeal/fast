@@ -52,12 +52,14 @@ Route::group(['namespace'=>'Admin','middleware' => ['web'],'prefix'=>'admin'], f
     Route::resource('/employ','EmployController');
     //企业任务模块
     Route::resource('/task','SalaryTaskController');
+    Route::resource('/task_application','TaskApplicationController');
     Route::resource('/company','CompanyController');
     //理赔模块
     Route::resource('/compensation','CompensationController');
     Route::post('/compensation/upload', 'CompensationController@upload');
     //历史查询模块
     Route::get('/history/download', 'HistoryController@download');
+    Route::post('/history/reupload', 'HistoryController@reupload');
     Route::resource('/history', 'HistoryController');
 });
 
