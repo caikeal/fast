@@ -2,8 +2,18 @@
 @section('moreCss')
     <link href="{{env('APP_URL')}}/css/admin/history/history.css" rel="stylesheet">
     <link href="{{env('APP_URL')}}/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
-    <style>
-
+    <link rel="stylesheet" href="{{env("APP_URL")}}/css/admin/webuploader.css">
+    <style type="text/css">
+        .webuploader-pick{
+            background: inherit;
+        }
+        .webuploader-pick-hover{
+            background: inherit;
+        }
+        .fast-table .reload.sure-reupload{
+            margin-top: 6px;
+            margin-left: -15px;
+        }
     </style>
 @endsection
 @section('content')
@@ -68,6 +78,7 @@
                 </thead>
                 <tbody>
                 @foreach($uploads as $k=>$v)
+                    <?php $countUp=0;?>
                     <tr>
                         <td></td>
                         <td><img src="{{ $v['company']['poster'] ? env('APP_URL') .'/'. $v['company']['poster'] : env('APP_URL').'/images/fast_company.png' }}" class="thumbnail thumbnail-radius">
@@ -89,11 +100,19 @@
                             <see-details upload-id="{{ $v['id'] }}" company-name="{{ $v['company']['name'] }}"></see-details>
                         </td>
                         <td>
-                            @if($roleLevel==0 || !count($v['application']))
-                            @elseif($v['application']['0']['status']==1)
-                                <span class="label label-success reload">重新上传</span>
+                            @if($roleLevel==1 || ($v['type']!=1 && $v['type']!=2))
+                            @elseif(count($v['application']) && $v['application']['0']['status']==1)
+                                <div id="uploader{{ $countUp }}" class="upload-ctrl"
+                                     data-upload={{ $v['id'] }} data-type={{ $v['type'] }} data-company={{ $v['company']['id'] }} data-reupload={{ $v['application']['0']['id'] }}>
+                                    <!--用来存放文件信息-->
+                                    <div id="thelist{{ $countUp }}" class="uploader-list"></div>
+                                    <div class="btns">
+                                        <div id="picker{{ $countUp }}">选择文件</div>
+                                    </div>
+                                </div>
+                                <?php $countUp++;?>
                             @else
-                                <span class="label label-success reload">申请上传</span>
+                                <span class="label label-success reload"  @click="reuploadApply({{ $v['id'] }})">申请上传</span>
                             @endif
                         </td>
                     </tr>
@@ -178,6 +197,14 @@
             $(".lock-place4").addClass("active");
         })($);
     </script>
+    <script src="http://7xqxb2.com2.z0.glb.qiniucdn.com/webuploader.min.js"></script>
+    <script>
+        // 文件接收服务端。
+        $.extend(WebUploader.Uploader.options, {
+            server: "{{url('admin/history/reupload')}}"
+        });
+    </script>
+    <script src="{{env('APP_URL')}}/js/admin/reupload.js"></script>
     <script src="{{env('APP_URL')}}/js/bootstrap-datetimepicker.min.js"></script>
     <script src="{{env('APP_URL')}}/js/bootstrap-datetimepicker.zh-CN.js"></script>
     <script>
@@ -272,6 +299,36 @@
                     var _this = this;
                     var url = "{{ url('admin/history/download') }}"+"?upload_id="+_this.uploadId;
                     window.open(url);
+                    return true;
+                },
+
+                reuploadApply: function (tplId) {
+                    var _this = this;
+                    var url = "{{ url('admin/task_application') }}";
+                    var confirm = window.confirm("您确定要重新上传吗？");
+                    if (!confirm){
+                        return false;
+                    }
+                    $.ajax(url, {
+                        type: 'post',
+                        dataType: 'json',
+                        timeout: '120000',
+                        data: {
+                            upload_id: tplId
+                        },
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    }).done(function (data) {
+                        if (data.ret_num==0) {
+                            alert(data.ret_msg);
+                        } else {
+                            alert(data.ret_msg);
+                        }
+                    }).fail(function (error) {
+                        alert(error.responseJSON.invalid);
+                    });
+
                     return true;
                 }
             },

@@ -31,6 +31,11 @@ class SalaryController extends Controller
         $this->excel = $excel;
     }
 
+    /**
+     * 薪资时间轴页面。
+     *
+     * @return mixed
+     */
     public function timeline(){
         //取2个月的薪资任务
         $now=Carbon::now();
@@ -52,6 +57,11 @@ class SalaryController extends Controller
         return view('admin.timeline',$data);
     }
 
+    /**
+     * 社保时间轴页面。
+     * 
+     * @return mixed
+     */
     public function insurance(){
         //取2个月的薪资任务
         $now=Carbon::now();
@@ -80,6 +90,7 @@ class SalaryController extends Controller
 
     /**
      * 模版的创建。
+     * 
      * @param SalaryBaseRequest $request
      * @return mixed
      */
@@ -147,7 +158,8 @@ class SalaryController extends Controller
     }
 
     /**
-     * 下载模板.
+     * 下载模板。
+     * 
      * type=1表示工资模板，
      * type=2表示社保模板，
      * type=3表示理赔模板，
@@ -194,6 +206,7 @@ class SalaryController extends Controller
 
     /**
      * 上传模板数据.
+     *
      * @param Request $request
      * @return mixed
      */

@@ -16,6 +16,18 @@ use DB;
 
 class Salary
 {
+    /**
+     * 保存薪资、社保详情。
+     * 策略：
+     * 相同用户、相同企业、相同查询时间、相同类型的算是同种详情，采用覆盖策略
+     * 否则，采用新建策略。
+     *
+     * @param $base_id
+     * @param $company_id
+     * @param $type
+     * @param $manager_id
+     * @param $all_content
+     */
     public function storeSalary($base_id,$company_id,$type,$manager_id,$all_content)
     {
         $now = Carbon::now();

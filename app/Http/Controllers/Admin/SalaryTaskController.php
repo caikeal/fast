@@ -61,7 +61,7 @@ class SalaryTaskController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Requests\Admin\SalaryTaskRequest  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Requests\Admin\SalaryTaskRequest $request)
@@ -180,8 +180,8 @@ class SalaryTaskController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  Requests\Admin\SalaryTaskRequest  $request
+     * @param  int  $tid
      * @return \Illuminate\Http\Response
      */
     public function update(Requests\Admin\SalaryTaskRequest $request, $tid)

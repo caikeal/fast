@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Fast\Service\Excel\SalaryExcel;
 use App\Fast\Service\History\History;
 use App\Fast\Service\Tools\UserAgentTrait;
+use App\Jobs\ReuploadSalary;
+use App\ReuploadApplication;
+use App\SalaryBase;
 use App\SalaryUpload;
 use App\User;
 use Carbon\Carbon;
@@ -18,10 +22,13 @@ class HistoryController extends Controller
 
     protected $history;
 
-    public function __construct(History $history)
+    protected $excel;
+
+    public function __construct(History $history, SalaryExcel $excel)
     {
         $this->middleware('auth:admin');
         $this->history = $history;
+        $this->excel = $excel;
     }
 
     /**
@@ -202,6 +209,12 @@ class HistoryController extends Controller
         //
     }
 
+    /**
+     * 历史文件下载。
+     *
+     * @param Request $request
+     * @return mixed
+     */
     public function download(Request $request)
     {
         $uploadId = $request->input('upload_id');
@@ -231,5 +244,112 @@ class HistoryController extends Controller
         $base_title = $this->beautyFileName($fileName, $ua);
 
         return response()->download(storage_path($uploads['upload']), $base_title);
+    }
+
+    public function reupload(Request $request)
+    {
+        set_time_limit(1800) ;
+        //验证excel格式是否正确
+        if(!$request->file('excel')->isValid()){
+            return response("failed",422);
+        }
+
+        $upload_id=$request->get('upload_id');
+        $reupload_id=$request->get('reupload_id');
+        $company=$request->get('company');
+        $nameFile=$request->get('name');
+        $type=$request->get('type');
+
+        $manager_id = \Auth::guard('admin')->user()->id;
+
+        $extension=explode(".",$nameFile);
+        if($extension[1]) {
+            $fileName = time().".".$extension[1];
+        }else{
+            $fileName = time().".xls";
+        }
+
+        //保存excel
+        $isStore = $this->excel->store($fileName, file_get_contents($request->file('excel')->getRealPath()));
+
+        if(!$isStore){
+            $this->excel->delete();
+            return response("failed",404);
+        }
+
+        //读取excel基础数据
+        $workExcel = $this->excel->read();
+        $base_id = $this->excel->getWorkTitle();
+        $workSheet = $this->excel->getSheet(0);
+        $company_id=$this->excel->getSheetTitle();
+
+        //=================================验证基础数据正确性
+        //工资上传是存在的
+        $uploadExist=SalaryUpload::where("company_id", $company_id)
+            ->where("manager_id", $manager_id)
+            ->where("id", $upload_id)->count();
+
+        //工资模版存在
+        $baseExist=SalaryBase::where("id", $base_id)
+            ->where('company_id', $company_id)
+            ->where('type', $type)->count();
+
+        //验证申请已经同意
+        $applicatonExist = ReuploadApplication::where('upload_id', $upload_id)
+            ->where('id', $reupload_id)->where('status',1)
+            ->where('applier', $manager_id)->count();
+
+        if(($type!=1 && $type!=2)||!$base_id||!$company_id
+            ||!is_numeric($base_id)||!is_numeric($company_id)
+            || $company_id!=$company ||!$uploadExist||!$baseExist
+            ||!$applicatonExist){
+            $this->excel->delete();
+            return response("liner",422);//格式不正确
+        }
+
+        //读取excel内容
+        $content=$this->excel->content();
+        foreach($content as $k=>$v){
+            //去除excel空姓名行
+            if(!$v[0]){
+                unset($content[$k]);
+            }
+        }
+
+        //空格数据表验证
+        if(count($content)<2){
+            $this->excel->delete();
+            return response("No Data",422);//必须有实际数据
+        }
+
+        //将数据存入缓存
+        \Cache::store('file')->put('admin_salaryReUp:'.$base_id."|".$company_id."|".$reupload_id, json_encode($content), 60);
+        unset($content);
+
+        \DB::beginTransaction();
+        try{
+            //记录上传者
+            $salaryUpload=new SalaryUpload();
+            $salaryUpload->manager_id=$manager_id;
+            $salaryUpload->base_id=$base_id;
+            $salaryUpload->company_id=$company_id;
+            $salaryUpload->type=$type;
+            $salaryUpload->upload='app/'.$this->excel->getPath();
+            $salaryUpload->save();
+
+            //关闭申请
+            ReuploadApplication::where('id', $reupload_id)->update(["status" => 4]);
+
+            \DB::commit();
+        }catch (\Exception $e){
+            \DB::rollBack();
+            $this->excel->delete();
+            return response("Save Wrong",422);//保存失败
+        }
+
+        //推送至队列异步执行插入
+        $this->dispatch(new ReuploadSalary($base_id,$company_id,$reupload_id,$type,$manager_id));
+
+        return response("success");
     }
 }
