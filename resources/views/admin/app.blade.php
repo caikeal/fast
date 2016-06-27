@@ -31,9 +31,6 @@
     {{--<!-- Morris -->--}}
     {{--<link href="//cdn.bootcss.com/morris.js/0.5.1/morris.css" rel="stylesheet">--}}
 
-    {{--<!-- Datepicker -->--}}
-    {{--<link href="{{env('APP_URL')}}/css/datepicker.css" rel="stylesheet"/>--}}
-
     <!-- Animate -->
     <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
 
@@ -42,15 +39,15 @@
     <link href="//cdn.bootcss.com/owl-carousel/1.32/owl.theme.css" rel="stylesheet">
 
     <!-- Simplify -->
-    {{--<link href="{{env('APP_URL')}}/css/admin/simplify.min.css" rel="stylesheet">--}}
-    <link href="http://7xqxb2.com2.z0.glb.qiniucdn.com/simplify.min.css" rel="stylesheet">
+    <link href="{{env('APP_URL')}}/css/admin/simplify.min.css" rel="stylesheet">
+    {{--<link href="http://7xqxb2.com2.z0.glb.qiniucdn.com/simplify.min.css" rel="stylesheet">--}}
 
     @yield('moreCss')
 </head>
 
 <body class="overflow-hidden">
 <div class="wrapper preload">
-    <header class="top-nav">
+    <header class="top-nav" id="top-news">
         <div class="top-nav-inner">
             <div class="nav-header">
                 <button type="button" class="navbar-toggle pull-left sidebar-toggle" id="sidebarToggleSM">
@@ -83,7 +80,7 @@
                             <li>
                                 <a href="#">
                                     提醒
-                                    <span class="badge badge-purple bounceIn animation-delay1 pull-right">2</span>
+                                    <span class="badge badge-purple bounceIn animation-delay1 pull-right" v-cloak>@{{ total }}</span>
                                 </a>
                             </li>
                             <li class="divider"></li>
@@ -137,57 +134,21 @@
                         </div>
                     </div>
                     <ul class="nav-notification">
-                        <li>
+                        <li v-cloak>
                             <a href="#" data-toggle="dropdown"><i class="fa fa-bell fa-lg"></i></a>
-                            <span class="badge badge-info bounceIn animation-delay5 active">4</span>
+                            <span class="badge badge-info bounceIn animation-delay5 active">@{{ total }}</span>
                             <ul class="dropdown-menu notification dropdown-3 pull-right">
-                                <li><a href="#">You have 5 new notifications</a></li>
-                                <li>
+                                <li><a href="#">您有 @{{ total }} 个新消息</a></li>
+                                <li v-for="newItem in news">
                                     <a href="#">
                                         <span class="notification-icon bg-warning">
                                             <i class="fa fa-warning"></i>
                                         </span>
-                                        <span class="m-left-xs">Server #2 not responding.</span>
-                                        <span class="time text-muted">Just now</span>
+                                        <span class="m-left-xs small-news-info" title="@{{ newItem.content }}">@{{ newItem.content }}</span>
+                                        <span class="time text-muted small-news-time" title="@{{ newItem.from_now }}">@{{ newItem.from_now }}</span>
                                     </a>
                                 </li>
-                                <li>
-                                    <a href="#">
-                                        <span class="notification-icon bg-success">
-                                            <i class="fa fa-plus"></i>
-                                        </span>
-                                        <span class="m-left-xs">New user registration.</span>
-                                        <span class="time text-muted">2m ago</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                    <span class="notification-icon bg-danger">
-                                        <i class="fa fa-bolt"></i>
-                                    </span>
-                                    <span class="m-left-xs">Application error.</span>
-                                    <span class="time text-muted">5m ago</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        <span class="notification-icon bg-success">
-                                    <i class="fa fa-usd"></i>
-                                    </span>
-                                    <span class="m-left-xs">2 items sold.</span>
-                                    <span class="time text-muted">1hr ago</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                    <span class="notification-icon bg-success">
-                                        <i class="fa fa-plus"></i>
-                                    </span>
-                                    <span class="m-left-xs">New user registration.</span>
-                                    <span class="time text-muted">1hr ago</span>
-                                    </a>
-                                </li>
-                                <li><a href="#">View all notifications</a></li>
+                                <li><a href="#">查看所有新消息</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -911,6 +872,39 @@
 
         }
 
+    });
+</script>
+
+<script>
+    new Vue({
+        el: '#top-news',
+        data: {
+            total: 0,
+            news: []
+        },
+        ready: function () {
+            var url = "{{ url('admin/notify') }}";
+            var _this = this;
+            $.ajax({
+                url:url,
+                dataType:'json',
+                headers:{
+                    'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content'),
+                },
+                timeout:60000,
+                data: {},
+                type:'GET'
+            }).done(function (data) {
+                _this.total = data.total;
+                _this.news = data.data;
+            }).fail(function (data) {
+                alert("网络错误！");
+                return false;
+            });
+        },
+        methods: {
+
+        }
     });
 </script>
 

@@ -21,11 +21,13 @@ class NewsInfo
      * @param $receiver
      * @param $type
      * @param $relate_id
+     * @param $content
      *
      * @return News
      */
-    public function storeNews($sender,$receiver,$type,$relate_id)
+    public function storeNews($sender,$receiver,$type,$relate_id,$content)
     {
+
         $news = new News();
         $news->sender = $sender;
         $news->receiver = $receiver;
@@ -33,6 +35,7 @@ class NewsInfo
         $news->is_read = 0;
         $news->status = 3;
         $news->relate_id = $relate_id;
+        $news->content = $content;
         $news->save();
 
         return $news;
