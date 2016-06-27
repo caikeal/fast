@@ -20,6 +20,7 @@ class CreateNewsTable extends Migration
             $table->tinyInteger('is_read',false,true)->comment('已读状态，0：未读，1：已读')->default(0);
             $table->tinyInteger('status',false,true)->comment('处理状态，1：ok，2：fail，3：wait')->default(3);
             $table->integer('relate_id',false,true)->comment('关联id');
+            $table->string('content')->comment('消息内容');
             $table->timestamps();
         });
     }

@@ -67,7 +67,7 @@ class TaskApplicationController extends Controller
 
         $uploadId = $request->input('upload_id');
         //判断改id是否是该用户所上传的
-        $isOwnUpload = SalaryUpload::where('manager_id', $managerId)->find($uploadId);
+        $isOwnUpload = SalaryUpload::with('company')->where('manager_id', $managerId)->find($uploadId);
         if (!$isOwnUpload || ($isOwnUpload['type']!=1 && $isOwnUpload['type']!=2)){
             return response()->json(['invalid'=>'您无权申请'])->setStatusCode(422);
         }
@@ -97,10 +97,16 @@ class TaskApplicationController extends Controller
 
         \DB::beginTransaction();
         try{
+            //消息内容
+            $tplType = $isOwnUpload['type']==1?'薪资':($isOwnUpload['type']==2?'社保':'');
+            $content = '您好，'.\Auth::guard("admin")->user()->name
+                .'向您申请重新上传'.$isOwnUpload->company->name
+                .''.$isOwnUpload->created_at.'的'.$tplType.'表格';
+
             //消息存在，最近状态不是3或消息不存在，新建申请\消息
             if (!$application || ($application['status'] !=3 && $application['status'] !=1)){
                 $tplApp = $this->reuploadApplication->saveApplication($managerId, $leaderId, $uploadId);
-                $this->news->storeNews($managerId, $leaderId, 1, $tplApp['id']);
+                $this->news->storeNews($managerId, $leaderId, 1, $tplApp['id'], $content);
             }
 
             //消息存在，最近状态是3，已过期，将3=>4
@@ -110,15 +116,15 @@ class TaskApplicationController extends Controller
 
                 //重新申请\消息
                 $tplApp = $this->reuploadApplication->saveApplication($managerId, $leaderId, $uploadId);
-                $this->news->storeNews($managerId, $leaderId, 1, $tplApp['id']);
+                $this->news->storeNews($managerId, $leaderId, 1, $tplApp['id'], $content);
             }
             \DB::commit();
             $result['ret_num'] = 0;
-            $result['ret_msg'] = '保存成功！';
+            $result['ret_msg'] = '申请成功！';
         }catch (\Exception $e){
             \DB::rollBack();
             $result['ret_num'] = 12;
-            $result['ret_msg'] = '保存失败！';
+            $result['ret_msg'] = '申请失败！';
         }
 
         //发送请求
