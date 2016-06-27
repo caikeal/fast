@@ -31,6 +31,10 @@ class CompensationController extends Controller
      */
     public function index()
     {
+        if(\Gate::foruser(\Auth::guard('admin')->user())->denies('compensation')){
+            return redirect('admin/index');
+        }
+
         $bases = SalaryBase::where('type',3)->get(['id', 'title']);
         return view('admin.compensation', ['bases'=>$bases]);
     }
@@ -107,6 +111,10 @@ class CompensationController extends Controller
      * @return mixed
      */
     public function upload(Request $request){
+        if(\Gate::foruser(\Auth::guard('admin')->user())->denies('compensation')){
+            return response("failed",404);
+        }
+
         //验证excel的格式
         if(!$request->file('excel')->isValid()){
             return response("failed",422);

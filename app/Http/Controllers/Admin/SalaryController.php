@@ -37,6 +37,10 @@ class SalaryController extends Controller
      * @return mixed
      */
     public function timeline(){
+        if(\Gate::foruser(\Auth::guard('admin')->user())->denies('salary')){
+            return redirect('admin/index');
+        }
+
         //取2个月的薪资任务
         $now=Carbon::now();
         $next=Carbon::now()->addMonth();
@@ -63,6 +67,10 @@ class SalaryController extends Controller
      * @return mixed
      */
     public function insurance(){
+        if(\Gate::foruser(\Auth::guard('admin')->user())->denies('salary')){
+            return redirect('admin/index');
+        }
+
         //取2个月的薪资任务
         $now=Carbon::now();
         $next=Carbon::now()->addMonth();
@@ -95,6 +103,11 @@ class SalaryController extends Controller
      * @return mixed
      */
     public function base(SalaryBaseRequest $request){
+        if(\Gate::foruser(\Auth::guard('admin')->user())->denies('salary')
+        && \Gate::foruser(\Auth::guard('admin')->user())->denies('compensation')){
+            return response()->json(['invalid'=>'无权限！'])->setStatusCode(422);
+        }
+
         $cats=$request->input('category');
         $cid=$request->input('cid');
         $title=$request->input('title');
@@ -167,6 +180,11 @@ class SalaryController extends Controller
      * @param Request $request
      */
     public function download(Request $request){
+        if(\Gate::foruser(\Auth::guard('admin')->user())->denies('salary')
+            && \Gate::foruser(\Auth::guard('admin')->user())->denies('compensation')){
+            return redirect('admin/index');
+        }
+
         $ua = strtolower($_SERVER["HTTP_USER_AGENT"]);
         $base_id=$request->get('bid');
         $base=SalaryBase::find($base_id);
@@ -211,6 +229,10 @@ class SalaryController extends Controller
      * @return mixed
      */
     public function upload(Request $request){
+        if(\Gate::foruser(\Auth::guard('admin')->user())->denies('salary')){
+            return response("failed",422);
+        }
+
         set_time_limit(1800) ;
         //验证excel格式是否正确
         if(!$request->file('excel')->isValid()){
