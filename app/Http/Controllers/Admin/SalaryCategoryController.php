@@ -22,6 +22,11 @@ class SalaryCategoryController extends Controller
      */
     public function index(Request $request)
     {
+        if(\Gate::foruser(\Auth::guard('admin')->user())->denies('salary')
+            && \Gate::foruser(\Auth::guard('admin')->user())->denies('compensation')){
+            return response()->json(['invalid'=>'无权限'])->setStatusCode(422);
+        }
+
         $type=$request->input("type");
         $allCats=SalaryCategory::where("type",$type)->get(['id', 'name as text', 'level']);
         $big=array();
@@ -59,6 +64,11 @@ class SalaryCategoryController extends Controller
      */
     public function store(Request $request)
     {
+        if(\Gate::foruser(\Auth::guard('admin')->user())->denies('salary')
+            && \Gate::foruser(\Auth::guard('admin')->user())->denies('compensation')){
+            return response()->json(['invalid'=>'无权限'])->setStatusCode(422);
+        }
+
         $salaryCategory=new SalaryCategory();
         $salaryCategory->name=$request->input('name');
         $salaryCategory->level=$request->input('level');

@@ -274,6 +274,7 @@
                     {{--</span>--}}
                     {{--</a>--}}
                     {{--</li>--}}
+                    @if(\Auth::guard('admin')->user()->can('salary'))
                     <li class="bg-palette2 lock-place2">
                         <a href="{{url('admin/timeline')}}">
                             <span class="menu-content block">
@@ -297,6 +298,7 @@
                         </span>
                         </a>
                     </li>
+                    @endif
                     <li class="bg-palette4 lock-place4">
                         <a href="{{url('admin/history')}}">
                             <span class="menu-content block">
@@ -369,6 +371,7 @@
                         </a>
                     </li>
                     @endif
+                    @if(\Auth::guard('admin')->user()->can('compensation'))
                     <li class="bg-palette3 lock-place10">
                         <a href="{{url('admin/compensation')}}">
                             <span class="menu-content block">
@@ -381,6 +384,7 @@
                             </span>
                         </a>
                     </li>
+                    @endif
                     {{--<li class="menu-header">--}}
                         {{--Others--}}
                     {{--</li>--}}
