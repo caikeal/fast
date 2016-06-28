@@ -80,7 +80,7 @@
                             <li>
                                 <a href="#">
                                     提醒
-                                    <span class="badge badge-purple bounceIn animation-delay1 pull-right" v-cloak>@{{ total }}</span>
+                                    <span class="badge badge-purple bounceIn animation-delay1 pull-right" v-show="total" v-cloak>@{{ total }}</span>
                                 </a>
                             </li>
                             <li class="divider"></li>
@@ -136,7 +136,7 @@
                     <ul class="nav-notification">
                         <li v-cloak>
                             <a href="#" data-toggle="dropdown"><i class="fa fa-bell fa-lg"></i></a>
-                            <span class="badge badge-info bounceIn animation-delay5 active">@{{ total }}</span>
+                            <span class="badge badge-info bounceIn animation-delay5 active" v-show="total">@{{ total }}</span>
                             <ul class="dropdown-menu notification dropdown-3 pull-right">
                                 <li><a href="#">您有 @{{ total }} 个新消息</a></li>
                                 <li v-for="newItem in news">
