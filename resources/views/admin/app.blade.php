@@ -78,7 +78,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="#">
+                                <a href="{{ url('admin/news') }}">
                                     提醒
                                     <span class="badge badge-purple bounceIn animation-delay1 pull-right" v-show="total" v-cloak>@{{ total }}</span>
                                 </a>
@@ -138,9 +138,9 @@
                             <a href="#" data-toggle="dropdown"><i class="fa fa-bell fa-lg"></i></a>
                             <span class="badge badge-info bounceIn animation-delay5 active" v-show="total">@{{ total }}</span>
                             <ul class="dropdown-menu notification dropdown-3 pull-right">
-                                <li><a href="#">您有 @{{ total }} 个新消息</a></li>
+                                <li><a href="{{ url('admin/news') }}">您有 @{{ total }} 个新消息</a></li>
                                 <li v-for="newItem in news">
-                                    <a href="#">
+                                    <a href="{{ url('admin/news') }}">
                                         <span class="notification-icon bg-warning">
                                             <i class="fa fa-warning"></i>
                                         </span>
@@ -148,7 +148,7 @@
                                         <span class="time text-muted small-news-time" title="@{{ newItem.from_now }}">@{{ newItem.from_now }}</span>
                                     </a>
                                 </li>
-                                <li><a href="#">查看所有新消息</a></li>
+                                <li><a href="{{ url('admin/news') }}">查看所有新消息</a></li>
                             </ul>
                         </li>
                     </ul>

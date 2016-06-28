@@ -62,8 +62,8 @@ Route::group(['namespace'=>'Admin','middleware' => ['web'],'prefix'=>'admin'], f
     Route::post('/history/reupload', 'HistoryController@reupload');
     Route::resource('/history', 'HistoryController');
     //消息模块
-    Route::resource('/news', 'NewsController');
     Route::get('/notify', 'NewsController@notify');
+    Route::resource('/news', 'NewsController');
 });
 
 Route::group(['middleware' => 'web'], function () {

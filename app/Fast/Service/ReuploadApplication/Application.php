@@ -33,4 +33,52 @@ class Application
 
         return $reupload;
     }
+
+    /**
+     * 消息同意。
+     *
+     * @param $reuploadId
+     *
+     * @return mixed
+     */
+    public function agree($reuploadId)
+    {
+        $reupload = ReuploadApplication::find($reuploadId);
+        $reupload->status = 1;
+        $reupload->update();
+
+        return $reupload;
+    }
+
+    /**
+     * 消息拒绝。
+     *
+     * @param $reuploadId
+     *
+     * @return mixed
+     */
+    public function refuse($reuploadId)
+    {
+        $reupload = ReuploadApplication::find($reuploadId);
+        $reupload->status = 2;
+        $reupload->update();
+
+        return $reupload;
+    }
+
+    /**
+     * 消息过期。
+     *
+     * @param $reuploadId
+     *
+     * @return mixed
+     */
+    public function expirate($reuploadId)
+    {
+        $reupload = ReuploadApplication::find($reuploadId);
+        $reupload->status = 4;
+        $reupload->update();
+
+        return $reupload;
+    }
 }
