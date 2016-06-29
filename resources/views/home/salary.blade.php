@@ -44,12 +44,10 @@
             }
             $('#beginTime').val(str);
             $('#beginTime').date({theme: "dateYM"});
-            var idcard = $("[name=idcard]").val();
             var url = "{{url('salary/details')}}";
             $.post(url, {
                 type:1,
                 time: str,
-                idcard: idcard,
                 _token: $("meta[name=csrf-token]").attr("content")
             }, function (res) {
                 if (res.status==1) {
@@ -107,11 +105,9 @@
             var _this = this;
             var url = "{{url('salary/details')}}";
             var salaryTime = $("#beginTime").val();
-            var idcard = $("[name=idcard]").val();
             $.post(url, {
                 type:1,
                 time: salaryTime,
-                idcard: idcard,
                 _token: $("meta[name=csrf-token]").attr("content")
             }, function (res) {
                 if (res.status==1) {
