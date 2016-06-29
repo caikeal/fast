@@ -1,4 +1,7 @@
 @extends('home.app')
+@section('head')
+    <title>手机绑定</title>
+@endsection
 @section('moreCss')
     <style type="text/css">
         body {

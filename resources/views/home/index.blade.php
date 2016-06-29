@@ -1,4 +1,7 @@
 @extends('home.app')
+@section('head')
+    <title>FAST</title>
+@endsection
 @section('content')
 <!-- 滑框start -->
 <div data-am-widget="slider" class="am-slider am-slider-b2" data-am-slider='{"directionNav":false}'>

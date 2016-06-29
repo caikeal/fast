@@ -81,6 +81,9 @@ Route::group(['middleware' => 'web'], function () {
     Route::post('/salary/details','SalaryController@detail');
     //社保模块
     Route::get('/insurance','SalaryController@insurance');
+    Route::get('/insurance/progress', 'InsuranceController@index');
+    Route::get('/insurance/specific/{id}', 'InsuranceController@specific');
+    Route::post('/insurance/details', 'InsuranceController@detail');
     //账号绑定
     Route::get('/binding','AccountController@showBindingForm');
     Route::post('/binding','AccountController@binding');
