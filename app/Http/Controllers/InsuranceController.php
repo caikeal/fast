@@ -4,39 +4,40 @@ namespace App\Http\Controllers;
 
 use App\InsuranceDetail;
 use App\SalaryCategory;
-use App\SalaryDetail;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
-class SalaryController extends Controller
+class InsuranceController extends Controller
 {
-    public function __construct()
-    {
+    public function __construct() {
         $this->middleware("auth");
     }
 
-    public function index(){
-        return view('home.salary');
+    public function index()
+    {
+        $user_id = \Auth::user()->id;
+        $insurance = InsuranceDetail::where('user_id', $user_id)->orderBy('created_at','desc')->paginate(15);
+        return view('home.insuranceProgress',['insurance'=>$insurance]);
     }
 
-    public function insurance(){
-        $user = \Auth::user()->id;
-        //是否有社保进度历史
-        $hasIt = InsuranceDetail::where('user_id', $user)->count();
-        return view('home.insurance', ['is_exist'=>$hasIt]);
+    public function specific($id)
+    {
+        return view('home.insuranceSpecific',['id'=>$id]);
     }
 
-    public function detail(Request $request){
-        $salary_day=$request->input('time');
+    public function detail(Request $request)
+    {
+        $id=$request->input('id');
         $type=$request->input('type');
-        if(!$salary_day||!is_numeric($salary_day)){
+        if(!$id||!is_numeric($id)||$type!=4){
             return response()->json(["status"=>0],200);
         }
+
         $user_id=\Auth::user()->id;
-        $detail=SalaryDetail::where("salary_day","=",$salary_day)
-            ->where("user_id","=",$user_id)->where('type',$type)->first();
+        $detail=InsuranceDetail::where("user_id","=",$user_id)
+            ->where('type',$type)->find($id);
         if(!$detail){
             return response()->json(["status"=>0],200);
         }
@@ -55,7 +56,7 @@ class SalaryController extends Controller
                 $data[]=array(
                     'category'=>$vv['name'],
                     'cid'=>$vv['id'],
-                    );
+                );
             }else{
                 $tpl_detail[$flag_id][]=array(
                     "name"=>$vv['name'],

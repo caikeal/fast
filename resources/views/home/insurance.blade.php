@@ -1,13 +1,30 @@
 @extends('home.app')
+@section('head')
+    <title>社保查询</title>
+@endsection
 @section('moreCss')
     <link rel="stylesheet" href="{{env('APP_URL')}}/css/home/selectTime.css">
     <style>
         body {
             background-color: #fff;
         }
+        .head-right{
+            float:right; color: #fff;position: relative;
+        }
+        .head-hint{
+            background: red;border-radius: 50%;width: 6px;height: 6px;display: inline-block;position: absolute;top:15px;right: -3px;
+        }
     </style>
-    @endsection
-    @section('content')
+@endsection
+@section('back')
+    <a href="{{ url('insurance/progress') }}" class="head-right" id="btn-back">
+        社保进度
+        @if($is_exist>0)
+            <span class="head-hint"></span>
+        @endif
+    </a>
+@endsection
+@section('content')
             <!-- 所属公司logo -->
     <div class="am-g am-center am-u-sm-centered">
         <img class="logo am-u-sm-centered" src="{{env('APP_URL')}}/images/logo.png">
@@ -175,7 +192,6 @@
 
             $(this).siblings().collapse('toggle');
         });
-
 
     </script>
 @endsection

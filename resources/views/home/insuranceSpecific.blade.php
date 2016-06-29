@@ -1,6 +1,6 @@
 @extends('home.app')
 @section('head')
-    <title>理赔查询</title>
+    <title>社保进度查询</title>
 @endsection
 @section('moreCss')
     <link rel="stylesheet" href="{{env('APP_URL')}}/css/home/selectTime.css">
@@ -12,8 +12,8 @@
 @endsection
 @section('back')
     <a href="{{ url('compensation/index') }}" class="am-icon-chevron-left" style="float:left; color: #fff;" id="btn-back"></a>
-@endsection
-@section('content')
+    @endsection
+    @section('content')
             <!-- 所属公司logo -->
     <div class="am-g am-center am-u-sm-centered">
         <img class="logo am-u-sm-centered" src="{{env('APP_URL')}}/images/logo.png">
@@ -28,10 +28,10 @@
     <script src="{{env('APP_URL')}}/js/home/iscroll.js"></script>
     <script>
         window.onload = function () {
-            var url = "{{url('compensation/details')}}";
+            var url = "{{url('insurance/details')}}";
             $.post(url, {
-                type:3,
-                time: {{ $time }},
+                type: 4,
+                id: {{ $id }},
                 _token: $("meta[name=csrf-token]").attr("content")
             }, function (res) {
                 if (res.status==1) {
@@ -79,7 +79,7 @@
                     $("table").addClass("am-table-striped");
                     $("table").addClass("am-table-hover");
                 } else {
-                    alert("没有该月理赔记录！");
+                    alert("没有该月社保办理进度记录！");
                 }
             }, 'json');
             //添加点击绑定事件

@@ -1,4 +1,7 @@
 @extends('home.app')
+@section('head')
+    <title>我的信息</title>
+@endsection
 @section('moreCss')
     <style>
         body {

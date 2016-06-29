@@ -1,4 +1,7 @@
 @extends('home.app')
+@section('head')
+    <title>理赔查询</title>
+@endsection
 @section('moreCss')
     <link rel="stylesheet" href="{{ env('APP_URL') }}/css/home/compensation.css">
 @endsection()
