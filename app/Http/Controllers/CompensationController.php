@@ -20,6 +20,7 @@ class CompensationController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('binding');
     }
 
     public function index()
