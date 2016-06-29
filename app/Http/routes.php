@@ -90,8 +90,9 @@ Route::group(['middleware' => 'web'], function () {
     //我的
     Route::get('/my','OwnController@showMyForm');
     Route::get('/info','OwnController@showMyForm');
+    //理赔查询
+    Route::get('/compensation/index','CompensationController@index');
+    Route::get('/compensation/days','CompensationController@getWorkDay');
+    Route::get('/compensation/details','CompensationController@specific');
+    Route::post('/compensation/details','CompensationController@detail');
 });
-//Route::group(['middleware' => 'web'], function () {
-//    Route::auth();
-//    Route::get('/home', 'HomeController@index');
-//});

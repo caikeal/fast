@@ -45,11 +45,28 @@
                 <span class="am-navbar-label">首页</span>
             </a>
         </li>
-        <li>
-            <a href="#">
-                <span class="am-icon-question"></span>
+        <li class="am-dropdown am-dropdown-up" data-am-dropdown>
+            <a class="am-dropdown-toggle" data-am-dropdown-toggle>
+                <span class="am-icon-bars"></span>
                 <span class="am-navbar-label">答疑解惑</span>
             </a>
+            <ul class="am-dropdown-content" style="text-align: center;padding: 0;">
+                <div>
+                    <a href="#" style="line-height: 49px;color: #000;">我的问题</a>
+                </div>
+                <div class="am-divider"></div>
+                <div>
+                    <a href="#" style="line-height: 49px;color: #000;">最新问题</a>
+                </div>
+                <div class="am-divider"></div>
+                <div>
+                    <a href="#" style="line-height: 49px;color: #000;">编辑问题</a>
+                </div>
+                <div class="am-divider"></div>
+                <div>
+                    <a href="#" style="line-height: 49px;color: #000;">查找问题</a>
+                </div>
+            </ul>
         </li>
         <li>
             <a href="#">
@@ -57,17 +74,30 @@
                 <span class="am-navbar-label">联系我们</span>
             </a>
         </li>
-        <li>
-            <a href="{{url('my')}}">
-                <span class="am-icon-user"></span>
-                <span class="am-navbar-label">我的</span>
+        <li class="am-dropdown am-dropdown-up" data-am-dropdown>
+            <a class="am-dropdown-toggle" data-am-dropdown-toggle>
+                <span class="am-icon-bars"></span>
+                <span class="am-navbar-label ">我的</span>
             </a>
+            <ul class="am-dropdown-content" style="text-align: center;padding: 0;">
+                <div>
+                    <a href="{{ url('my') }}" style="line-height: 49px;color: #000;">基本信息</a>
+                </div>
+                <div class="am-divider"></div>
+                <div>
+                    <a href="{{ url('rebinding') }}" style="line-height: 49px;color: #000;">重新绑定手机</a>
+                </div>
+                <div class="am-divider"></div>
+                <div>
+                    <a href="{{ url('reset') }}" style="line-height: 49px;color: #000;">修改密码</a>
+                </div>
+            </ul>
         </li>
     </ul>
 </div>
 <!-- 导航栏end -->
 <!--[if lt IE 9]>
-<script src="http://libs.baidu.com/jquery/1.11.1/jquery.min.js"></script>
+<script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>
 <script src="http://cdn.staticfile.org/modernizr/2.8.3/modernizr.js"></script>
 <script src="http://cdn.amazeui.org/amazeui/2.5.2/js/amazeui.ie8polyfill.min.js"></script>
 <![endif]-->
@@ -75,6 +105,26 @@
 <script src="http://cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
 <!--<![endif]-->
 <script src="http://cdn.amazeui.org/amazeui/2.5.2/js/amazeui.min.js"></script>
+<!-- 修改bottom-bar -->
+<script type="text/javascript">
+    var buttomBar = function () {
+        var dropUpWidth = $(".am-dropdown.am-dropdown-up").width();
+        var middleWidth = dropUpWidth/2 - 8;
+
+        style = "<style type='text/css' id='bottom-bar'>.am-dropdown-content:after, .am-dropdown-content:before{left: "+ middleWidth +"px;}.am-dropdown-flip .am-dropdown-content:after, .am-dropdown-flip .am-dropdown-content:before{right: "+ middleWidth +"px;}</style>";
+        var style=$("head").append(style);
+    };
+
+    $(document).ready(function () {
+        $("#bottom-bar").remove();
+        buttomBar();
+    });
+
+    $(window).resize(function () {
+        $("#bottom-bar").remove();
+        buttomBar();
+    });
+</script>
 @yield('moreScript')
 </body>
 </html>

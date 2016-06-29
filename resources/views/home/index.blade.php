@@ -1,6 +1,6 @@
 @extends('home.app')
 @section('content')
-        <!-- 滑框start -->
+<!-- 滑框start -->
 <div data-am-widget="slider" class="am-slider am-slider-b2" data-am-slider='{"directionNav":false}'>
     <ul class="am-slides">
         <li>
@@ -27,7 +27,7 @@
         </a>
     </li>
     <li class="box box-2">
-        <a href="#">
+        <a href="{{ url('compensation/index') }}">
             <div class="am-g">
                 <div class="am-u-sm-5 thumb">
                     <img src="{{env('APP_URL')}}/images/settlement.png" alt="理赔查询图片">

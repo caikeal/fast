@@ -826,68 +826,66 @@
                         return false;
                     }
                     $.ajax({
-                                url:url,
-                                dataType:'json',
-                                headers:{
-                                    'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content'),
-                                },
-                                timeout:60000,
-                                data: {
-                                    name: _this.editCompanyId,
-                                    receiver: _this.editReceiveId,
-                                    sd: _this.editSalaryDay,
-                                    id: _this.editInsuranceDay,
-                                    memo:_this.editMemo,
-                                    _method:'PUT'
-                                },
-                                type:'POST'
-                            })
-                            .done(function(data){
-                                if(data.ret_num==0){
-                                    _this.is_editCompanyId=0;
-                                    _this.editCompanyIdErrors='';
-                                    _this.is_editReceiveId=0;
-                                    _this.editReceiveIdErrors='';
-                                    _this.is_editSalaryDay=0;
-                                    _this.editSalaryDayErrors='';
-                                    _this.is_editInsuranceDay=0;
-                                    _this.editInsuranceDayErrors='';
-                                    _this.is_editTaskType=0;
-                                    _this.editTaskTypeErrors='';
-                                    _this.is_editMemo=0;
-                                    _this.editMemoErrors='';
-                                    _this.editCompanyId='';
-                                    _this.editReceiveId='';
-                                    _this.editSalaryDay='';
-                                    _this.editInsuranceDay='';
-                                    _this.editTaskType=[];
-                                    _this.editMemo='';
-                                    $('#reset-task').modal('hide');
-                                    alert(data.ret_msg);
-                                }else{
-                                    _this.is_editCompanyId=1;
-                                    _this.editCompanyIdErrors=data.ret_msg;
-                                }
-                            })
-                            .fail(function(data){
-                                var errs=JSON.parse(data.responseText);
-                                if(errs.name){
-                                    _this.is_editCompanyId=1;
-                                    _this.editCompanyIdErrors=errs.name[0];
-                                }
-                                if(errs.receiver){
-                                    _this.is_editReceiveId=1;
-                                    _this.editReceiveIdErrors=errs.receiver[0];
-                                }
-                                if(errs.sd){
-                                    _this.is_editSalaryDay=1;
-                                    _this.editSalaryDayErrors=errs.sd[0];
-                                }
-                                if(errs.id){
-                                    _this.is_editInsuranceDay=1;
-                                    _this.editInsuranceDayErrors=errs.id[0];
-                                }
-                            });
+                        url:url,
+                        dataType:'json',
+                        headers:{
+                            'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content'),
+                        },
+                        timeout:60000,
+                        data: {
+                            name: _this.editCompanyId,
+                            receiver: _this.editReceiveId,
+                            sd: _this.editSalaryDay,
+                            id: _this.editInsuranceDay,
+                            memo:_this.editMemo,
+                            _method:'PUT'
+                        },
+                        type:'POST'
+                    }).done(function(data){
+                        if(data.ret_num==0){
+                            _this.is_editCompanyId=0;
+                            _this.editCompanyIdErrors='';
+                            _this.is_editReceiveId=0;
+                            _this.editReceiveIdErrors='';
+                            _this.is_editSalaryDay=0;
+                            _this.editSalaryDayErrors='';
+                            _this.is_editInsuranceDay=0;
+                            _this.editInsuranceDayErrors='';
+                            _this.is_editTaskType=0;
+                            _this.editTaskTypeErrors='';
+                            _this.is_editMemo=0;
+                            _this.editMemoErrors='';
+                            _this.editCompanyId='';
+                            _this.editReceiveId='';
+                            _this.editSalaryDay='';
+                            _this.editInsuranceDay='';
+                            _this.editTaskType=[];
+                            _this.editMemo='';
+                            $('#reset-task').modal('hide');
+                            alert(data.ret_msg);
+                        }else{
+                            _this.is_editCompanyId=1;
+                            _this.editCompanyIdErrors=data.ret_msg;
+                        }
+                    }).fail(function(data){
+                        var errs=JSON.parse(data.responseText);
+                        if(errs.name){
+                            _this.is_editCompanyId=1;
+                            _this.editCompanyIdErrors=errs.name[0];
+                        }
+                        if(errs.receiver){
+                            _this.is_editReceiveId=1;
+                            _this.editReceiveIdErrors=errs.receiver[0];
+                        }
+                        if(errs.sd){
+                            _this.is_editSalaryDay=1;
+                            _this.editSalaryDayErrors=errs.sd[0];
+                        }
+                        if(errs.id){
+                            _this.is_editInsuranceDay=1;
+                            _this.editInsuranceDayErrors=errs.id[0];
+                        }
+                    });
                 },
                 createCompany:function(){
                     var _this=this;

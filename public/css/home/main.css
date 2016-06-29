@@ -35,3 +35,18 @@ body{
     border:1px solid #f8f8f8;
     background-color: #fff;
 }
+.am-tab-panel{
+    height: 40%;
+    width: 100%;
+}
+.am-navbar .am-navbar-nav{
+    overflow: visible;
+}
+.am-dropdown-flip .am-dropdown-content:after, .am-dropdown-flip .am-dropdown-content:before {
+    left: auto;
+    right: 30px;
+}
+.am-dropdown-content:after, .am-dropdown-content:before{
+    left: 30px;
+    right: auto;
+}
