@@ -272,7 +272,7 @@
                         </a>
                     </li>
                     <li class="bg-palette1 lock-place5">
-                        <a href="#">
+                        <a href="{{ url('admin/underling') }}">
                             <span class="menu-content block">
                                 <span class="menu-icon"><i class="block fa fa-bar-chart fa-lg"></i></span>
                                 <span class="text m-left-sm">数据统计</span>

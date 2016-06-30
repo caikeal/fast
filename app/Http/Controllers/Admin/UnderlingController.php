@@ -8,9 +8,8 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Gate;
 
-class EmployController extends Controller
+class UnderlingController extends Controller
 {
     public function __construct()
     {
@@ -22,22 +21,18 @@ class EmployController extends Controller
      * Display a listing of the resource.
      *
      * @param  \Illuminate\Http\Request  $request
-     * 
+     *
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
     {
-        if(Gate::foruser(\Auth::guard('admin')->user())->denies('employ')){
-            return redirect('admin/index');
-        }
-
         $name=trim($request->input('name'));
         //不能查询到自己
         $manager_id = \Auth::guard('admin')->user()->id;
         if($name){
             $managers=Manager::whereRaw("find_in_set(id,queryChildren($manager_id))")
                 ->with(['tasks' => function ($query) {
-                    $query->where('status', 0);
+                    $query->groupBy('company_id');
                 }])->where('id','!=',$manager_id)->with('leader')
                 ->where(function($query) use ($name){
                     $query->where('name','like',"%".$name."%")
@@ -46,7 +41,7 @@ class EmployController extends Controller
         }else {
             $managers = Manager::whereRaw("find_in_set(id,queryChildren($manager_id))")
                 ->with(['tasks' => function ($query) {
-                    $query->where('status', 0);
+                    $query->groupBy('company_id');
                 }])->where("id", "!=", $manager_id)->with('leader')->paginate(15);
         }
         //下级权限
@@ -56,6 +51,72 @@ class EmployController extends Controller
             $role_arr[]=$role->id;
         }
         $memberRoles=Role::whereIn('pid',$role_arr)->get();
-        return view('admin.employ',['managers'=>$managers,'name'=>$name,'memberRoles'=>$memberRoles]);
+        return view('admin.underling',['managers'=>$managers,'name'=>$name,'memberRoles'=>$memberRoles]);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        //
     }
 }

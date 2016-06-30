@@ -22,6 +22,8 @@ class TaskApplicationController extends Controller
     {
         $this->reuploadApplication = $reuploadApplication;
         $this->news = $news;
+        $this->middleware('auth:admin');
+        $this->middleware('throttle');
     }
 
     /**

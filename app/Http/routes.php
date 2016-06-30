@@ -64,6 +64,8 @@ Route::group(['namespace'=>'Admin','middleware' => ['web'],'prefix'=>'admin'], f
     //消息模块
     Route::get('/notify', 'NewsController@notify');
     Route::resource('/news', 'NewsController');
+    //下属上传数据统计模块
+    Route::resource('/underling', 'UnderlingController');
 });
 
 Route::group(['middleware' => 'web'], function () {

@@ -22,6 +22,8 @@ class NewsController extends Controller
     {
         $this->newInfo = $newsInfo;
         $this->application = $application;
+        $this->middleware('auth:admin');
+        $this->middleware('throttle');
     }
 
     /**

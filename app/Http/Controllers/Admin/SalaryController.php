@@ -28,6 +28,7 @@ class SalaryController extends Controller
     public function __construct(SalaryExcel $excel)
     {
         $this->middleware('auth:admin');
+        $this->middleware('throttle');
         $this->excel = $excel;
     }
 
