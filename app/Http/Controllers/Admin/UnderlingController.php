@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Manager;
 use App\Role;
+use App\SalaryUpload;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -81,9 +83,42 @@ class UnderlingController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        //
+        $company = $request->input('company');
+        $from = $request->input('from');
+        $to = $request->input('to');
+
+        //格式化时间
+        if ($from && $to){
+            $from = Carbon::parse($from)->toDateTimeString();
+            $to = Carbon::parse($to)->toDateTimeString();
+        }
+
+        //查询上传记录
+        $searchCondition = SalaryUpload::with([
+            'company'=>function($query){
+                $query->select(['id','name']);
+            }
+        ])
+            ->where('manager_id', $id);
+
+        if ($company){
+            $searchCondition = $searchCondition->whereHas('company',function($query) use($company){
+                $query->where('name','like',"%".$company."%")->select(['id','name','poster']);
+            });
+        }
+
+        if ($from && $to){
+            $searchCondition = $searchCondition->where('created_at', '>', $from);
+            $searchCondition = $searchCondition->where('created_at', '<=', $to);
+        }
+        $allUploads = $searchCondition->orderBy('created_at','desc')->paginate(15);
+        $result = $allUploads->toArray();
+        $result['company'] = $company;
+        $result['from'] = $from;
+        $result['to'] = $to;
+        return $result;
     }
 
     /**

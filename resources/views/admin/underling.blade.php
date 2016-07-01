@@ -81,10 +81,119 @@
             text-align: center;
             background: #0092e4;
         }
+        .history-modal .modal-body-header {
+            height: auto;
+            padding: 24px 25px 24px 15px;
+        }
+        .history-modal .modal-body-header .search {
+            width: 72px;
+            height: 30px;
+            line-height: 30px;
+            float: left;
+            text-align: center;
+            margin-left: 20px;
+            margin-top: 2px;
+            font-size: 18px;
+            color: #fff;
+            background: #0092e4;
+            border: 1px solid #0092e4;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .history-modal .modal-body-header .search:hover,
+        .history-modal .modal-body-header .search:active{
+            background: #07a6ff;
+            border: 1px solid #888888;
+            -webkit-transition: all 0.3s ease;
+            -moz-transition: all 0.3s ease ;
+            -ms-transition: all 0.3s ease ;
+            -o-transition: all 0.3s ease ;
+            transition: all 0.3s ease ;
+        }
+        .history-modal .modal-body-header .search:active{
+            border: 2px solid rgba(0,0,0,.125);
+            box-shadow: inset 0 3px 5px rgba(0,0,0,.125);
+        }
+
+        .history-modal .modal-body-header input{-webkit-border-radius: 20px;-moz-border-radius: 20px;border-radius: 20px;width: 465px;float: left;display: block;color: #474755;
+            font-size: 14px;}
+        .history-modal .modal-content {
+            width: 600px;
+        }
+        .history-modal .modal-title {
+            font-size: 18px;
+            color: #383838;
+            font-weight: 600;
+        }
+        .history-modal .modal-body {
+            width: 100%;
+            height: auto;
+            padding: 0;
+        }
+        .history-modal .modal-footer {
+            height: 85px;
+            box-sizing: border-box;
+            border-top:0;
+        }
+        .history-modal .modal-footer .history-button {
+            width: 288px;
+            height: 46px;
+            line-height: 34px;
+            text-align: center;
+            margin: 3px auto;
+            font-size: 22px;
+            color: #fff;
+            background: #0092e4;
+            display: block;
+        }
+        .history-modal table {
+            width: 100%;
+            margin-bottom: 0;
+            background: #fff;
+        }
+        .history-modal table thead tr{
+            height: 30px;
+            line-height: 30px;
+            background: #edf2f4;
+            color: #607b96;
+        }
+        .history-modal table th,td {
+            text-align: left;
+            /*border: 1px solid transparent;*/
+        }
+        .history-modal table tbody tr {
+            height: 22px;
+            line-height: 22px;
+            color: #000;
+        }
+        .history-modal .table>thead>tr>th {
+            border:0;
+        }
+        .history-modal .table>tbody>tr>td {
+            border:0;
+        }
+
+        .table tbody tr:hover td, .table tbody tr:hover th {
+            background-color: #f5f5f5;
+        }
+
+        .history-page{
+            margin-bottom: 10px;
+            margin-left: 15px;
+        }
+
+        .history-page select{
+            display: inline-block;
+            width: auto;
+        }
+
+        .history-page span{
+            font-size: 14px;
+        }
     </style>
 @endsection
 @section('content')
-    <div class="padding-md" id="employ">
+    <div class="padding-md" id="underling">
         {{--<div class="alert alert-danger alert-dismissible" role="alert" v-if="systemErrors">--}}
         {{--<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>--}}
         {{--<strong>Warning!</strong> @{{systemErrors}}--}}
@@ -153,7 +262,7 @@
                             </td>
                             <td>{{ $manager->updated_at }}</td>
                             <td>
-                                <span class="label label-success upload-details">查看详情</span>
+                                <see-details username="{{ $manager->name }}" :id={{ $manager->id }} ></see-details>
                             </td>
                         </tr>
                     @endforeach
@@ -163,88 +272,65 @@
             </div>
         </div>
 
-        <!-- modal createManager-->
-        <div class="modal fade" id="create-manager" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-            <div class="modal-dialog" role="document">
+        <!--history modal-->
+        <div class="modal fade history-modal" id="underlingModal" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-hidden="true">×
                         </button>
-                        <h4 class="modal-title" id="myModalLabel">创建账号</h4>
+                        <h4 class="modal-title" id="myModalLabel" v-cloak>
+                            @{{ name }}
+                        </h4>
                     </div>
-                    <div class="modal-body">
-                        <div class="container-fluid">
-                            <form action="" class="form-horizontal">
-                                <div class="form-group" :class="{'has-error':is_managerName}">
-                                    <label for="name" class="col-lg-2 control-label lable-xs-center">姓名:</label>
-
-                                    <div class=" col-lg-10">
-                                        <input type="text" class="form-control" id="name" name="name" placeholder="姓名"
-                                               v-model="managerName">
-                                    </div>
-
-                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display':is_managerName?'block':'none'}">@{{ managerNameErrors }}</p>
-                                </div>
-
-                                <div class="form-group" :class="{'has-error':is_managerAccount}">
-                                    <label for="account" class="col-lg-2 control-label lable-xs-center">账号:</label>
-
-                                    <div class=" col-lg-10">
-                                        <input type="email" class="form-control" id="account" name="account"
-                                               placeholder="账号" v-model="managerAccount">
-                                    </div>
-
-                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display':is_managerAccount?'block':'none'}">@{{ managerAccountErrors }}</p>
-                                </div>
-
-                                <div class="form-group" :class="{'has-error':is_managerPassword}">
-                                    <label for="password" class="col-lg-2 control-label lable-xs-center">密码:</label>
-
-                                    <div class=" col-lg-10">
-                                        <input type="text" class="form-control" id="password" name="password"
-                                               placeholder="密码" v-model="managerPassword">
-                                    </div>
-
-                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display':is_managerPassword?'block':'none'}">@{{ managerPasswordErrors }}</p>
-                                </div>
-
-                                <div class="form-group" :class="{'has-error':is_managerRoles}">
-                                    <div class="col-lg-offset-2 col-lg-10">
-                                        @foreach($memberRoles as $memberRole)
-                                            <div class="checkbox inline-block">
-                                                <div class="custom-checkbox">
-                                                    <input type="checkbox" id="{{$memberRole->name}}" class="checkbox-blue" value={{$memberRole->id}}
-                                                            v-model="managerRoles">
-                                                    <label for="{{$memberRole->name}}"></label>
-                                                </div>
-                                                <div class="inline-block vertical-top">
-                                                    {{$memberRole->label}}
-                                                </div>
-                                            </div>
-                                            &nbsp;&nbsp;&nbsp;
-                                        @endforeach
-                                    </div>
-                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display':is_managerRoles?'block':'none'}">@{{ managerRolesErrors }}</p>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <div class="row">
-                            <div class="col-sm-offset-2 col-sm-8">
-                                <a class="btn btn-primary block m-top-md" @click="newAccount">创建账号</a>
+                    <div class="modal-body clearfix">
+                        <div class="modal-body-header clearfix">
+                            <input type="text" class="input-medium form-control" placeholder="企业名" v-model="company">
+                            <div class="search" @click="searchUpload">
+                            搜索
                             </div>
                         </div>
+                        <div class="modal-body-context" style="overflow-x: auto;">
+                        <section class="history-page">
+                            <span>总共@{{ maxPage }}页</span>
+                            <span>现</span>
+                            <select name="pagination" class="form-control" v-model="page" @change="searchUpload">
+                            <option v-for="pageItem in maxPage" :value="pageItem+1">@{{ pageItem+1 }}</option>
+                            </select>
+                            <span>页</span>
+                        </section>
+                        <table class="table table-striped">
+                            <thead style="white-space: nowrap">
+                            <tr>
+                                <th>企业名</th>
+                                <th>时间</th>
+                                <th>类别</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr v-for="dataItem in allData" v-cloak>
+                                <td>@{{ dataItem.company.name }}</td>
+                                <td>@{{ dataItem.created_at }}</td>
+                                <td>@{{ dataItem.type | uploadType}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        </div>
                     </div>
+                <div class="modal-footer"></div>
                 </div>
             </div>
         </div>
-        <!-- /modal createManager-->
+        <!--/history modal-->
     </div>
     <!--/pdadding-md-->
-@endsection
-@section('addition')
+
+    {{--查看详情模版--}}
+    <template id="details-template" style="display: none;">
+        <span class="label label-success upload-details" data-toggle="modal" data-target="#underlingModal" @click="notify">查看详情</span>
+    </template>
 @endsection
 @section('moreScript')
     <script>
@@ -253,5 +339,122 @@
             $(".main-menu .accordion>li").removeClass("active");
             $(".lock-place5").addClass("active");
         })($);
+    </script>
+    <script>
+        Vue.filter('uploadType', function (val) {
+            switch (val) {
+                case 1:
+                    return '代发工资';
+                    break;
+                case 2:
+                    return '社保公积金';
+                    break;
+                case 3:
+                    return '理赔进度';
+                    break;
+                case 4:
+                    return '社保进度';
+                    break;
+            }
+        });
+
+        Vue.component('see-details',{
+            template: '#details-template',
+            props: {
+               id: {
+                   default: 0,
+                   type: Number,
+                   required: true
+               },
+                username: {
+                   required: true,
+                   default: ""
+               }
+            },
+            methods: {
+                notify: function () {
+                    this.$dispatch('id', this.id);
+                    this.$dispatch('name', this.username);
+                    var _this = this;
+                    var url = "{{ url('admin/underling') }}"+"/"+this.id;
+                    $.ajax(url, {
+                        type: 'get',
+                        dataType: 'json',
+                        timeout: '120000',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    }).done(function (data) {
+                        if (data.data.length!=0) {
+                            _this.$dispatch('all-data', data.data);
+                            _this.$dispatch('page', data.current_page);
+                            _this.$dispatch('max-page', data.last_page);
+                        }
+                    }).fail(function () {
+                        alert("该记录已失效！");
+                    });
+
+                    return true;
+                }
+            }
+        });
+
+        new Vue({
+            el: '#underling',
+            data: {
+                id: 0,
+                allData: [],
+                page: 0,
+                maxPage: 0,
+                from: "",
+                to: "",
+                company: "",
+                name: ""
+            },
+            methods: {
+                searchUpload: function () {
+                    var _this = this;
+                    var url = "{{ url('admin/underling') }}"+"/"+this.id;
+                    $.ajax(url, {
+                        type: 'get',
+                        dataType: 'json',
+                        timeout: '120000',
+                        data: {
+                            company: _this.company,
+                            page: _this.page,
+                            from: _this.from,
+                            to: _this.to
+                        },
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    }).done(function (data) {
+                        _this.allData = data.data;
+                        _this.maxPage = Number(data.last_page);
+                    }).fail(function () {
+                        alert("该记录已失效！");
+                    });
+
+                    return true;
+                },
+            },
+            events: {
+                'id': function (id) {
+                    this.id = id;
+                },
+                'all-data': function (allData) {
+                    this.allData = allData;
+                },
+                'max-page': function (maxPage) {
+                    this.maxPage = Number(maxPage);
+                },
+                'page': function (page) {
+                    this.page = page;
+                },
+                'name': function (name) {
+                    this.name = name;
+                }
+            }
+        });
     </script>
 @endsection
