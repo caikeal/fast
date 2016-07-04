@@ -126,8 +126,7 @@
                                 @elseif($v['status']==4)
                                     <span class="label label-remind">已失效</span>
                                 @elseif($v['status']==3)
-                                    <span class="label label-success pass" @click="apply({{ $v['id'] }},1)">通过</span>
-                                    <span class="label label-danger refuse" @click="apply({{ $v['id'] }},2)">拒绝</span>
+                                    <apply-btn :id="{{ $v['id'] }}"></apply-btn>
                                 @endif
                             @endif
                         </td>
@@ -144,42 +143,72 @@
         </div>
     </div>
     <!--/pdadding-md-->
+
+    <template id="template-apply-btn" style="display: none;">
+        <span class="label label-success pass" @click="apply(1)" v-if="see">通过</span>
+        <span style="margin-right: 5px;" v-if="see"></span>
+        <span class="label label-danger refuse" @click="apply(2)" v-if="see">拒绝</span>
+        <span class="label label-remind" v-if="!see">@{{ content }}</span>
+    </template>
 @endsection
 @section('moreScript')
     <script>
+        Vue.component("apply-btn",{
+            template: "#template-apply-btn",
+            props: {
+                id: {
+                    required: true
+                }
+            },
+            data: function () {
+                return {
+                    see: true,
+                    content: ''
+                }
+            },
+            methods: {
+                apply: function (val) {
+                    var news = this.id;
+                    var self = this;
+                    $.ajax("{{ url('admin/news') }}/"+news, {
+                        type: 'post',
+                        dataType: 'json',
+                        timeout: '120000',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        data: {
+                            _method: 'PUT',
+                            st: val
+                        }
+                    }).done(function (data) {
+                        if (data.ret_num==0) {
+                            alert(data.ret_msg);
+                            if (val === 1){
+                                self.content = "已通过";
+                                self.see = false;
+                            }else {
+                                self.content = "已拒绝";
+                                self.see = false;
+                            }
+                        } else {
+                            alert("网络错误！");
+                        }
+                    }).fail(function (error) {
+                        if (error.responseJSON.invalid){
+                            alert(error.responseJSON.invalid);
+                        }else if(error.responseJSON.error){
+                            alert(error.responseJSON.error);
+                        }else{
+                            alert("网络错误！");
+                        }
+                    });
+                }
+            }
+        });
     new Vue({
         el: '#news',
-        data: '',
-        methods: {
-            apply: function (news,val) {
-                $.ajax("{{ url('admin/news') }}/"+news, {
-                    type: 'post',
-                    dataType: 'json',
-                    timeout: '120000',
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    data: {
-                        _method: 'PUT',
-                        st: val
-                    }
-                }).done(function (data) {
-                    if (data.ret_num==0) {
-                        alert(data.ret_msg);
-                    } else {
-                        alert("网络错误！");
-                    }
-                }).fail(function (error) {
-                    if (error.responseJSON.invalid){
-                        alert(error.responseJSON.invalid);
-                    }else if(error.responseJSON.error){
-                        alert(error.responseJSON.error);
-                    }else{
-                        alert("网络错误！");
-                    }
-                });
-            }
-        }
+        data: ''
     });
     </script>
 @endsection
