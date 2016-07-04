@@ -53,8 +53,11 @@ class HistoryController extends Controller
         //查询上传记录
         $searchCondition = SalaryUpload::with([
             'application'=>function($query){
-                $query->orderBy('created_at','desc')->first();
-            }])->where('manager_id', $manager_id);
+                $query->where('status', '!=', 4)
+                    ->where('status', '!=', 2)
+                    ->orderBy('created_at','desc');
+            }])
+            ->where('manager_id', $manager_id);
 
         if ($company){
             $searchCondition = $searchCondition->whereHas('company',function($query) use($company){
