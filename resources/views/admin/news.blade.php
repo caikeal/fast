@@ -165,7 +165,7 @@
                     }
                 }).done(function (data) {
                     if (data.ret_num==0) {
-                        alert(ret_msg);
+                        alert(data.ret_msg);
                     } else {
                         alert("网络错误！");
                     }
