@@ -13,6 +13,7 @@
         .fast-table .reload.sure-reupload{
             margin-top: 6px;
             margin-left: -15px;
+            background: #FF9800;
         }
     </style>
 @endsection
@@ -77,8 +78,8 @@
                 </tr>
                 </thead>
                 <tbody>
+                <?php $countUp=0;?>
                 @foreach($uploads as $k=>$v)
-                    <?php $countUp=0;?>
                     <tr>
                         <td></td>
                         <td><img src="{{ $v['company']['poster'] ? env('APP_URL') .'/'. $v['company']['poster'] : env('APP_URL').'/images/fast_company.png' }}" class="thumbnail thumbnail-radius">
