@@ -25,7 +25,7 @@ class ManagerRequest extends Request
     {
         return [
             'email'=>'email|unique:managers,email,'.$this->get('user_id'),
-            'phone'=>'numeric|min:6'
+            'phone'=>'regex:[^\d{0,4}-?\d{7,8}#?\d{0,4}$]|min:6'
         ];
     }
 
@@ -34,7 +34,7 @@ class ManagerRequest extends Request
         return [
             'email.email'=>'邮箱格式错误！',
             'email.unique'=>'该邮箱已存在！',
-            'phone.numeric'=>'电话号码格式错误！',
+            'phone.regex'=>'电话号码格式错误！',
             'phone.min'=>'电话号码位数错误！'
         ];
     }
