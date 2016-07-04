@@ -730,7 +730,7 @@
                     return false;
                 }
 
-                if (isNaN(_this.managerInfo.phone)){
+                if (!_this.managerInfo.phone.match(/^\d{0,4}-?\d{7,8}#?\d{0,4}$/)){
                     _this.managerErrors.phone.validInfo = '电话格式错误！';
                     _this.managerErrors.phone.isInvalid = 1;
                     return false;
