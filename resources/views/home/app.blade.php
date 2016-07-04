@@ -74,25 +74,31 @@
                 <span class="am-navbar-label">联系我们</span>
             </a>
         </li>
-        <li class="am-dropdown am-dropdown-up" data-am-dropdown>
-            <a class="am-dropdown-toggle" data-am-dropdown-toggle>
-                <span class="am-icon-bars"></span>
-                <span class="am-navbar-label ">我的</span>
+        <li>
+            <a href="{{url('my')}}">
+                <span class="am-icon-user"></span>
+                <span class="am-navbar-label">我的</span>
             </a>
-            <ul class="am-dropdown-content" style="text-align: center;padding: 0;">
-                <div>
-                    <a href="{{ url('my') }}" style="line-height: 49px;color: #000;">基本信息</a>
-                </div>
-                <div class="am-divider"></div>
-                <div>
-                    <a href="{{ url('rebinding') }}" style="line-height: 49px;color: #000;">重新绑定手机</a>
-                </div>
-                <div class="am-divider"></div>
-                <div>
-                    <a href="{{ url('reset') }}" style="line-height: 49px;color: #000;">修改密码</a>
-                </div>
-            </ul>
         </li>
+        {{--<li class="am-dropdown am-dropdown-up" data-am-dropdown>--}}
+            {{--<a class="am-dropdown-toggle" data-am-dropdown-toggle>--}}
+                {{--<span class="am-icon-bars"></span>--}}
+                {{--<span class="am-navbar-label ">我的</span>--}}
+            {{--</a>--}}
+            {{--<ul class="am-dropdown-content" style="text-align: center;padding: 0;">--}}
+                {{--<div>--}}
+                    {{--<a href="{{ url('my') }}" style="line-height: 49px;color: #000;">基本信息</a>--}}
+                {{--</div>--}}
+                {{--<div class="am-divider"></div>--}}
+                {{--<div>--}}
+                    {{--<a href="{{ url('rebinding') }}" style="line-height: 49px;color: #000;">重新绑定手机</a>--}}
+                {{--</div>--}}
+                {{--<div class="am-divider"></div>--}}
+                {{--<div>--}}
+                    {{--<a href="{{ url('reset') }}" style="line-height: 49px;color: #000;">修改密码</a>--}}
+                {{--</div>--}}
+            {{--</ul>--}}
+        {{--</li>--}}
     </ul>
 </div>
 <!-- 导航栏end -->
