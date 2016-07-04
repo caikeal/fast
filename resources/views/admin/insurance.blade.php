@@ -44,7 +44,7 @@
             </div>
             <div class="row">
                 <div class="col-md-8">
-                    <div id="uploader_pro" class="upload-ctrl" data-task="0">
+                    <div id="uploader_pro" data-task="0">
                         <!--用来存放文件信息-->
                         <div id="thelist_pro" class="uploader-list"></div>
                         <div class="btns">
