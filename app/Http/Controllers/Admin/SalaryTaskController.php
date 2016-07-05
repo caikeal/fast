@@ -36,8 +36,8 @@ class SalaryTaskController extends Controller
             ->orWhere("receive_id",$manager_id)->orWhere("by_id",$manager_id)
             ->orderBy('deal_time','desc')->paginate(15);
         }else {
-           $tasks=SalaryTask::with('company')->with('receiver')->orWhere("by_id",$manager_id)
-               ->where("manager_id",$manager_id)->orWhere("receive_id",$manager_id)
+           $tasks=SalaryTask::with('company')->with('receiver')->where("by_id",$manager_id)
+               ->orWhere("manager_id",$manager_id)->orWhere("receive_id",$manager_id)
                ->orderBy('deal_time','desc')->paginate(15);
         }
 
