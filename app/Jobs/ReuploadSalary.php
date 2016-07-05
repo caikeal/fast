@@ -19,6 +19,7 @@ class ReuploadSalary extends Job implements ShouldQueue
     protected $reupload_id;
     protected $type;
     protected $manager_id;
+    protected $upload_id;
     protected $salary;
 
     /**
@@ -30,13 +31,14 @@ class ReuploadSalary extends Job implements ShouldQueue
      * @param $type
      * @param $manager_id
      */
-    public function __construct($base_id, $company_id, $reupload_id, $type, $manager_id)
+    public function __construct($base_id, $company_id, $reupload_id, $type, $manager_id, $upload_id)
     {
         $this->base_id = $base_id;
         $this->company_id = $company_id;
         $this->reupload_id = $reupload_id;
         $this->type = $type;
         $this->manager_id = $manager_id;
+        $this->upload_id = $upload_id;
         $this->salary = new Salary();
     }
 
@@ -47,7 +49,7 @@ class ReuploadSalary extends Job implements ShouldQueue
     {
         DB::reconnect();
         $now = Carbon::now();
-        $contents=\Cache::store('file')->get('admin_salaryReUp:' . $this->base_id . "|" . $this->company_id."|".$this->reupload_id);
+        $contents=\Cache::store('file')->get('admin_salaryReUp:' . $this->base_id . "|" . $this->company_id."|".$this->reupload_id."|".$this->upload_id);
         //开启事务
         DB::beginTransaction();
         try {
@@ -75,6 +77,8 @@ class ReuploadSalary extends Job implements ShouldQueue
     public function failed()
     {
         //关闭申请
-        ReuploadApplication::where('id', $this->reupload_id)->update(["status" => 1]);
+        if ($this->reupload_id){
+            ReuploadApplication::where('id', $this->reupload_id)->update(["status" => 1]);
+        }
     }
 }
