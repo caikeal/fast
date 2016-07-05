@@ -16,8 +16,10 @@ class NewsInfo
     /**
      * 保存消息。
      *
-     * type=1，重新上传薪资和社保 $relate_id=>重新上传id
-     * type=2, 同意、拒绝消息 $relate_id=>上条消息id
+     * type=1, 重新上传薪资和社保 $relate_id=>重新上传id
+     * type=2, 薪资和社保同意、拒绝消息 $relate_id=>上条消息id
+     * type=3, 上级下发薪资任务到下级
+     * type=4, 上级下发社保任务到下级
      *
      * @param $sender
      * @param $receiver

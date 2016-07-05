@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Company;
+use App\Fast\Service\News\NewsInfo;
 use App\Manager;
 use App\SalaryTask;
 use Illuminate\Http\Request;
@@ -13,8 +14,11 @@ use Illuminate\Support\Facades\Gate;
 
 class SalaryTaskController extends Controller
 {
-    public function __construct()
+    protected $taskNews;
+
+    public function __construct(NewsInfo $taskNews)
     {
+        $this->taskNews = $taskNews;
         $this->middleware('auth:admin');
         $this->middleware('throttle');
     }
@@ -102,6 +106,10 @@ class SalaryTaskController extends Controller
             $task->deal_time=strtotime($salaryDay);
             $task->salary_day=date("Ym",strtotime($salaryDay));
             $task->save();
+
+            //发送派发任务消息
+            $content="管理员".\Auth::guard('admin')->user()->name."给您分配了1个薪资任务，快去看看";
+            $this->taskNews->storeNews($manager_id,$receiver,3,$task->id,$content);
         }
         if($insuranceDay){
             $task2=new SalaryTask();
@@ -113,6 +121,10 @@ class SalaryTaskController extends Controller
             $task2->deal_time=strtotime($insuranceDay);
             $task2->salary_day=date("Ym",strtotime($insuranceDay));
             $task2->save();
+
+            //发送派发任务消息
+            $content="管理员".\Auth::guard('admin')->user()->name."给您分配了1个社保任务，快去看看";
+            $this->taskNews->storeNews($manager_id,$receiver,4,$task2->id,$content);
         }
         
         if($salaryDay && $insuranceDay){
@@ -219,6 +231,11 @@ class SalaryTaskController extends Controller
             $result['ret_msg']='该任务为社保任务，薪资任务请新建！';
             return response()->json($result);
         }
+        if ($task['receive_id']==$receiver){
+            $result['ret_num']=135;
+            $result['ret_msg']='该任务已经属于该用户！';
+            return response()->json($result);
+        }
 
         if($salaryDay){
             $task->type=1;
@@ -237,7 +254,20 @@ class SalaryTaskController extends Controller
         if($memo){
             $task->memo=$memo;
         }
-        $task->save();
+        $task->update();
+
+        //分配任务信息提示
+        $taskName = '';
+        $taskType = 0;
+        if ($task->type == 1){
+            $taskName = '薪资';
+            $taskType = 3;
+        }elseif($task->type == 2){
+            $taskName = '社保';
+            $taskType = 4;
+        }
+        $content="管理员".\Auth::guard('admin')->user()->name."给您分配了1个".$taskName."任务，快去看看";
+        $this->taskNews->storeNews($manager_id,$receiver,$taskType,$task->id,$content);
         $result['ret_num']=0;
         $result['ret_msg']='保存成功！';
         return response()->json($result);
