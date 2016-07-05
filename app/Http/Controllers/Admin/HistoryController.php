@@ -297,10 +297,16 @@ class HistoryController extends Controller
             ->where('company_id', $company_id)
             ->where('type', $type)->count();
 
-        //验证申请已经同意
-        $applicatonExist = ReuploadApplication::where('upload_id', $upload_id)
-            ->where('id', $reupload_id)->where('status',1)
-            ->where('applier', $manager_id)->count();
+        //验证申请已经同意(1级管理员直接默认同意)
+        $roleLevel = \Auth::guard('admin')->user()->roles()->first()->level;
+        if ($roleLevel==1){
+            $applicatonExist = 1;
+        }else{
+            $applicatonExist = ReuploadApplication::where('upload_id', $upload_id)
+                ->where('id', $reupload_id)->where('status',1)
+                ->where('applier', $manager_id)->count();
+        }
+
 
         if(($type!=1 && $type!=2)||!$base_id||!$company_id
             ||!is_numeric($base_id)||!is_numeric($company_id)
@@ -326,7 +332,7 @@ class HistoryController extends Controller
         }
 
         //将数据存入缓存
-        \Cache::store('file')->put('admin_salaryReUp:'.$base_id."|".$company_id."|".$reupload_id, json_encode($content), 60);
+        \Cache::store('file')->put('admin_salaryReUp:'.$base_id."|".$company_id."|".$reupload_id."|".$upload_id, json_encode($content), 60);
         unset($content);
 
         \DB::beginTransaction();
@@ -351,7 +357,7 @@ class HistoryController extends Controller
         }
 
         //推送至队列异步执行插入
-        $this->dispatch(new ReuploadSalary($base_id,$company_id,$reupload_id,$type,$manager_id));
+        $this->dispatch(new ReuploadSalary($base_id,$company_id,$reupload_id,$type,$manager_id,$upload_id));
 
         return response("success");
     }

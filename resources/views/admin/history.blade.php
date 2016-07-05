@@ -101,7 +101,17 @@
                             <see-details upload-id="{{ $v['id'] }}" company-name="{{ $v['company']['name'] }}"></see-details>
                         </td>
                         <td>
-                            @if($roleLevel==1 || ($v['type']!=1 && $v['type']!=2))
+                            @if($v['type']!=1 && $v['type']!=2)
+                            @elseif($roleLevel==1 && ($v['type']==1 || $v['type']==2))
+                                <div id="uploader{{ $countUp }}" class="upload-ctrl"
+                                     data-upload={{ $v['id'] }} data-type={{ $v['type'] }} data-company={{ $v['company']['id'] }} data-reupload=0>
+                                    <!--用来存放文件信息-->
+                                    <div id="thelist{{ $countUp }}" class="uploader-list"></div>
+                                    <div class="btns">
+                                        <div id="picker{{ $countUp }}">选择文件</div>
+                                    </div>
+                                </div>
+                                <?php $countUp++;?>
                             @elseif(count($v['application']) && $v['application']['0']['status']==1)
                                 <div id="uploader{{ $countUp }}" class="upload-ctrl"
                                      data-upload={{ $v['id'] }} data-type={{ $v['type'] }} data-company={{ $v['company']['id'] }} data-reupload={{ $v['application']['0']['id'] }}>
