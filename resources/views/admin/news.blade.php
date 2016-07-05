@@ -113,9 +113,21 @@
                         <td></td>
                         <td>{{ $v['created_at'] }}</td>
                         <td>
-                            <a href="{{ url('admin/history') }}">
-                            {{ $v['content'] }}
-                            </a>
+                            @if($v['type']==1 || $v['type']==2)
+                                <a href="{{ url('admin/history') }}">
+                                {{ $v['content'] }}
+                                </a>
+                            @elseif($v['type']==3)
+                                <a href="{{ url('admin/timeline') }}">
+                                    {{ $v['content'] }}
+                                </a>
+                            @elseif($v['type']==4)
+                                <a href="{{ url('admin/insurance') }}">
+                                    {{ $v['content'] }}
+                                </a>
+                            @else
+                                {{ $v['content'] }}
+                            @endif
                         </td>
                         <td>
                             @if($v['type']==1)
