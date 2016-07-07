@@ -69,7 +69,7 @@ class Insurance
                         $wages .= $vv . "||";
                     }
                 }
-                $wages = trim($wages, "||");
+                $wages = rtrim($wages, "||");
                 if (!$is_exist_detail) {
                     DB::table('insurance_details')->insert([
                         'user_id' => $user_id,
