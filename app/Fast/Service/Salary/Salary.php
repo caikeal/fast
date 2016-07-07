@@ -65,7 +65,7 @@ class Salary
                         $wages .= $vv . "||";
                     }
                 }
-                $wages = trim($wages, "||");
+                $wages = rtrim($wages, "||");
                 if (!$is_exist_detail) {
                     DB::table('salary_details')->insert([
                         'user_id' => $user_id,
