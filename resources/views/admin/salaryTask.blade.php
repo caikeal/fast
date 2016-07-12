@@ -233,6 +233,9 @@
                                 @if($task->status==0)
                                     @if(\Auth::guard('admin')->user()->can('editTask'))
                                         <reset-task-btn :task-id={{$task->id}}></reset-task-btn>
+                                        @if(\Auth::guard('admin')->user()->can('deleteTask'))
+                                            <delete-task-btn :task-id={{$task->id}}></delete-task-btn>
+                                        @endif
                                     @else
                                     <a class="btn btn-success">进行中</a>
                                     @endif
@@ -527,6 +530,10 @@
         <template id="task-btn-template"  style="display: none">
             <a class="btn btn-success" data-target="#reset-task" data-toggle="modal" @click="notify">修改信息</a>
         </template>
+
+        <template id="task-delete-btn-template"  style="display: none">
+            <a class="btn btn-info" @click="deleteTask">删除任务</a>
+        </template>
     </div>
     <!--/pdadding-md-->
 @endsection
@@ -606,6 +613,47 @@
                 }
             }
         });
+
+        Vue.component('delete-task-btn',{
+            template: '#task-delete-btn-template',
+            props:{
+                taskId:{
+                    type:Number,
+                    required: true
+                }
+            },
+            methods:{
+                deleteTask: function () {
+                    var _this = this;
+                    var url="{{url('admin/task')}}/"+_this.taskId;
+                    var isConfirm = window.confirm("你确定要删除吗？");
+                    if (!isConfirm){
+                        return false;
+                    }
+                    $.ajax({
+                        url:url,
+                        dataType:'json',
+                        headers:{
+                            'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content'),
+                        },
+                        timeout:60000,
+                        data: {
+                            _method : "delete",
+                        },
+                        type:'POST'
+                    }).done(function (data) {
+                        if(data.ret_num==0){
+                            alert("操作成功");
+                        }else{
+                            alert(data.ret_msg);
+                        }
+                    }).fail(function (data) {
+                        alert("网络错误！");
+                    });
+                }
+            }
+        });
+
         new Vue({
             el: "#company",
             data:{
