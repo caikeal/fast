@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Company;
+use App\Fast\Service\AutoTask\AutoTask;
 use App\Fast\Service\News\NewsInfo;
+use App\Fast\Service\Task\Task;
 use App\Manager;
 use App\SalaryTask;
 use Illuminate\Http\Request;
@@ -15,10 +17,14 @@ use Illuminate\Support\Facades\Gate;
 class SalaryTaskController extends Controller
 {
     protected $taskNews;
+    protected $autoTask;
+    protected $task;
 
-    public function __construct(NewsInfo $taskNews)
+    public function __construct(NewsInfo $taskNews, AutoTask $autoTask, Task $task)
     {
+        $this->task = $task;
         $this->taskNews = $taskNews;
+        $this->autoTask = $autoTask;
         $this->middleware('auth:admin');
         $this->middleware('throttle');
     }
@@ -110,7 +116,11 @@ class SalaryTaskController extends Controller
             //发送派发任务消息
             $content="管理员".\Auth::guard('admin')->user()->name."给您分配了1个薪资任务，快去看看";
             $this->taskNews->storeNews($manager_id,$receiver,3,$task->id,$content);
+
+            //创建自动任务
+            $this->autoTask->storeAutoTask($manager_id, $receiver, Null, $name, 1, strtotime($salaryDay), $memo);
         }
+
         if($insuranceDay){
             $task2=new SalaryTask();
             $task2->company_id=$name;
@@ -125,6 +135,9 @@ class SalaryTaskController extends Controller
             //发送派发任务消息
             $content="管理员".\Auth::guard('admin')->user()->name."给您分配了1个社保任务，快去看看";
             $this->taskNews->storeNews($manager_id,$receiver,4,$task2->id,$content);
+
+            //创建自动任务
+            $this->autoTask->storeAutoTask($manager_id, $receiver, Null, $name, 2, strtotime($salaryDay), $memo);
         }
         
         if($salaryDay && $insuranceDay){
@@ -237,6 +250,14 @@ class SalaryTaskController extends Controller
             return response()->json($result);
         }
 
+        //获取原参数
+        $old = [];
+        $old['creator'] = $task['manager_id'];
+        $old['receiver'] = $task['receive_id'];
+        $old['by'] = $task['by_id'];
+        $old['company_id'] = $task['company_id'];
+        $old['type'] = $task['type'];
+
         if($salaryDay){
             $task->type=1;
             $task->deal_time=strtotime($salaryDay);
@@ -266,8 +287,14 @@ class SalaryTaskController extends Controller
             $taskName = '社保';
             $taskType = 4;
         }
+
+        //发送提醒
         $content="管理员".\Auth::guard('admin')->user()->name."给您分配了1个".$taskName."任务，快去看看";
         $this->taskNews->storeNews($manager_id,$receiver,$taskType,$task->id,$content);
+
+        //修改自动任务
+        $this->autoTask->changeAutoTask($old, $task['receive_id'], $task['by_id'], $task['deal_time'], $task['memo']);
+        
         $result['ret_num']=0;
         $result['ret_msg']='保存成功！';
         return response()->json($result);
@@ -281,6 +308,36 @@ class SalaryTaskController extends Controller
      */
     public function destroy($id)
     {
-        //
+        //检查删除权限
+        if(Gate::foruser(\Auth::guard('admin')->user())->denies('deleteTask')){
+            return redirect('admin/index');
+        }
+        $tasks = SalaryTask::find($id);
+
+        if ($tasks['status'] !== 0){
+            $result['ret_num']=33;
+            $result['ret_msg']='任务已开始暂无法删除！';
+            return $result;
+        }
+        \DB::beginTransaction();
+        try{
+            //删除薪资、社保任务
+            $this->task->deleteTask($id);
+            //删除定时任务
+            $this->autoTask->deleteAutoTask($tasks['manager_id'], $tasks['receive_id'], $tasks['by_id'], $tasks['company_id'], $tasks['type']);
+            \DB::commit();
+
+            $result['ret_num']=0;
+            $result['ret_msg']='操作成功！';
+
+            return $result;
+        }catch (\Exception $e){
+            \DB::rollBack();
+            $result['ret_num']=44;
+            $result['ret_msg']='修改失败！';
+
+            return $result;
+        }
+
     }
 }
