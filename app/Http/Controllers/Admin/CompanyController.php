@@ -17,6 +17,20 @@ class CompanyController extends Controller
     }
 
     /**
+     * 获取所有企业.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        $allCompanys = Company::get(['id', 'name as text']);
+        $result['ret_num'] = 0;
+        $result['msg'] = '成功！';
+        $result['data'] = $allCompanys;
+        return response()->json($result);
+    }
+
+    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request

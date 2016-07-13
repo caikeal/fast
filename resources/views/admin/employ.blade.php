@@ -88,8 +88,13 @@
             color: #0006FF;
         }
 
-        [v-cloak] {
-            display: none;
+        .table>tbody>tr>td{
+            vertical-align: middle;
+        }
+
+        .table>thead>tr{
+            background: #edf2f4;
+            color: #607b96;
         }
     </style>
 @endsection
@@ -153,12 +158,11 @@
                 {{--<span>页</span>--}}
             </div>
         </div>
-        <div class="line"></div>
         <!-- 历史记录表格 -->
         <div class="row base-backcolor">
             <div class="col-sm-12 col-md-12 col-lg-12">
                 <!-- table -->
-                <table class="table" id="dataTable">
+                <table class="table table-striped" id="dataTable">
                     <thead>
                     <tr>
                         <th>姓名</th>

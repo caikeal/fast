@@ -747,7 +747,7 @@
                         _this.is_confirmPassword=1;
                         return false;
                     }
-                    var url = "{{url('admin/manager')}}"+"/"+_this.managerId;
+                    var url = "{{url('admin/super/reset_password')}}"+"/"+_this.managerId;
                     $.ajax({
                         url:url,
                         dataType:'json',
