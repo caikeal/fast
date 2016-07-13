@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\UserLog;
 use App\InsuranceDetail;
+use App\ModuleStatistics;
 use App\SalaryCategory;
 use Illuminate\Http\Request;
 
@@ -16,9 +18,17 @@ class InsuranceController extends Controller
         $this->middleware('binding');
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $user_id = \Auth::user()->id;
+
+        //统计模块访问量
+        $moduleData = new ModuleStatistics();
+        $moduleData->user_id = $user_id;
+        $moduleData->ip = $request->ip();
+        $moduleData->module = 'InsuranceProgress';
+        \Event::fire(new UserLog($moduleData));
+
         $insurance = InsuranceDetail::where('user_id', $user_id)->orderBy('created_at','desc')->paginate(15);
         return view('home.insuranceProgress',['insurance'=>$insurance]);
     }

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\CompensationDetail;
+use App\Events\UserLog;
+use App\ModuleStatistics;
 use App\SalaryCategory;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -23,8 +25,17 @@ class CompensationController extends Controller
         $this->middleware('binding');
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        $user = \Auth::user()->id;
+
+        //统计模块访问量
+        $moduleData = new ModuleStatistics();
+        $moduleData->user_id = $user;
+        $moduleData->ip = $request->ip();
+        $moduleData->module = 'Compensation';
+        \Event::fire(new UserLog($moduleData));
+
         return view('home.compensation');
     }
 
