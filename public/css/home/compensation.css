@@ -1,0 +1,382 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #efefef;
+    font-family: "\5FAE\8F6F\96C5\9ED1";
+}
+
+#Calendar {
+    width: 100%;
+    height: auto;
+}
+
+#CalendarMain {
+    width: 100%;
+    height: 350px;
+    margin: 0 auto;
+}
+
+#title {
+    width: 100%;
+    height: 40px;
+    background-color: #33363b;
+    position: relative;
+    box-sizing: border-box;
+}
+
+#title .title-text {
+    width: 150px;
+    height: 30px;
+    text-align: center;
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.selectBtn {
+    font-weight: 900;
+    font-size: 18px;
+    color: #fff;
+    cursor: pointer;
+    text-decoration: none;
+    padding: 7px 10px 6px 10px;
+}
+
+.selectBtn:hover {
+    background-color: #1d953f;
+}
+
+.selectYear {
+    float: left;
+    width: auto;
+    position: relative;
+}
+
+.selectMonth {
+    float: left;
+    width: auto;
+    position: relative;
+}
+
+.month {
+    float: left;
+    width: 28px;
+    height: 28px;
+    background-size: 100% 100%;
+    background-image: url("../../images/left-icon.png");
+    background-repeat: no-repeat;
+    box-sizing: border-box;
+    margin-top: 6px;
+    margin-left: 3%;
+    border: 1px solid #fff;
+    border-radius: 50%;
+    -ms-border-radius: 50%;
+    -webkit-border-radius: 50%;
+}
+
+.nextMonth {
+    float: right;
+    width: 28px;
+    height: 28px;
+    background-size: 100% 100%;
+    background-image: url("../../images/right-icon.png");
+    background-repeat: no-repeat;
+    box-sizing: border-box;
+    margin-top: 6px;
+    margin-right: 3%;
+    border: 1px solid #fff;
+    border-radius: 50%;
+    -ms-border-radius: 50%;
+    -webkit-border-radius: 50%;
+}
+
+.currentDay {
+    float: right;
+}
+
+#context {
+    width: 100%;
+    background: #33363b;
+    color: #fff;
+}
+
+.week {
+    width: 100%;
+    height: 30px;
+}
+
+.week > h3 {
+    float: left;
+    color: #fff;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    margin-top: 5px;
+    font-size: 16px;
+    clear: right;
+}
+
+.dayItem {
+    float: left;
+}
+
+.lastItem {
+    color: #d1c7b7 !important;
+}
+
+.item {
+    color: #fff;
+    float: left;
+    text-align: center;
+    cursor: pointer;
+    margin: 5px 0;
+    font-size: 13px;
+    position: relative;
+    line-height: 30px;
+    height: 30px;
+}
+
+.item>a {
+    color: inherit;
+}
+
+/*.item:hover {*/
+/*color: #b9121b;*/
+/*}*/
+
+.currentItem > a {
+    background-color: #b9121b;
+    width: 30px;
+    line-height: 30px;
+    float: left;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    color: #fff;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    position: absolute;
+}
+
+.messageItem > a {
+    width: 30px;
+    line-height: 30px;
+    float: left;
+    color: #fff;
+    background-size: 5px 5px;
+    background-image: url("../../images/red-point.png");
+    background-position: 24px 2px;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+}
+
+#foots {
+    width: 100%;
+    height: 35px;
+    background-color: #fff;
+    border-top: 1px solid #ccc;
+    margin-top: -1px;
+    color: #fff;
+}
+
+#footNow {
+    float: right;
+    margin: 6px 15px 0 0;
+    color: #009ad6;
+}
+
+#Container {
+    margin-top: 5px;
+    overflow: hidden;
+    float: left;
+}
+
+#center {
+    width: 100%;
+    overflow: hidden;
+}
+
+#centerMain {
+    width: 300%;
+    margin-left: -100%;
+}
+
+#selectYearDiv {
+    float: left;
+    background-color: #fff;
+}
+
+#selectYearDiv > div {
+    float: left;
+    text-align: center;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    margin-left: -1px;
+    margin-top: -1px;
+    cursor: pointer;
+    color: #909090;
+}
+
+.currentYearSd, .currentMontSd {
+    color: #ff4400 !important;
+}
+
+#selectMonthDiv {
+    float: left;
+    background-color: #fff;
+}
+
+#selectMonthDiv > div {
+    color: #909090;
+    float: left;
+    text-align: center;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    margin-left: -1px;
+    margin-top: -1px;
+    cursor: pointer;
+}
+
+#selectYearDiv > div:hover, #selectMonthDiv > div:hover {
+    background-color: #efefef;
+}
+
+#centerCalendarMain {
+    float: left;
+}
+
+#CalendarMain .footer-text {
+    font-size: 13px;
+    background: #33363b;
+    width: 100%;
+    padding: 10px 5%;
+    box-sizing: border-box;
+    line-height: 24px;
+    color: #fff;
+}
+
+.check-button {
+    width: 90%;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    font-size: 20px;
+    color: #fff;
+    background: #0092e4;
+    border-radius: 5px;
+    -ms-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    margin: 60px auto 20px;
+}
+
+.clearfix {
+    *zoom: 1;
+}
+
+.clearfix:after, .clearfix:before {
+    content: "";
+    display: table;
+}
+
+.clearfix:after {
+    clear: both;
+}
+
+.company {
+    height: 45px;
+    border-top: 1px solid #e5e5e5;
+    border-bottom: 1px solid #e5e5e5;
+    background: #fff;
+    line-height: 45px;
+    margin: 15px auto 10px;
+}
+
+.company .company-icon {
+    width: 16%;
+    position: relative;
+    height: 100%;
+    float: left;
+    background: #0092e4;
+}
+
+.company .company-img {
+    width: 20px;
+    height: 20px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: absolute;
+    margin: auto;
+    background-image: url("../../images/company-img.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+.company .company-name {
+    width: 84%;
+    float: left;
+    padding-left: 5%;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+.claim-detail {
+    background: #fff;
+    font-size: 13px;
+    margin-bottom: 10px;
+    border-top: 1px solid #e5e5e5;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.claim-main {
+    height: auto;
+}
+
+.claim-row {
+    padding: 0 5%;
+    box-sizing: border-box;
+    height: 35px;
+    line-height: 35px;
+    clear: both;
+}
+
+.claim-textarea {
+    border-top: 1px solid #e5e5e5;
+    border-bottom: 1px solid #e5e5e5;
+    background: #fff;
+}
+
+.claim-reason {font-size: 13px;}
+
+.wid90fr {
+    width: 95%;
+    padding-right: 5.5%;
+    box-sizing: border-box;
+    float: right;
+    height: 32px;
+    line-height: 32px;
+    color: #a9aaac;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.claim-textarea textarea {
+    margin: 10px 5% 0 5%;
+    border: 0;
+    resize: none;
+    width: 90%;
+    outline: none;
+}

@@ -97,12 +97,13 @@
             color: #0006FF;
         }
 
-        [v-cloak] {
-            display: none;
-        }
-
         .table>tbody>tr>td{
             vertical-align: middle;
+        }
+
+        .table>thead>tr{
+            background: #edf2f4;
+            color: #607b96;
         }
     </style>
 @endsection
@@ -176,7 +177,6 @@
                 {{--<span>页</span>--}}
             </div>
         </div>
-        <div class="line"></div>
         <!-- 历史记录表格 -->
         <div class="row base-backcolor">
             <div class="col-sm-12 col-md-12 col-lg-12">
@@ -233,6 +233,9 @@
                                 @if($task->status==0)
                                     @if(\Auth::guard('admin')->user()->can('editTask'))
                                         <reset-task-btn :task-id={{$task->id}}></reset-task-btn>
+                                        @if(\Auth::guard('admin')->user()->can('deleteTask'))
+                                            <delete-task-btn :task-id={{$task->id}}></delete-task-btn>
+                                        @endif
                                     @else
                                     <a class="btn btn-success">进行中</a>
                                     @endif
@@ -405,7 +408,7 @@
         </div>
         <!-- /modal createTask-->
 
-        <!-- modal restTask-->
+        <!-- modal resetTask-->
         <div class="modal fade" id="reset-task" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -522,10 +525,14 @@
                 </div>
             </div>
         </div>
-        <!-- /modal restTask-->
+        <!-- /modal resetTask-->
 
         <template id="task-btn-template"  style="display: none">
             <a class="btn btn-success" data-target="#reset-task" data-toggle="modal" @click="notify">修改信息</a>
+        </template>
+
+        <template id="task-delete-btn-template"  style="display: none">
+            <a class="btn btn-info" @click="deleteTask">删除任务</a>
         </template>
     </div>
     <!--/pdadding-md-->
@@ -606,6 +613,47 @@
                 }
             }
         });
+
+        Vue.component('delete-task-btn',{
+            template: '#task-delete-btn-template',
+            props:{
+                taskId:{
+                    type:Number,
+                    required: true
+                }
+            },
+            methods:{
+                deleteTask: function () {
+                    var _this = this;
+                    var url="{{url('admin/task')}}/"+_this.taskId;
+                    var isConfirm = window.confirm("你确定要删除吗？");
+                    if (!isConfirm){
+                        return false;
+                    }
+                    $.ajax({
+                        url:url,
+                        dataType:'json',
+                        headers:{
+                            'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content'),
+                        },
+                        timeout:60000,
+                        data: {
+                            _method : "delete",
+                        },
+                        type:'POST'
+                    }).done(function (data) {
+                        if(data.ret_num==0){
+                            alert("操作成功");
+                        }else{
+                            alert(data.ret_msg);
+                        }
+                    }).fail(function (data) {
+                        alert("网络错误！");
+                    });
+                }
+            }
+        });
+
         new Vue({
             el: "#company",
             data:{
@@ -826,68 +874,66 @@
                         return false;
                     }
                     $.ajax({
-                                url:url,
-                                dataType:'json',
-                                headers:{
-                                    'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content'),
-                                },
-                                timeout:60000,
-                                data: {
-                                    name: _this.editCompanyId,
-                                    receiver: _this.editReceiveId,
-                                    sd: _this.editSalaryDay,
-                                    id: _this.editInsuranceDay,
-                                    memo:_this.editMemo,
-                                    _method:'PUT'
-                                },
-                                type:'POST'
-                            })
-                            .done(function(data){
-                                if(data.ret_num==0){
-                                    _this.is_editCompanyId=0;
-                                    _this.editCompanyIdErrors='';
-                                    _this.is_editReceiveId=0;
-                                    _this.editReceiveIdErrors='';
-                                    _this.is_editSalaryDay=0;
-                                    _this.editSalaryDayErrors='';
-                                    _this.is_editInsuranceDay=0;
-                                    _this.editInsuranceDayErrors='';
-                                    _this.is_editTaskType=0;
-                                    _this.editTaskTypeErrors='';
-                                    _this.is_editMemo=0;
-                                    _this.editMemoErrors='';
-                                    _this.editCompanyId='';
-                                    _this.editReceiveId='';
-                                    _this.editSalaryDay='';
-                                    _this.editInsuranceDay='';
-                                    _this.editTaskType=[];
-                                    _this.editMemo='';
-                                    $('#reset-task').modal('hide');
-                                    alert(data.ret_msg);
-                                }else{
-                                    _this.is_editCompanyId=1;
-                                    _this.editCompanyIdErrors=data.ret_msg;
-                                }
-                            })
-                            .fail(function(data){
-                                var errs=JSON.parse(data.responseText);
-                                if(errs.name){
-                                    _this.is_editCompanyId=1;
-                                    _this.editCompanyIdErrors=errs.name[0];
-                                }
-                                if(errs.receiver){
-                                    _this.is_editReceiveId=1;
-                                    _this.editReceiveIdErrors=errs.receiver[0];
-                                }
-                                if(errs.sd){
-                                    _this.is_editSalaryDay=1;
-                                    _this.editSalaryDayErrors=errs.sd[0];
-                                }
-                                if(errs.id){
-                                    _this.is_editInsuranceDay=1;
-                                    _this.editInsuranceDayErrors=errs.id[0];
-                                }
-                            });
+                        url:url,
+                        dataType:'json',
+                        headers:{
+                            'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content'),
+                        },
+                        timeout:60000,
+                        data: {
+                            name: _this.editCompanyId,
+                            receiver: _this.editReceiveId,
+                            sd: _this.editSalaryDay,
+                            id: _this.editInsuranceDay,
+                            memo:_this.editMemo,
+                            _method:'PUT'
+                        },
+                        type:'POST'
+                    }).done(function(data){
+                        if(data.ret_num==0){
+                            _this.is_editCompanyId=0;
+                            _this.editCompanyIdErrors='';
+                            _this.is_editReceiveId=0;
+                            _this.editReceiveIdErrors='';
+                            _this.is_editSalaryDay=0;
+                            _this.editSalaryDayErrors='';
+                            _this.is_editInsuranceDay=0;
+                            _this.editInsuranceDayErrors='';
+                            _this.is_editTaskType=0;
+                            _this.editTaskTypeErrors='';
+                            _this.is_editMemo=0;
+                            _this.editMemoErrors='';
+                            _this.editCompanyId='';
+                            _this.editReceiveId='';
+                            _this.editSalaryDay='';
+                            _this.editInsuranceDay='';
+                            _this.editTaskType=[];
+                            _this.editMemo='';
+                            $('#reset-task').modal('hide');
+                            alert(data.ret_msg);
+                        }else{
+                            _this.is_editCompanyId=1;
+                            _this.editCompanyIdErrors=data.ret_msg;
+                        }
+                    }).fail(function(data){
+                        var errs=JSON.parse(data.responseText);
+                        if(errs.name){
+                            _this.is_editCompanyId=1;
+                            _this.editCompanyIdErrors=errs.name[0];
+                        }
+                        if(errs.receiver){
+                            _this.is_editReceiveId=1;
+                            _this.editReceiveIdErrors=errs.receiver[0];
+                        }
+                        if(errs.sd){
+                            _this.is_editSalaryDay=1;
+                            _this.editSalaryDayErrors=errs.sd[0];
+                        }
+                        if(errs.id){
+                            _this.is_editInsuranceDay=1;
+                            _this.editInsuranceDayErrors=errs.id[0];
+                        }
+                    });
                 },
                 createCompany:function(){
                     var _this=this;

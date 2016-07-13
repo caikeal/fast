@@ -13,7 +13,7 @@ class ManagerRequest extends Request
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,17 +24,18 @@ class ManagerRequest extends Request
     public function rules()
     {
         return [
-            'pwd'=>'confirmed|required',
-            'pwd_confirmation'=>'required_with:pwd'
+            'email'=>'email|unique:managers,email,'.$this->get('user_id'),
+            'phone'=>'regex:[^\d{0,4}-?\d{7,8}#?\d{0,4}$]|min:6'
         ];
     }
 
     public function messages()
     {
         return [
-            'pwd.required'=>'新密码必填！',
-            'pwd.confirmed'=>'两次密码不一致！',
-            'pwd_confirmation.required_with'=>'缺少参数！'
+            'email.email'=>'邮箱格式错误！',
+            'email.unique'=>'该邮箱已存在！',
+            'phone.regex'=>'电话号码格式错误！',
+            'phone.min'=>'电话号码位数错误！'
         ];
     }
 }

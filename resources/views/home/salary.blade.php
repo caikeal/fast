@@ -1,4 +1,7 @@
 @extends('home.app')
+@section('head')
+    <title>薪资查询</title>
+@endsection
 @section('moreCss')
     <link rel="stylesheet" href="{{env('APP_URL')}}/css/home/selectTime.css">
     <style>
@@ -15,8 +18,8 @@
     <form class="am-form am-form-horizontal" style="margin-bottom: 20px;margin-top: 20px;margin-right: 1rem;">
         <div class="am-form-group">
             <div class="am-u-sm-8">
-                <input type="text" class="am-text-center am-form-field am-round kbtn" id="beginTime"
-                       placeholder="查询月份"/>
+                <input type="month" class="am-text-center am-form-field am-round kbtn"
+                       placeholder="查询月份" value="{{ $now }}" id="beginTime"/>
             </div>
             <button class="am-btn am-btn-primary am-u-sm-4 am-round" id="searchSalary" type="button"><span
                         class="am-icon-search"></span>搜索
@@ -31,25 +34,23 @@
     </section>
 @endsection
 @section('moreScript')
-    <script src="{{env('APP_URL')}}/js/home/date.js"></script>
+    <script src="{{env('APP_URL')}}/js/home/formatDate.js"></script>
     <script src="{{env('APP_URL')}}/js/home/iscroll.js"></script>
     <script>
         window.onload = function () {
             //初始化
+            var str = "{{ $now }}";
             var d = new Date();
             if (d.getMonth() < 9) {
                 var str = d.getFullYear() + "0" + (d.getMonth() + 1);
             } else {
                 var str = d.getFullYear() + "" + (d.getMonth() + 1);
             }
-            $('#beginTime').val(str);
-            $('#beginTime').date({theme: "dateYM"});
-            var idcard = $("[name=idcard]").val();
+
             var url = "{{url('salary/details')}}";
             $.post(url, {
                 type:1,
                 time: str,
-                idcard: idcard,
                 _token: $("meta[name=csrf-token]").attr("content")
             }, function (res) {
                 if (res.status==1) {
@@ -106,12 +107,10 @@
         $("#searchSalary").click(function () {
             var _this = this;
             var url = "{{url('salary/details')}}";
-            var salaryTime = $("#beginTime").val();
-            var idcard = $("[name=idcard]").val();
+            var salaryTime = format($("#beginTime").val());
             $.post(url, {
                 type:1,
                 time: salaryTime,
-                idcard: idcard,
                 _token: $("meta[name=csrf-token]").attr("content")
             }, function (res) {
                 if (res.status==1) {
@@ -167,15 +166,17 @@
         });
 
         $("#accordion").on("click", ".am-accordion-title", function () {
-            $(".am-active").removeClass('am-active');
-            $(".am-in").removeClass('am-in');
-            $(this).siblings().addClass('am-in');
-            $(this).parent().addClass('am-active');
+            if (!$(this).parent().hasClass('am-active')){
+                var hasIt = true;
+            }
 
-            // $(".am-active").removeClass('am-active');
-            // $(".am-in").removeClass('am-in');
-            // $(this).parent().addClass('am-active');
-            // $(this).siblings().collapse('toggle');
+            if (hasIt){
+                $(this).parent().addClass('am-active');
+            }else{
+                $(this).parent().removeClass('am-active');
+            }
+
+            $(this).siblings().collapse('toggle');
         });
 
 

@@ -31,7 +31,7 @@ class AccountController extends Controller
 
     public function sms($phone)
     {
-        $is_phone=is_numeric($phone)&&preg_match('/^13\d{9}$|^14\d{9}$|^15\d{9}$|^17\d{9}$|^18\d{9}$/',$phone);
+        $is_phone=is_numeric($phone) && preg_match('/^13\d{9}$|^14\d{9}$|^15\d{9}$|^17\d{9}$|^18\d{9}$/',$phone);
         if(!$is_phone){
             $data=array(
                 "status"=>0,
