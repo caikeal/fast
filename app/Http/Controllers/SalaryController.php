@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\UserLog;
 use App\InsuranceDetail;
+use App\ModuleStatistics;
 use App\SalaryCategory;
 use App\SalaryDetail;
 use Carbon\Carbon;
@@ -19,16 +21,34 @@ class SalaryController extends Controller
         $this->middleware('binding');
     }
 
-    public function index(){
+    public function index(Request $request){
         $now = Carbon::now()->format("Y-m");
+
+        $user = \Auth::user()->id;
+
+        //统计模块访问量
+        $moduleData = new ModuleStatistics();
+        $moduleData->user_id = $user;
+        $moduleData->ip = $request->ip();
+        $moduleData->module = 'Salary';
+        \Event::fire(new UserLog($moduleData));
+
         return view('home.salary',['now'=>$now]);
     }
 
-    public function insurance(){
+    public function insurance(Request $request){
         $now = Carbon::now()->format("Y-m");
         $user = \Auth::user()->id;
         //是否有社保进度历史
         $hasIt = InsuranceDetail::where('user_id', $user)->count();
+
+        //统计模块访问量
+        $moduleData = new ModuleStatistics();
+        $moduleData->user_id = $user;
+        $moduleData->ip = $request->ip();
+        $moduleData->module = 'Insurance';
+        \Event::fire(new UserLog($moduleData));
+
         return view('home.insurance', ['is_exist'=>$hasIt, 'now'=>$now]);
     }
 
