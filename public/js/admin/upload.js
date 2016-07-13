@@ -72,12 +72,19 @@ $(".upload-ctrl").each(function(index,eles){
 			$('#' + file.id).find('p.state').text('已上传');
 			$(this.options.pick.id).find('.webuploader-pick').addClass('webuploader-pick-disable');
 			$(this.options.pick.id).find('.webuploader-pick').next().addClass('webuploader-pick-disable');
-			//todo html response
 		});
 
 		window["uploader" + index].on('uploadError', function (file, reason) {
 			console.log(reason);
-			$('#' + file.id).find('p.state').text("上传失败");
+			if (reason == 'failed') {
+				$('#' + file.id).find('p.state').text("不是有效的excel文件！");
+			}else if(reason == 'liner'){
+				$('#' + file.id).find('p.state').text("数据格式错误");
+			}else if(reason == 'No Data'){
+				$('#' + file.id).find('p.state').text("空数据");
+			}else{
+				$('#' + file.id).find('p.state').text("上传失败");
+			}
 			if ($(this.options.pick.list + " >.item").length > 2) {
 				$($(this.options.pick.list + " >.item")[0]).remove();
 			}

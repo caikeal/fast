@@ -1,15 +1,83 @@
 @extends('admin.app')
 @section('moreCss')
     <link rel="stylesheet" href="{{env("APP_URL")}}/css/admin/webuploader.css">
+    <style>
+        .select-gap{
+            margin-bottom: 5px;
+        }
+        .line{
+            margin: 20px 0px;
+            border: 1px solid #e2e2e2;
+        }
+        .section-box{
+            background-color: #fff;
+            border: 1px solid #e2e2e2;
+            border-radius: 10px;
+            padding: 15px;
+        }
+        .section-box .line{
+            margin: 5px 0 15px 0;
+            border: 1px solid #e2e2e2;
+        }
+    </style>
 @endsection
 @section('content')
     <div class="padding-md" id="type" data-type="2">
-        <h2 class="header-text">
+        <h3 class="header-text">
             社保上传
-						<span class="sub-header">
-							{{--19 Updates--}}
-						</span>
-        </h2>
+            <span class="sub-header">
+                {{--19 Updates--}}
+            </span>
+        </h3>
+
+        <!--社保进度-->
+        <section class="section-box">
+            <div class="row">
+                <div class="col-md-8">
+                    <h4>进度上传</h4>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="line"></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div id="uploader_pro" data-task="0">
+                        <!--用来存放文件信息-->
+                        <div id="thelist_pro" class="uploader-list"></div>
+                        <div class="btns">
+                            <div id="picker_pro">选择文件</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-5 col-sm-5 timeline-select select-gap">
+                            <select name="c1" class="form-control">
+                                @foreach($bases as $base)
+                                    <option value="{{ $base->id }}">{{ $base->title }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-2 col-sm-2 select-gap">
+                            <a class="btn btn-success timeline-btn download-progress-base" data-company="c1">下载模版
+                            </a>
+                        </div>
+                        <div class="col-md-2 col-sm-2 select-gap">
+                            <progress-base-btn :company-id=0 type="4" @click="initModal"></progress-base-btn>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!--/社保进度-->
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="line"></div>
+            </div>
+        </div>
 
         <div class="row">
             <div class="col-md-10">
@@ -62,9 +130,7 @@
                                                    data-company="c{{$task->company_id}}">下载模版
                                                 </a>
 
-                                                <div class="timeline-new" data-company="c{{$task->company_id}}"><i
-                                                            class="fa fa-plus-circle"></i> 新建模版
-                                                </div>
+                                                <new-base-btn :company-id={{ $task->company_id }} type="2" @click="initModal"></new-base-btn>
                                             </div>
                                         </div><!-- ./timeline-body -->
                                     </div><!-- ./timeline-item-inner -->
@@ -118,9 +184,7 @@
                                                 <div class="btn btn-success timeline-btn download-base"
                                                      data-company="c{{$task->company_id}}">下载模版
                                                 </div>
-                                                <div class="timeline-new" data-company="c{{$task->company_id}}"><i
-                                                            class="fa fa-plus-circle"></i> 新建模版
-                                                </div>
+                                                <new-base-btn :company-id={{ $task->company_id }} type="2" @click="initModal"></new-base-btn>
                                             </div>
                                         </div>
                                         <!-- ./timeline-body -->
@@ -138,148 +202,245 @@
             <!-- ./col -->
         </div>
         <!-- ./row -->
-    </div>
-    <!-- ./padding-md -->
-    @endsection
-    @section('addition')
-            <!-- Modal -->
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog"
-         aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close"
-                            data-dismiss="modal" aria-hidden="true">
-                        &times;
-                    </button>
-                    <h4 class="modal-title" id="myModalLabel">
-                        新建模板
-                    </h4>
-                </div>
-                <div class="modal-body">
-                    {{--@if($errors->any())--}}
-                    {{--<ul class="list-group">--}}
-                    {{--@foreach($errors->all() as $error)--}}
-                    {{--<li class="list-group-item list-group-item-danger">{{$error}}</li>--}}
-                    {{--@endforeach--}}
-                    {{--</ul>--}}
-                    {{--@endif--}}
-                    <form class="bs-example bs-example-form" role="form" action="{{url('admin/salary/base')}}"
-                          method="post">
-                        {!! csrf_field() !!}
-                        <input type="hidden" name="cid" value="">
-                        <input type="hidden" name="type" value="2">
 
-                        <div class="modle-form">
+        <!-- timeline-base-template -->
+        <template id="timeline-btn-template"  style="display: none">
+            <div class="timeline-new" @click="notify">
+                <i class="fa fa-plus-circle"></i> 新建模版
+            </div>
+        </template>
+        <!-- ./timeline-base-template -->
+
+        <!-- progress-base-template -->
+        <template id="progress-btn-template"  style="display: none">
+         <div class="btn btn-success" @click="notify">
+            新建模版
+            </div>
+        </template>
+        <!-- /progress-base-template -->
+
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" role="dialog"
+             aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close"
+                                data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            新建模板
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
                             <div class="row creatCategroy">
-                                <div class="col-lg-12">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" id="createBigCategory">
-                                   <span class="input-group-btn">
-                                      <button class="btn btn-primary" type="button" id="createBig">
-                                          大类选项创建
-                                      </button>
-                                   </span>
-                                    </div><!-- /input-group -->
-                                </div><!-- /.col-lg-12 -->
-
+                                <div class="col-md-12">
+                                    <vue-input input-name="大类选项创建" :new-category.sync="bigCategorys" level="1" :type="type"></vue-input>
+                                </div>
                                 <div class="clearfix" style="margin: 10px 0;"></div>
-
-                                <div class="col-lg-12">
-                                    <div class="input-group create">
-                                        <input type="text" class="form-control" id="littleCategory">
-                                   <span class="input-group-btn">
-                                      <button class="btn btn-primary" type="button" id="createLittle">
-                                          小类选项创建
-                                      </button>
-                                   </span>
-                                    </div><!-- /input-group -->
-                                </div><!-- /.col-lg-12 -->
-                            </div><!-- /.row -->
-
-                            <div class="clearfix" style="margin: 10px 0;"></div>
-
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <input class="form-control" type="text" name="title" placeholder="模版标题">
+                                <div class="col-md-12">
+                                    <vue-input input-name="小类选项创建" :new-category.sync="smallCategorys" level="2" :type="type"></vue-input>
                                 </div>
                             </div>
+                            <div class="clearfix" style="margin: 10px 0;"></div>
+
+                            <div :class="['company-selector',{'has-error':errors.companyErrors.isInvalid}]" v-if="companyShow">
+                                <vue-select class="vue-select3" name="select0"
+                                            :options="allCompany" :model.sync="companyId"
+                                            :searchable="true" language="zh-CN" drop-node="body">
+                                </vue-select>
+                                <span class="help-block">@{{ errors.companyErrors.msg }}</span>
+                            </div>
+
+                            <div class="clearfix" style="margin: 10px 0;"></div>
+                            <div class="row">
+                                <div :class="['col-md-12',{'has-error':errors.titleErrors.isInvalid}]">
+                                    <input type="text" name="base-title" v-model="baseTitle | nospace" class="form-control" placeholder="模版标题">
+                                    <span class="help-block">@{{ errors.titleErrors.msg }}</span>
+                                </div>
+                            </div>
+
                             <br>
 
                             <div>
-                                    <span class="help-block" style="color: red">
-                                        <span style="font-weight: 800">*</span>
-                                        模版中自动包含
-                                        <span style="font-weight: 800">'姓名'、'身份证'、'发薪日'</span>，
-                                        <span style="font-weight: 800"> 请勿</span>
-                                        再次
-                                        <span style="font-weight: 800">创建</span>
-                                    </span>
-                            </div>
-                            <div class="row addCategory well">
-                                <div style="margin-top: 15px;">
-                                    <lagre class="text-muted">选择大类:</lagre>
-                                    <select class="bigCategorySelect text-muted" name="category[]">
-                                    </select>
-                                    <a class="addSmall text-muted" type="button"
-                                       style="margin-left: 25px;color: #0BC10E;cursor: pointer;">
-                                        <i class="fa fa-plus-circle"></i> 新增小类
-                                    </a>
-                                    <a class="delete-big text-muted" type="button"
-                                       style="margin-left: 25px;color: #e36159;cursor: pointer;">
-                                        <i class="fa fa-minus-circle"></i> 删除分组
-                                    </a>
-                                </div>
-
-                                <div class="addsmallSelect" style="margin-top: 15px;margin-left: 1px;">
-                                    <small class="text-muted">选择小类:</small>
-                                    <span class="small-select-btn" style="display:inline-block;margin: 10px 10px;">
-                                        <span style="position: relative">
-                                        <select class="smallCategorySelect text-muted" name="category[]"
-                                                style="margin-left: 4px;">
-                                        </select>
-                                        <div class="delete-small" style="position: absolute;top: -12px;right: -8px;
-                                        color: #fff;border-radius: 50%;width: 1.5rem;height: 1.5rem;
-                                        text-align: center;border-radius: 50%;background-color: #00a2d4;cursor: pointer;">
-                                            <i class="fa fa-times"></i>
-                                        </div>
+                                        <span class="help-block" style="color: red">
+                                            <span style="font-weight: 800">*</span>
+                                            模版中自动包含
+                                            <span style="font-weight: 800">'姓名'、'身份证'、'发薪日'</span>，
+                                            <span style="font-weight: 800"> 请勿</span>
+                                            再次
+                                            <span style="font-weight: 800">创建</span>
                                         </span>
-                                    </span>
+                            </div>
 
-                                </div>
-                            </div>
+                            <dynamic-selectors :dynamic-selectors.sync="selectors"
+                                               :big-categorys="bigCategorys"
+                                               :small-categorys="smallCategorys"
+                                               :dynamic-errors.sync="errors.dynamicErrors">
+                            </dynamic-selectors>
                         </div>
-                        <div class="col-lg-12" style="padding: 10px 100px 10px;">
-                            <h4><a id="addBig" type="button" style="color: #0BC10E;cursor: pointer;"><i
-                                            class="fa fa-plus-circle"></i> 新增分组</a></h4>
+
+                    </div>
+                    <div class="modal-footer" style="text-align: center;">
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-info"
+                                    data-target="#goModal" data-toggle="modal" @click="getRehearsal">预览模版
+                            </button>
+                            <button type="submit" class="btn btn-primary" @click="saveBase">
+                            保存模板
+                            </button>
                         </div>
-                        <div class="modal-footer" style="text-align: center;">
-                            <div class="col-lg-12">
-                                <button type="button" class="btn btn-default"
-                                        data-dismiss="modal">关闭
-                                </button>
-                                <button id="saveModle" type="submit" class="btn btn-primary">
-                                    保存模板
-                                </button>
-                            </div>
-                        </div>
-                    </form>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+        </div>
+        <!-- /.modal -->
+
+        <div class="modal fade" id="goModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">预览@{{ baseTitle }}模版</h4>
+                    </div>
+                    <div class="modal-body">
+                        <section class="accordion-gapped">
+                            <dl v-for="rehearsalItem in rehearsal" :class="[rehearsalItem.show?'active':'']">
+                                <dt class="accordion-title" @click="toggleCats($index)">
+                                @{{ rehearsalItem.bigSelect }}
+                                </dt>
+                                <dd v-show="rehearsalItem.show" transition="expand">
+                                    <table class="table table-striped table-border">
+                                        <tbody>
+                                        <tr v-for="smallRehearsal in rehearsalItem.smallSelect"  track-by="$index">
+                                            <th scope="row">@{{ smallRehearsal }}</th>
+                                            <td>具体内容</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </dd>
+                            </dl>
+                        </section>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div>
+        <!-- /.Modal -->
+
+        <!-- template -->
+        <script type="text/x-template" id="dynamic-selectors-template">
+            <div class="dynamic-table">
+                <selector v-for="selector in dynamicSelectors"
+                          :big-categorys="bigCategorys"
+                          :small-categorys="smallCategorys"
+                          :big-select.sync="selector.bigSelect"
+                          :small-select.sync="selector.smallSelect"
+                          :big-errors.sync="dynamicErrors[$index]['bigErrors']"
+                          :small-errors.sync="dynamicErrors[$index]['smallErrors']">
+                    <a class="text-muted delete-group" @click.prevent="deleteSelector(selector)">
+                        <i class="fa fa-minus-circle"></i> 删除分组
+                    </a>
+                </selector>
+                <div class="row">
+                    <div class="col-md-12" style="padding-bottom: 30px;">
+                        <h4>
+                            <a id="addBig" class="add-group" @click.prevent="addSelector">
+                                <i class="fa fa-plus-circle"></i> 新增分组
+                            </a>
+                        </h4>
+                    </div>
                 </div>
             </div>
-            <!-- /.modal-content -->
-        </div>
+        </script>
+
+        <script type="text/x-template" id="selectors-template">
+            <div class="addCategory well">
+                <div class="category-section">
+                    <span class="text-muted category-title">选择大类:</span>
+                    <div class="category-content big-category-content">
+                        <div :class="['big-selector', {'has-error': bigErrors.isInvalid}]">
+                            <big-selector :big-select.sync="bigSelect" :big-categorys="bigCategorys"></big-selector>
+                        </div>
+                        <a class="text-muted add-small-category" @click="addSmallSelector">
+                        <i class="fa fa-plus-circle"></i> 新增小类
+                        </a>
+                        <div style="float:right;">
+                            <slot></slot>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+
+                <div class="category-section">
+                    <span class="text-muted category-title">选择小类:</span>
+                    <div class="category-content">
+                        <div :class="['small-selector', {'has-error':smallErrors[$index]['isInvalid']}]" v-for="small in smallSelect" track-by="$index">
+                            <small-selector :small.sync="small" :small-categorys="smallCategorys">
+                                <div class="delete-small" @click="deleteSmallSelector(small)">
+                                <i class="fa fa-times close-cirle"></i>
+                        </div>
+                        </small-selector>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+
+            </div>
+        </script>
+
+        <script type="text/x-template" id="big-selectors-template">
+            <vue-select class="vue-select3" name="select3"
+                        :options="bigCategorys" :model.sync="bigSelect"
+                        :searchable="true" language="zh-CN" drop-node="body">
+            </vue-select>
+        </script>
+
+        <script type="text/x-template" id="small-selectors-template">
+            <vue-select class="vue-select3" name="select3"
+                        :options="smallCategorys" :model.sync="small"
+                        :searchable="true" language="zh-CN" drop-node="body">
+            </vue-select>
+
+            <slot></slot>
+        </script>
+
+        <script type="text/x-template" id="vue-input-template">
+            <div class="input-group open">
+                <input type="text" v-model="newText | nospace" v-el:need-input @input="findList(newText)" @blur="clearSearch" class="form-control">
+                <span class="input-group-btn">
+                    <button @click="addToTexts" class="btn btn-primary">@{{ inputName }}</button>
+                </span>
+                <ul class="dropdown-menu" aria-labelledby="dLabel" v-if="searchArr.length!=0">
+                    <li>
+                        <a herf="javascript:void(0);" style="color:#f8547a">存在如下类似：</a>
+                    </li>
+                    <li role="separator" class="divider"></li>
+                    <li v-for="search in searchArr">
+                        <a herf="javascript:void(0);" style="color:#f8547a">@{{ search }}</a>
+                    </li>
+                </ul>
+            </div>
+        </script>
+        <!-- /template -->
     </div>
-    <!-- /.modal -->
+    <!-- ./padding-md -->
 @endsection
 @section('moreScript')
-    //侧边栏位置锁定
+    {{--侧边栏位置锁定--}}
     <script>
         !(function () {
             $(".main-menu .accordion>li").removeClass("active");
             $(".lock-place3").addClass("active");
         })($);
     </script>
-    //文件上传
+    {{--文件上传--}}
     {{--<script src="{{env('APP_URL')}}/js/webuploader-0.1.5/webuploader.min.js"></script>--}}
     <script src="http://7xqxb2.com2.z0.glb.qiniucdn.com/webuploader.min.js"></script>
     <script>
@@ -289,7 +450,24 @@
         });
     </script>
     <script src="{{env('APP_URL')}}/js/admin/upload.js"></script>
+    <script src="{{env('APP_URL')}}/js/admin/upload_insurance_progress.js"></script>
+    <script src="{{env('APP_URL')}}/js/admin/search.js"></script>
+
     <script type="text/javascript">
+        // 进度文件接收服务端。
+        $.extend(picker_pro.options,{
+            server: "{{url('admin/insurance/upload')}}"
+        });
+    </script>
+
+    <script type="text/javascript">
+        //修复双层modal的bug
+        $(document).ready(function(){
+            $('#goModal').on('hidden.bs.modal', function (e) {
+                $(this).parent().addClass("modal-open");
+            })
+        });
+
         //下载
         $(".download-base").on("click", function () {
             var bid = $(this).prev().children("select").val();
@@ -298,147 +476,741 @@
                 return false;
             }
             var url = "{{url('admin/salary/download')}}?bid=" + bid;
-//            console.log(url);
             window.location.href = "{{url('admin/salary/download')}}?bid=" + bid;
         });
 
-        //起吊模态框
-        $(".timeline-new").click(function () {
-            var url = "{{url('admin/salary/category')}}";
-            var cp = $(this).attr("data-company").substr(1);
-            var bi = $(this).prevAll(".timeline-select").children("[name=c" + cp + "]").val();
-            $("[name='cid']").val(cp);
-            $(".bigCategorySelect").each(function (index, ele) {
-                if (index > 0) {
-                    $(ele).parent().parent(".addCategory").remove();
+        $(".download-progress-base").on("click", function () {
+            var bid = $(this).parent().prev().children("select").val();
+            if (bid == null) {
+                alert("未选择模版！");
+                return false;
+            }
+            var redirectUrl = "{{ url('admin/salary/download') }}?bid=" + bid;
+            window.location.href = redirectUrl;
+        });
+
+        //vue过滤器
+        Vue.filter('nospace', {
+            read: function (val) {
+                return val.trim();
+            },
+
+            write: function(val){
+                return val.trim();
+            }
+        });
+
+        //vue组件
+        Vue.component('progress-base-btn', {
+            template: '#progress-btn-template',
+            props: {
+                companyId: {
+                    type: Number,
+                    required: true
+                },
+                type: {
+                    required: true
                 }
-            });
-            $(".smallCategorySelect").each(function (index, ele) {
-                if (index > 0) {
-                    $(ele).remove();
+            },
+            methods: {
+                notify: function(){
+                    var _this=this;
+                    _this.$dispatch('company-id', _this.companyId);
+                    _this.$dispatch('company-show', 1);
+                    //不存在企业，需要获取所有企业让用户选择
+                    if (_this.companyId == 0){
+                        $.ajax("{{ url('admin/company') }}", {
+                            type: 'get',
+                            dataType: 'json',
+                            timeout: '120000',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            }
+                        }).done(function (data) {
+                            if (data.ret_num==0) {
+                                _this.$dispatch('all-company', data.data);
+                            } else {
+                                alert("网络错误！");
+                            }
+                        }).fail(function () {
+                            alert("网络错误！");
+                        });
+                    }
+
+                    if(_this.type){
+                        this.$dispatch('type', _this.type);
+                    }
+                    var url = "{{url('admin/salary/category')}}";
+                    $.ajax(url, {
+                        type: 'get',
+                        dataType: 'json',
+                        timeout: '120000',
+                        data: {type: _this.type},
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    }).done(function (data) {
+                        if (data.status) {
+                            _this.$dispatch('big-category', data.big);
+                            _this.$dispatch('small-category', data.small);
+                        } else {
+                            alert("网络错误！");
+                        }
+                    }).fail(function () {
+                        alert("网络错误！");
+                    });
                 }
-            });
-            $(".bigCategorySelect >option").remove();
-            $(".smallCategorySelect >option").remove();
-            $.ajax(url, {
-                type: 'get',
-                dataType: 'json',
-                timeout: '120000',
-                data: {cid: cp, bid: bi, type: 2},
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        Vue.component('new-base-btn', {
+            template: '#timeline-btn-template',
+            props: {
+                companyId: {
+                    type: Number,
+                    required: true
+                },
+                type: {
+                    required: true
                 }
-            }).done(function (data) {
-                if (data.status) {
-                    if (data.big.length) {
-                        for (var i = 0; i < (data.big).length; i++) {
-                            $(".bigCategorySelect").append("<option value='" + data.big[i].id + "'>" + data.big[i].name + "</option>");
+            },
+            methods: {
+                notify: function(){
+                    var _this=this;
+                    _this.$dispatch('company-show', 0);
+                    if(_this.companyId){
+                        this.$dispatch('company-id', _this.companyId);
+                    }
+                    if(_this.type){
+                        this.$dispatch('type', _this.type);
+                    }
+                    var url = "{{url('admin/salary/category')}}";
+                    $.ajax(url, {
+                        type: 'get',
+                        dataType: 'json',
+                        timeout: '120000',
+                        data: {type: _this.type},
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    }).done(function (data) {
+                        if (data.status) {
+                            _this.$dispatch('big-category', data.big);
+                            _this.$dispatch('small-category', data.small);
+                        } else {
+                            alert("网络错误！");
+                        }
+                    }).fail(function () {
+                        alert("网络错误！");
+                    });
+                }
+            }
+        });
+
+        Vue.component('vue-input', {
+            template: "#vue-input-template",
+            props: {
+                newCategory: {
+                    twoWay: true
+                },
+                inputName: {
+                    required: true
+                },
+                type: {
+                    required: true
+                },
+                level: {
+                    required: true
+                }
+            },
+            data: function(){
+                return {
+                    newText: '',
+                    searchArr: [],
+                    solidInclude: [
+                        {id: 0, text: '姓名'},
+                        {id: 0, text: '身份证'},
+                        {id: 0, text: '发薪日'}
+                    ]
+                }
+            },
+            methods: {
+                addToTexts: function(){
+                    var self = this;
+                    if (this.newText == ""){
+                        alert("请勿添加空白！");
+                        return false;
+                    }
+                    //判断是否在newCategory中，保证不重复创建
+                    if (this.isInNewCat(this.newText)) {
+                        alert("已经存在！");
+                        return false;
+                    }
+                    //调用接口,发送post请求给后台
+                    url = "{{url('admin/salary/category')}}";
+                    $.ajax(url, {
+                        type: 'post',
+                        dataType: 'json',
+                        timeout: '120000',
+                        data: {name: self.newText, level: self.level, type: self.type},
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    }).done(function (data) {
+                        if (data.status) {
+                            var datum = {id: data.cid, text: self.newText, level: self.level};
+                            self.newCategory.push(datum);
+                            self.newText = '';
+                            alert("添加成功！");
+                        } else {
+                            alert("网络错误！");
+                        }
+                    }).fail(function () {
+                        alert("网络错误！");
+                    }).complete();
+
+                },
+
+                isInNewCat: function(info){
+                    var tpl = [];
+                    tpl = this.newCategory.concat(this.solidInclude);
+                    for(var i = 0; i < tpl.length; i++){
+                        if (info == tpl[i].text){
+                            return true;
+                            break;
                         }
                     }
-                    if (data.small.length) {
-                        for (var j = 0; j < (data.small).length; j++) {
-                            $(".smallCategorySelect").append("<option value='" + data.small[j].id + "'>" + data.small[j].name + "</option>");
+                    return false;
+                },
+
+                findList: function(info){
+                    this.searchArr = [];
+                    var tpl = [];
+                    tpl = this.newCategory.concat(this.solidInclude);
+                    if (!info) {
+                        return true;
+                    }
+
+                    for(var i = 0; i < tpl.length; i++){
+                        if (tpl[i].text.indexOf(info) >= 0){
+                            this.searchArr.push(tpl[i].text);
                         }
                     }
-                    $('#myModal').modal();
+
+                    return true;
+                },
+
+                clearSearch: function(){
+                    this.searchArr = [];
+
+                    return true;
+                }
+            }
+        });
+
+        Vue.component('vue-select', {
+            replace: true,
+            inherit: false,
+            template: "<select class='form-control' v-model='model' :name='name' style='width: 100%;'>"
+            +   "<option v-if='optionsType === \"values\"' v-for='val in options' :value='val'>@{{val}}</option>"
+            +   "<option v-if='optionsType === \"options\"' v-for='opt in options' :value='opt.id'>@{{opt.text}}</option>"
+            +   "<optgroup v-if='optionsType === \"groups\"' v-for='group in options' :label='group.label'>"
+            +     "<option v-for='opt in group.options' :value='opt.id'>@{{opt.text}}</option>"
+            +   "</optgroup>"
+            + "</select>",
+            props: {
+                options: {
+                    type: Array,
+                    required: true
+                },
+                model: {
+                    required: true,
+                    twoWay: true
+                },
+                searchable: {
+                    type: Boolean,
+                    required: false,
+                    default: false
+                },
+                matchValue: {
+                    type: Boolean,
+                    required: false,
+                    default: true
+                },
+                name: {
+                    type: String,
+                    required: false,
+                    default: ""
+                },
+                language: {
+                    type: String,
+                    required: false,
+                    default: ""
+                },
+                theme: {
+                    type: String,
+                    required: false,
+                    default: "bootstrap"
+                },
+                dropNode: {
+                    type: String,
+                    required: false,
+                    default: "body"
+                }
+            },
+            data: function() {
+                return {
+                    optionsType: "unknown"
+                }
+            },
+            beforeCompile: function() {
+                this.isChanging = false;
+                this.control = null;
+                this.optionsType = this.getOptionsType();
+            },
+            watch: {
+                "options": function(val, oldVal) {
+                    // console.debug("options.change");
+                    this.optionsType = this.getOptionsType();
+                    var found = this.inOptions(this.model);
+                    var newValue = (found ? this.model : null);
+                    this.control.removeData("data");  // remove the cached options data
+                    // note that setting the model will automatically changed in the "change"
+                    // event of the select2 control
+                    this.control.val(newValue).trigger("change");
+                },
+                "model": function(val, oldVal) {
+                    //console.debug("model.change");
+                    if (! this.isChanging) {
+                        this.isChanging = true;
+                        this.control.val(val).trigger("change");
+                        this.isChanging = false;
+                    }
+                }
+            },
+            ready: function() {
+                var language = this.language;
+                if (language === null || language === "") {
+                    if (this.$language) {
+                        language = this.$language;
+                    } else {
+                        language = DEFAULT_LANGUAGE;
+                    }
+                }
+                var args = {
+                    theme: this.theme,
+                    language: this.getLanguageCode(language),
+                    dropdownParent: $(this.dropNode),
+                };
+                if (! this.searchable) {
+                    args.minimumResultsForSearch = Infinity;  // hide the search box
                 } else {
-                    alert("网络错误！");
+                    if (this.matchValue) {
+                        args.matcher = matcher;
+                    }
                 }
-            }).fail(function () {
-                alert("网络错误！");
-            }).complete();
-        });
-
-        //创建大类选项
-        $("#createBig").click(function () {
-            var bigCategory = $("#createBigCategory").val().trim();
-            if (bigCategory != "") {
-                //发送post请求给后台
-                url = "{{url('admin/salary/category')}}";
-                $.ajax(url, {
-                    type: 'post',
-                    dataType: 'json',
-                    timeout: '120000',
-                    data: {name: bigCategory, level: 1, type: 2},
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                this.control = $(this.$el);
+                this.control.select2(args);
+                var me = this;
+                this.control.on("change", function(e) {
+                    //console.debug("control.change");
+                    if (! me.isChanging) {
+                        me.isChanging = true;
+                        me.model = Number(me.control.val());
+                        me.$nextTick(function () {
+                            me.isChanging = false;
+                        });
                     }
-                }).done(function (data) {
-                    if (data.status) {
-                        $(".bigCategorySelect ").append("<option value='" + data.cid + "'>" + bigCategory + "</option>");
-                        $("#createBigCategory").val("");
+                });
+            },
+            methods: {
+                /**
+                 * Gets the type of the `options` property of this component.
+                 *
+                 * The `options` property of this component may have the following types:
+                 * - "values": the `options` is an array of strings, e.g., `[value1, value2, value3]`;
+                 * - "options": the `options` is an array of options, e.g., `[{text: 'name1', id: 'val1'}, {text: 'name2', id: 'val2'}]`;
+                 * - "groups": the `options` is an array of option groups, e.g.,
+                 *   `[{label: 'group1', options: [{text: 'name1', id: 'val1'}, {text: 'name2', id: 'val2'}]},
+                 *     {label: 'group2', options: [{text: 'name3', id: 'val3'}, {text: 'name4', id: 'val4'}]}]`;
+                 *
+                 * @param options
+                 *    the new options.
+                 * @return
+                *    the string representing the type of the `options` property of this
+                 *    component.
+                 */
+                getOptionsType: function() {
+                    if (this.options.length === 0) {
+                        return "values";
+                    }
+                    var el = this.options[0];
+                    if (typeof el == "string" || el instanceof String) {
+                        return "values";
+                    } else if (typeof el.text !== "undefined") {
+                        return "options";
+                    } else if (typeof el.label !== "undefined") {
+                        return "groups";
                     } else {
-                        alert("网络错误！");
+                        return "unknown";
                     }
-                }).fail(function () {
-                    alert("网络错误！");
-                }).complete();
-            } else {
-                alert("请勿添加空白！");
-            }
-        });
+                },
 
-        //点击创建小分类选项按钮
-        $("#createLittle").click(function () {
-            var littleCategory = $("#littleCategory").val().trim();
-            if (littleCategory != "") {
-                //发送post请求给后台
-                url = "{{url('admin/salary/category')}}";
-                $.ajax(url, {
-                    type: 'post',
-                    dataType: 'json',
-                    timeout: '120000',
-                    data: {name: littleCategory, level: 2, type: 2},
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                /**
+                 * Tests whether a specified value exists in the options.
+                 *
+                 * @param value
+                 *    the value to test.
+                 * @return
+                *    true if the specified value exists in the options; false otherwise.
+                 */
+                inOptions: function(value) {
+                    var type = this.getOptionsType();
+                    var list = this.options;
+                    var i, j;
+                    switch (type) {
+                        case "values":
+                            for (i = 0; i < list.length; ++i) {
+                                if (value === list[i]) {
+                                    return true;
+                                }
+                            }
+                            break;
+                        case "options":
+                            for (i = 0; i < list.length; ++i) {
+                                if (value === list[i].id) {
+                                    return true;
+                                }
+                            }
+                            break;
+                        case "groups":
+                            for (i = 0; i < list.length; ++i) {
+                                var options = list[i].options;
+                                for (j = 0; j < options.length; ++j) {
+                                    if (value === options[j].id) {
+                                        return true;
+                                    }
+                                }
+                            }
+                            break;
+                        default:
+                            break;
                     }
-                }).done(function (data) {
-                    if (data.status) {
-                        $(".smallCategorySelect").append("<option value='" + data.cid + "'>" + littleCategory + "</option>");
-                        $("#littleCategory").val("");
+                    return false;
+                },
+
+                /**
+                 * Gets the language code from the "language-country" locale code.
+                 *
+                 * The function will strip the language code before the first "-" of a
+                 * locale code. For example, pass "en-US" will returns "en". But for some
+                 * special locales, the function reserves the locale code. For example,
+                 * the "zh-CN" for the simplified Chinese and the "zh-TW" for the
+                 * traditional Chinese.
+                 *
+                 * @param locale
+                 *    A locale code.
+                 * @return
+                *    the language code of the locale.
+                 */
+                getLanguageCode: function(locale) {
+                    if (locale === null || locale.length === 0) {
+                        return "en";
+                    }
+                    if (locale.length <= 2) {
+                        return locale;
                     } else {
-                        alert("网络错误！");
+                        switch (locale) {
+                            case "pt-BR":
+                            case "zh-CN":
+                            case "zh-TW":
+                                return locale;
+                            default:
+                                // reserve only the first two letters language code
+                                return locale.substr(0, 2);
+                        }
                     }
-                }).fail(function () {
-                    alert("网络错误！");
-                }).complete();
-            } else {
-                alert("请勿添加空白！");
+                }
             }
         });
 
-        //点击添加大分类按钮
-        $("#addBig").on("click", function () {
-            var bigThis = $(this);
-            $(".modle-form").append($(".addCategory:first").clone());
-            //删除多余的smallCateforySelect
-            $(".addCategory").last().find(".small-select-btn:first").nextAll().remove();
-        });
-
-        //点击添加小分类按钮
-        $(".modal-content").on("click", ".addSmall", function () {
-            var _this = $(this);
-            _this.parent().next().append($(".small-select-btn:first").clone());
-        });
-
-        //点击删除大分类按钮
-        $(".modal-content").on("click",".delete-big",function(){
-            var _this = $(this);
-            if($(".delete-big").length==1){
-                alert("只有1个分组不能删除！");
-                return false;
+        Vue.component('small-selector', {
+            template: '#small-selectors-template',
+            props: {
+                smallCategorys: [],
+                small: 0,
             }
-            _this.parent().parent().remove();
         });
 
-        //点击删除小分类按钮
-        $(".modal-content").on("click",".delete-small",function(){
-            var _this = $(this);
-            if($(_this).parent().parent().parent().find(".small-select-btn").length==1){
-                alert("只有1个分组不能删除！");
-                return false;
+        Vue.component('big-selector', {
+            template: '#big-selectors-template',
+            props: {
+                bigCategorys: [],
+                bigSelect: 0
             }
-            _this.parent().parent().remove();
+        });
+
+        Vue.component('selector', {
+            template: '#selectors-template',
+            props: {
+                bigCategorys: [],
+                smallCategorys: [],
+                bigSelect: 0,
+                smallSelect: [],
+                bigErrors: {},
+                smallErrors: []
+            },
+            methods: {
+                addSmallSelector: function(){
+                    var addTpl = 0;
+                    if (this.smallCategorys[0]) {
+                        addTpl = this.smallCategorys[0]['id'];
+                    }
+                    this.smallSelect.push(addTpl);
+                    this.smallErrors.push({isInvalid: false, msg: ""});
+                },
+                deleteSmallSelector: function(small){
+                    this.smallSelect.$remove(small);
+                }
+            }
+        });
+
+        Vue.component('dynamic-selectors', {
+            template: '#dynamic-selectors-template',
+            props: {
+                dynamicSelectors: [],
+                bigCategorys: [],
+                smallCategorys: [],
+                dynamicErrors: []
+            },
+            methods: {
+                addSelector: function(){
+                    var addBigTpl = 0;
+                    var addSmallTpl = 0;
+                    if (this.bigCategorys[0]) {
+                        addBigTpl = this.bigCategorys[0]['id'];
+                    }
+                    if (this.bigCategorys[0]) {
+                        addSmallTpl = this.smallCategorys[0]['id'];
+                    }
+                    this.dynamicSelectors.push({bigSelect: addBigTpl, smallSelect: [addSmallTpl]});
+                    this.dynamicErrors.push({bigErrors: {isInvalid: false, msg: ''}, smallErrors: [{isInvalid: false, msg: ''}]});
+                },
+                deleteSelector: function(selector){
+                    this.dynamicSelectors.$remove(selector);
+                }
+            }
+        });
+
+        var vm = new Vue({
+            el: '#type',
+            data: {
+                companyId: 0,
+                bigCategorys: [],
+                smallCategorys: [],
+                allCompany: [],
+                selectors: [],
+                errors: {
+                    dynamicErrors: [],
+                    titleErrors: {isInvalid: false, msg: ''},
+                    companyErrors: {isInvalid: false, msg: ''}
+                },
+                rehearsal: [],
+                baseTitle: '',
+                type: 0,
+                companyShow: 0
+            },
+            methods: {
+                initModal: function () {
+                    $("#myModal").modal('show');
+                },
+
+                getRehearsal: function(){
+                    this.rehearsal = [];
+                    var self = this;
+                    var bigCats = this.getCategorys(this.bigCategorys);
+                    var smallCats = this.getCategorys(this.smallCategorys);
+                    for (var i = 0; i < self.selectors.length; i++) {
+                        var tplBigCat = '';
+                        var tplSmallCats = [];
+                        var tplShow = false;
+                        if (i===0) {
+                            tplShow = true;
+                        }
+                        tplBigCat = bigCats[self.selectors[i]['bigSelect']];
+                        for (var j = 0; j < self.selectors[i]['smallSelect'].length; j++) {
+                            tplSmallCats.push(smallCats[self.selectors[i]['smallSelect'][j]]);
+                        }
+                        self.rehearsal.push({bigSelect: tplBigCat, smallSelect: tplSmallCats, show: tplShow});
+                    }
+
+                    return true;
+                },
+
+                getCategorys: function(cats) {
+                    var tplCats = {};
+                    for (var i = 0; i < cats.length; i++) {
+                        tplCats[cats[i]['id']] = cats[i]['text'];
+                    }
+
+                    return tplCats;
+                },
+
+                toggleCats: function(index){
+                    if (this.rehearsal[index].show) {
+                        this.rehearsal[index].show = false;
+                    }else{
+                        for (var i = 0; i < this.rehearsal.length; i++) {
+                            this.rehearsal[i].show = false;
+                        }
+                        this.rehearsal[index].show = true;
+                    }
+                },
+
+                saveBase: function(){
+                    var errorsNum = 0;
+                    this.errors.dynamicErrors = [];
+                    this.errors.titleErrors = {isInvalid: false, msg: ''};
+                    this.errors.companyErrors = {isInvalid: false, msg: ''};
+                    var self = this;
+
+                    if (this.baseTitle == '') {
+                        this.errors.titleErrors.isInvalid = true;
+                        this.errors.titleErrors.msg = '模板标题必填！';
+                        errorsNum++;
+                    }
+
+                    if (this.companyId == 0){
+                        this.errors.companyErrors.isInvalid = true;
+                        this.errors.companyErrors.msg = '企业必填！';
+                        errorsNum++;
+                    }
+
+                    if (this.selectors.length == 0) {
+                        this.errors.titleErrors.isInvalid = true;
+                        this.errors.titleErrors.msg = '分组至少一项！';
+                        errorsNum++;
+                    }
+
+                    //错误分析
+                    var selectors = this.selectors;
+                    var allCats = [];
+                    for (var i = 0; i < selectors.length; i++) {
+                        var tplSmallErrors = [];
+                        var tplBigErrors = {};
+                        allCats.push(selectors[i]['bigSelect']);
+
+                        if (!selectors[i]['bigSelect']) {
+                            tplBigErrors = {isInvalid: true, msg: '必须选择！'};
+                            errorsNum++;
+                        }else if(selectors[i]['smallSelect'].length==0){
+                            tplBigErrors = {isInvalid: true, msg: '小类至少一项！'};
+                            errorsNum++;
+                        }else if(this.checkRepeat(selectors[i]['bigSelect'], selectors)){
+                            tplBigErrors = {isInvalid: true, msg: '有重复选项！'};
+                            errorsNum++;
+                        }else{
+                            tplBigErrors = {isInvalid: false, msg: ''};
+                        }
+
+                        for (var j = 0; j < selectors[i]['smallSelect'].length; j++) {
+                            allCats.push(selectors[i]['smallSelect'][j]);
+                            if (!selectors[i]['smallSelect'][j]) {
+                                tplSmallErrors.push({isInvalid: true, msg: '必须选择！'});
+                                errorsNum++;
+                            }else if(this.checkRepeat(selectors[i]['smallSelect'][j], selectors)){
+                                tplSmallErrors.push({isInvalid: true, msg: '有重复选项！'});
+                                errorsNum++;
+                            }else{
+                                tplSmallErrors.push({isInvalid: false, msg: ''});
+                            }
+                        }
+
+                        this.errors.dynamicErrors.push({bigErrors: tplBigErrors, smallErrors: tplSmallErrors});
+
+                    }
+
+                    if (errorsNum) {
+                        return false;
+                    }
+
+                    var url = "{{url('admin/salary/base')}}";
+                    $.ajax(url, {
+                        type: 'post',
+                        dataType: 'json',
+                        timeout: '120000',
+                        data: {cid: self.companyId, title: self.baseTitle, type: self.type, category: allCats},
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    }).done(function (data) {
+                        if (data.ret_num === 0) {
+                            self.companyId = 0;
+                            self.bigCategorys = [];
+                            self.smallCategorys = [];
+                            self.selectors = [];
+                            self.errors = {
+                                dynamicErrors: [],
+                                titleErrors: {isInvalid: false, msg: ''}
+                            };
+                            self.rehearsal = [];
+                            self.baseTitle = '';
+                            alert(data.ret_msg);
+                            window.location.href = data.data.url;
+                        } else {
+                            alert("网络错误！");
+                        }
+                    }).fail(function (errors) {
+                        errorInfo = errors.responseJSON;
+                        if (errorInfo.title){
+                            self.errors.titleErrors = {isInvalid: true, msg: errorInfo.title};
+                        }else{
+                            alert("网络错误！");
+                        }
+                    }).complete();
+                },
+
+                checkRepeat: function(checkVal, selectors){
+                    var tplAll = 0;
+                    for (var i = 0; i < selectors.length; i++) {
+                        if (checkVal == selectors[i]['bigSelect']) {
+                            tplAll++;
+                        }
+
+                        for (var j = 0; j < selectors[i]['smallSelect'].length; j++) {
+                            if (checkVal == selectors[i]['smallSelect'][j]) {
+                                tplAll++;
+                            }
+                        }
+                    }
+
+                    if (tplAll == 1 || tplAll == 0) {
+                        return false;
+                    }else{
+                        return true;
+                    }
+                }
+            },
+            events: {
+                'company-id': function (companyId) {
+                    this.companyId=companyId;
+                },
+                'big-category': function (bigCategory) {
+                    this.bigCategorys=bigCategory;
+                },
+                'small-category': function (smallCategory){
+                    this.smallCategorys=smallCategory;
+                },
+                'type': function(type){
+                    this.type=type;
+                },
+                'all-company': function (allCompany){
+                    this.allCompany=allCompany;
+                },
+                'company-show': function (companyShow) {
+                    this.companyShow=companyShow;
+                }
+            }
         });
     </script>
 @endsection

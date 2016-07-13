@@ -20,6 +20,7 @@ class CreateManagersTable extends Migration
             $table->string('password',60);
             $table->string('email',255)->index();
             $table->integer('pid')->index();
+            $table->tinyInteger('is_first')->unsigned()->default(0);
             $table->softDeletes();
             $table->rememberToken();
             $table->timestamps();
