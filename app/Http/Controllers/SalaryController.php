@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\InsuranceDetail;
 use App\SalaryCategory;
 use App\SalaryDetail;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -19,14 +20,16 @@ class SalaryController extends Controller
     }
 
     public function index(){
-        return view('home.salary');
+        $now = Carbon::now()->format("Y-m");
+        return view('home.salary',['now'=>$now]);
     }
 
     public function insurance(){
+        $now = Carbon::now()->format("Y-m");
         $user = \Auth::user()->id;
         //是否有社保进度历史
         $hasIt = InsuranceDetail::where('user_id', $user)->count();
-        return view('home.insurance', ['is_exist'=>$hasIt]);
+        return view('home.insurance', ['is_exist'=>$hasIt, 'now'=>$now]);
     }
 
     public function detail(Request $request){

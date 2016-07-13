@@ -32,8 +32,8 @@
     <form class="am-form am-form-horizontal" style="margin-bottom: 20px;margin-top: 20px;margin-right: 1rem;">
         <div class="am-form-group">
             <div class="am-u-sm-8">
-                <input type="text" class="am-text-center am-form-field am-round kbtn" id="beginTime"
-                       placeholder="查询月份"/>
+                <input type="month" class="am-text-center am-form-field am-round kbtn" id="beginTime"
+                       placeholder="查询月份" value="{{ $now }}"/>
             </div>
             <button class="am-btn am-btn-primary am-u-sm-4 am-round" id="searchSalary" type="button"><span
                         class="am-icon-search"></span>搜索
@@ -48,19 +48,19 @@
     </section>
 @endsection
 @section('moreScript')
-    <script src="{{env('APP_URL')}}/js/home/date.js"></script>
+    <script src="{{env('APP_URL')}}/js/home/formatDate.js"></script>
     <script src="{{env('APP_URL')}}/js/home/iscroll.js"></script>
     <script>
         window.onload = function () {
             //初始化
+            var str = "{{ $now }}";
             var d = new Date();
             if (d.getMonth() < 9) {
                 var str = d.getFullYear() + "0" + (d.getMonth() + 1);
             } else {
                 var str = d.getFullYear() + "" + (d.getMonth() + 1);
             }
-            $('#beginTime').val(str);
-            $('#beginTime').date({theme: "dateYM"});
+
             var url = "{{url('salary/details')}}";
             $.post(url, {
                 type:2,
@@ -121,7 +121,7 @@
         $("#searchSalary").click(function () {
             var _this = this;
             var url = "{{url('salary/details')}}";
-            var salaryTime = $("#beginTime").val();
+            var salaryTime = format($("#beginTime").val());
             $.post(url, {
                 type:2,
                 time: salaryTime,
