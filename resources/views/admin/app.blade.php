@@ -40,7 +40,7 @@
 
     <!-- Simplify -->
     {{--<link href="{{env('APP_URL')}}/css/admin/simplify.min.css" rel="stylesheet">--}}
-    <link href="http://7xqxb2.com2.z0.glb.qiniucdn.com/simplify.min.css" rel="stylesheet">
+    <link href="http://7xqxb2.com1.z0.glb.clouddn.com/simplify.min.css" rel="stylesheet">
 
     @yield('moreCss')
 </head>
