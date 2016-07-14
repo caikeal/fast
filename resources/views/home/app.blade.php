@@ -37,6 +37,7 @@
 </header>
 <!-- 内容 -->
 @yield('content')
+<div style="margin-bottom: 60px;"></div>
 <!-- 导航栏start -->
 <div data-am-widget="navbar" class="am-navbar am-cf am-navbar-default  am-no-layout" id="">
     <ul class="am-navbar-nav am-cf am-avg-sm-4">
