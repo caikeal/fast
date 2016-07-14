@@ -11,7 +11,7 @@
     </style>
 @endsection
 @section('back')
-    <a href="{{ url('compensation/index') }}" class="am-icon-chevron-left" style="float:left; color: #fff;" id="btn-back"></a>
+    <a href="javascript :history.back(-1);" class="am-icon-chevron-left" style="float:left; color: #fff;" id="btn-back"></a>
     @endsection
     @section('content')
             <!-- 所属公司logo -->
