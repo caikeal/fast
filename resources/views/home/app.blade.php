@@ -24,6 +24,7 @@
     <!-- <link rel="alternate icon" type="image/png" href="../../assets/i/favicon.png"> -->
     <link rel="stylesheet" href="http://cdn.amazeui.org/amazeui/2.5.2/css/amazeui.min.css"/>
     <link rel="stylesheet" href="{{env('APP_URL')}}/css/home/main.css">
+
     @yield('moreCss')
 </head>
 <body>
@@ -69,7 +70,7 @@
             {{--</ul>--}}
         {{--</li>--}}
         <li>
-            <a href="#">
+            <a href="{{  url('contactus') }}">
                 <span class="am-icon-commenting"></span>
                 <span class="am-navbar-label">联系我们</span>
             </a>

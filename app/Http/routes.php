@@ -100,4 +100,6 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('/compensation/days','CompensationController@getWorkDay');
     Route::get('/compensation/details','CompensationController@specific');
     Route::post('/compensation/details','CompensationController@detail');
+    //联系我们模块
+    Route::get('/contactus', 'ContactController@index');
 });
