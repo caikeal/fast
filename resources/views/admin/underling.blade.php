@@ -385,7 +385,7 @@
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         }
                     }).done(function (data) {
-                        if (data.data.length!=0) {
+                        if (data.length!=0) {
                             _this.$dispatch('all-data', data.data);
                             _this.$dispatch('page', data.current_page);
                             _this.$dispatch('max-page', data.last_page);
