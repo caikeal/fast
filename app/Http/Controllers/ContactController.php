@@ -18,7 +18,7 @@ class ContactController extends Controller
             ->orderBy("created_at", "desc")->first();
 
         if ($salary){
-            $salaryFromer = $salary->fromer->first(['id','name','phone','email']);
+            $salaryFromer = $salary->fromer()->first(['id','name','phone','email']);
         }else{
             $salaryFromer = [
                 'name' => '',
@@ -30,7 +30,7 @@ class ContactController extends Controller
         $insurance = SalaryDetail::where('user_id', $user_id)->where('type',2)
             ->orderBy("created_at", "desc")->first();
         if ($insurance){
-            $insuranceFromer = $insurance->fromer->first(['id','name','phone','email']);
+            $insuranceFromer = $insurance->fromer()->first(['id','name','phone','email']);
         }else{
             $insuranceFromer = [
                 'name' => '',
@@ -42,7 +42,7 @@ class ContactController extends Controller
         $compensation = CompensationDetail::where('user_id', $user_id)->where('type',3)
             ->orderBy("created_at", "desc")->first();
         if ($compensation){
-            $compensationFromer = $compensation->fromer->first(['id','name','phone','email']);
+            $compensationFromer = $compensation->fromer()->first(['id','name','phone','email']);
         }else{
             $compensationFromer = [
                 'name' => '',
