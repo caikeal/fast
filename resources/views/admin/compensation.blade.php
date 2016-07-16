@@ -5,6 +5,10 @@
         .select-gap{
             margin-bottom: 5px;
         }
+        .pre-see-base>.table>thead>tr>th{
+            vertical-align: middle;
+            text-align: center;
+        }
     </style>
 @endsection
 @section('content')
@@ -41,6 +45,9 @@
                         </a>
                     </div>
                     <div class="col-md-2 col-sm-2 select-gap">
+                        <see-base-btn></see-base-btn>
+                    </div>
+                    <div class="col-md-2 col-sm-2 select-gap">
                         <new-base-btn :company-id=0 @click="initModal"></new-base-btn>
                     </div>
                     <div class="clearfix"></div>
@@ -57,6 +64,14 @@
             </div>
         </template>
         <!-- ./timeline-base-template -->
+
+        <!-- base-template -->
+        <template id="base-btn-template"  style="display: none">
+            <a class="btn btn-info" @click="notify">
+            查看模版
+            </a>
+        </template>
+        <!-- ./base-template -->
 
         <!-- Modal -->
         <div class="modal fade" id="myModal" role="dialog"
@@ -139,6 +154,7 @@
         </div>
         <!-- /.modal -->
 
+        <!-- Modal -->
         <div class="modal fade" id="goModal">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -165,6 +181,39 @@
                             </dl>
                         </section>
 
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div>
+        <!-- /.Modal -->
+
+        <!-- Modal -->
+        <div class="modal fade" id="watchModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">预览<b>@{{ baseData.title }}</b>模版</h4>
+                    </div>
+                    <div class="modal-body pre-see-base" style="overflow-x: scroll;">
+                        <table class="table table-bordered">
+                            <thead  style="white-space: nowrap">
+                                <tr>
+                                <th rowspan="2">姓名</th>
+                                <th rowspan="2">身份证</th>
+                                <th rowspan="2">日期</th>
+                                <th colspan="@{{ bigBase.detailNum }}" v-for="bigBase in baseData.base">@{{ bigBase.name }}</th>
+                            </tr>
+                                <tr>
+                                <th v-for="smallBaseItem in baseData.smallBase">
+                                    @{{ smallBaseItem }}
+                                </th>
+                            </tr>
+                            </thead>
+                        </table>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
@@ -309,6 +358,8 @@
             window.location.href = redirectUrl;
         });
 
+
+
         //vue过滤器
         Vue.filter('nospace', {
             read: function (val) {
@@ -374,6 +425,35 @@
                         } else {
                             alert("网络错误！");
                         }
+                    }).fail(function () {
+                        alert("网络错误！");
+                    });
+                }
+            }
+        });
+
+        Vue.component('see-base-btn', {
+            template: '#base-btn-template',
+            methods: {
+                notify: function(){
+                    var baseId = $("[name=c1]").val();
+
+                    if (!baseId){
+                        alert("缺少选项！");
+                        return false;
+                    }
+
+                    var _this = this;
+                    $.ajax("{{ url('admin/base') }}/"+baseId, {
+                        type: 'get',
+                        dataType: 'json',
+                        timeout: '120000',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    }).done(function (data) {
+                        _this.$dispatch('base-data', data);
+                        $('#watchModal').modal('show');
                     }).fail(function () {
                         alert("网络错误！");
                     });
@@ -788,7 +868,8 @@
                 },
                 rehearsal: [],
                 baseTitle: '',
-                type: 3
+                type: 3,
+                baseData: []
             },
             methods: {
                 initModal: function () {
@@ -973,6 +1054,9 @@
                 },
                 'all-company': function (allCompany){
                     this.allCompany=allCompany;
+                },
+                'base-data': function (baseData) {
+                    this.baseData=baseData;
                 }
             }
         });
