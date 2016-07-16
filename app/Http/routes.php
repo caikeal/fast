@@ -32,6 +32,8 @@ Route::group(['namespace'=>'Admin','middleware' => ['web'],'prefix'=>'admin'], f
     Route::post('/login','AuthController@login');
     Route::get('/logout','AuthController@logout');
     Route::get('/index','HomeController@index');
+    //模版模块
+    Route::get('/base/{id}', 'SalaryBaseController@show');
     //薪资模块
     Route::get('/timeline','SalaryController@timeline');
     Route::post('/salary/base','SalaryController@base');
