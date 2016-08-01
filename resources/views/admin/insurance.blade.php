@@ -19,6 +19,10 @@
             margin: 5px 0 15px 0;
             border: 1px solid #e2e2e2;
         }
+        .pre-see-base>.table>thead>tr>th{
+            vertical-align: middle;
+            text-align: center;
+        }
     </style>
 @endsection
 @section('content')
@@ -53,16 +57,22 @@
                     </div>
                     <div class="row">
                         <div class="col-md-5 col-sm-5 timeline-select select-gap">
-                            <select name="c1" class="form-control">
+                            <select name="cp" class="form-control">
                                 @foreach($bases as $base)
                                     <option value="{{ $base->id }}">{{ $base->title }}</option>
                                 @endforeach
                             </select>
                         </div>
+
                         <div class="col-md-2 col-sm-2 select-gap">
-                            <a class="btn btn-success timeline-btn download-progress-base" data-company="c1">下载模版
+                            <a class="btn btn-success timeline-btn download-progress-base" data-company="cp">下载模版
                             </a>
                         </div>
+
+                        <div class="col-md-2 col-sm-2 select-gap">
+                            <see-base-btn company-id="cp"></see-base-btn>
+                        </div>
+
                         <div class="col-md-2 col-sm-2 select-gap">
                             <progress-base-btn :company-id=0 type="4" @click="initModal"></progress-base-btn>
                         </div>
@@ -126,9 +136,12 @@
                                                         @endforeach
                                                     </select>
                                                 </div>
+
                                                 <a class="btn btn-success timeline-btn download-base"
                                                    data-company="c{{$task->company_id}}">下载模版
                                                 </a>
+
+                                                <see-base-btn company-id="c{{$task->company_id}}"></see-base-btn>
 
                                                 <new-base-btn :company-id={{ $task->company_id }} type="2" @click="initModal"></new-base-btn>
                                             </div>
@@ -181,9 +194,13 @@
                                                         @endforeach
                                                     </select>
                                                 </div>
+
                                                 <div class="btn btn-success timeline-btn download-base"
                                                      data-company="c{{$task->company_id}}">下载模版
                                                 </div>
+
+                                                <see-base-btn company-id="c{{$task->company_id}}"></see-base-btn>
+
                                                 <new-base-btn :company-id={{ $task->company_id }} type="2" @click="initModal"></new-base-btn>
                                             </div>
                                         </div>
@@ -218,6 +235,14 @@
             </div>
         </template>
         <!-- /progress-base-template -->
+
+        <!-- base-template -->
+        <template id="base-btn-template"  style="display: none">
+            <a class="btn btn-info timeline-btn" @click="notify">
+            查看模版
+            </a>
+        </template>
+        <!-- ./base-template -->
 
         <!-- Modal -->
         <div class="modal fade" id="myModal" role="dialog"
@@ -299,6 +324,7 @@
         </div>
         <!-- /.modal -->
 
+        <!-- Modal -->
         <div class="modal fade" id="goModal">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -325,6 +351,39 @@
                             </dl>
                         </section>
 
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div>
+        <!-- /.Modal -->
+
+        <!-- Modal -->
+        <div class="modal fade" id="watchModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">预览<b>@{{ baseData.title }}</b>模版</h4>
+                    </div>
+                    <div class="modal-body pre-see-base" style="overflow-x: scroll;">
+                        <table class="table table-bordered">
+                            <thead  style="white-space: nowrap">
+                            <tr>
+                                <th rowspan="2">姓名</th>
+                                <th rowspan="2">身份证</th>
+                                <th rowspan="2">日期</th>
+                                <th colspan="@{{ bigBase.detailNum }}" v-for="bigBase in baseData.base">@{{ bigBase.name }}</th>
+                            </tr>
+                            <tr>
+                                <th v-for="smallBaseItem in baseData.smallBase">
+                                    @{{ smallBaseItem }}
+                                </th>
+                            </tr>
+                            </thead>
+                        </table>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
@@ -600,6 +659,41 @@
                         } else {
                             alert("网络错误！");
                         }
+                    }).fail(function () {
+                        alert("网络错误！");
+                    });
+                }
+            }
+        });
+
+        Vue.component('see-base-btn', {
+            template: '#base-btn-template',
+            props: {
+                companyId:{
+                    type: String,
+                    required: true
+                }
+            },
+            methods: {
+                notify: function(){
+                    var baseId = $("[name="+this.companyId+"]").val();
+
+                    if (!baseId){
+                        alert("缺少选项！");
+                        return false;
+                    }
+
+                    var _this = this;
+                    $.ajax("{{ url('admin/base') }}/"+baseId, {
+                        type: 'get',
+                        dataType: 'json',
+                        timeout: '120000',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    }).done(function (data) {
+                        _this.$dispatch('base-data', data);
+                        $('#watchModal').modal('show');
                     }).fail(function () {
                         alert("网络错误！");
                     });
@@ -1018,7 +1112,8 @@
                 rehearsal: [],
                 baseTitle: '',
                 type: 0,
-                companyShow: 0
+                companyShow: 0,
+                baseData: []
             },
             methods: {
                 initModal: function () {
@@ -1209,6 +1304,9 @@
                 },
                 'company-show': function (companyShow) {
                     this.companyShow=companyShow;
+                },
+                'base-data': function (baseData) {
+                    this.baseData=baseData;
                 }
             }
         });
