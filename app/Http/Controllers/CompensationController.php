@@ -89,7 +89,7 @@ class CompensationController extends Controller
         $wages=explode("||",$detail->wages);
         foreach($tpl_detail as $kt=>$vt){
             foreach($vt as $kd=>$vd){
-                $tpl_detail[$kt][$kd]['v']=$wages[$count_arr]?$wages[$count_arr]:"";
+                $tpl_detail[$kt][$kd]['v']=key_exists($count_arr,$wages)?($wages[$count_arr]?$wages[$count_arr]:""):"";
                 $count_arr++;
             }
         }
