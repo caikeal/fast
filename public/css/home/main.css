@@ -13,7 +13,7 @@ body{
 .am-table>tfoot>tr>th,
 .am-table>thead>tr>td,
 .am-table>thead>tr>th{
-    max-width: 220px;
+    max-width: 20px;
 }
 .thumb{
     padding: 1.7rem 0.5rem 1.4rem 0.5rem;
