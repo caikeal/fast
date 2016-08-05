@@ -186,7 +186,7 @@
             </div>
 
             <div class="am-g clear-history">
-                <div><a href="#" class="clear-history-btn" @click="clearCache">清除搜索历史</a></div>
+                <div><a href="#" class="clear-history-btn" @click.prevent="clearCache">清除搜索历史</a></div>
             </div>
         </section>
         <!-- history end -->
