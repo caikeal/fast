@@ -205,6 +205,8 @@ class History
             $to = $page * 15;
             $indexArr = explode("||", $allIndex);
             $to = count($indexArr) <= $to ? count($indexArr) : $to;
+            $maxPage = ceil(count($indexArr)/15);
+            $this->setMaxPage($uploadId, $maxPage);
 
             for ($i = $from; $i < $to; $i++) {
                 $content[] = \Cache::store('redis')->get("history:".$uploadId . ":" . $indexArr[$i]);
