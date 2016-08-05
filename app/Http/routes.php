@@ -104,4 +104,9 @@ Route::group(['middleware' => 'web'], function () {
     Route::post('/compensation/details','CompensationController@detail');
     //联系我们模块
     Route::get('/contactus', 'ContactController@index');
+    //答疑解惑模块
+    Route::resource('/question', 'QuestionController');
+    Route::get('question-my', 'QuestionController@myQuestion');
+    Route::get('question-new', 'QuestionController@newQuestion');
+    Route::get('question-search', 'QuestionController@searchQuestion');
 });
