@@ -283,13 +283,13 @@
                         </a>
                     </li>
                     <li class="bg-palette2 lock-place6">
-                        <a href="#">
+                        <a href="{{ url('admin/answer') }}">
                             <span class="menu-content block">
                                 <span class="menu-icon"><i class="block fa fa-question-circle fa-lg"></i></span>
-                                <span class="text m-left-sm">解惑答疑</span>
+                                <span class="text m-left-sm">答疑解惑</span>
                             </span>
                             <span class="menu-content-hover block">
-                                解惑答疑
+                                答疑解惑
                             </span>
                         </a>
                     </li>

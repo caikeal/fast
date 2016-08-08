@@ -147,7 +147,11 @@ class QuestionController extends Controller
      */
     public function show($id)
     {
-        $info = Question::where('id', $id)->first();
+        $info = Question::where('id', $id)->get()->map(function($val){
+            $val['answer'] = nl2br($val['answer']);
+            return $val;
+        })->first();
+        
         return view('home.questionDetail',['info'=>$info]);
     }
 

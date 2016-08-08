@@ -13,4 +13,9 @@ class Question extends Model
     ];
 
     protected $dates=['answer_at'];
+
+    public function user()
+    {
+        return $this->belongsTo('App\User', 'creator');
+    }
 }

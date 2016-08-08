@@ -52,7 +52,7 @@
             @if($info['creator']==\Auth::user()->id)
             <p class="detail">{{ $info['detail'] }}</p>
             @endif
-            <p class="answer">{{ $info['answer']?$info['answer']:"客服暂未回应，请等待。。。" }}</p>
+            <p class="answer">{!! $info['answer']?$info['answer']:"客服暂未回应，请等待。。。" !!}</p>
         </div>
     </section>
 @endsection
