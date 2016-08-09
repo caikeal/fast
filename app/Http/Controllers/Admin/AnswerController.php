@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Fast\Service\Answer\Answer;
 use App\Question;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -11,26 +12,19 @@ use App\Http\Controllers\Controller;
 
 class AnswerController extends Controller
 {
-    public function __construct()
+    protected $answer;
+    public function __construct(Answer $answer)
     {
         $this->middleware('auth:admin');
         $this->middleware('throttle');
+        $this->answer = $answer;
     }
 
     public function info()
     {
         $managerId = \Auth::guard("admin")->user()->id;
-        $roles = \Auth::guard("admin")->user()->roles()->get();
         //获取用户可以回答的问题类型
-        $roleNameArr = $roles->map(function($item, $key){
-            if (strpos($item['name'], 'compensate') !== false){
-                return [3,4];
-            }else if (strpos($item['name'], 'salary') !== false){
-                return [1,2];
-            }else{
-                return [];
-            }
-        });
+        $roleNameArr = $this->answer->canAnswerType();
         //查询对应类型的问题(15个/页)
         $allQuestion = Question::whereIn('type', $roleNameArr->collapse())
             ->where('status', 1)->paginate(15);
@@ -78,17 +72,8 @@ class AnswerController extends Controller
     public function show($id)
     {
         $managerId = \Auth::guard("admin")->user()->id;
-        $roles = \Auth::guard("admin")->user()->roles()->get();
         //获取用户可以回答的问题类型
-        $roleNameArr = $roles->map(function($item, $key){
-            if (strpos($item['name'], 'compensate') !== false){
-                return [3,4];
-            }else if (strpos($item['name'], 'salary') !== false){
-                return [1,2];
-            }else{
-                return [];
-            }
-        });
+        $roleNameArr = $this->answer->canAnswerType();
 
         //查询对应类型的问题
         $allQuestion = Question::with(['user'=>function ($query) {
@@ -125,17 +110,8 @@ class AnswerController extends Controller
     {
         $answer = $request->input('answer');
         $managerId = \Auth::guard("admin")->user()->id;
-        $roles = \Auth::guard("admin")->user()->roles()->get();
         //获取用户可以回答的问题类型
-        $roleNameArr = $roles->map(function($item, $key){
-            if (strpos($item['name'], 'compensate') !== false){
-                return [3,4];
-            }else if (strpos($item['name'], 'salary') !== false){
-                return [1,2];
-            }else{
-                return [];
-            }
-        });
+        $roleNameArr = $this->answer->canAnswerType();
 
         //查询对应类型的问题
         $questionInfo = Question::whereIn('type', $roleNameArr->collapse())
