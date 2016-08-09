@@ -12,6 +12,7 @@
             </div>
         </div>
 
+        <!--数据块-->
         <div class="row m-top-md">
             @if ($type->contains(1))
             <div class="col-lg-3 col-sm-6">
@@ -89,9 +90,171 @@
                 {{--</div>--}}
             {{--</div>--}}
         </div>
+        <!--end 数据块-->
 
+        <!--图表块-->
+        <!--访问次数-->
+        <div id="visit-charts" style="width: 100%;height:500px;"></div>
+        <!--访问人数-->
+        <div id="user-charts" style="width: 100%;height:500px;"></div>
+        <!--end 图表块-->
     </div><!-- ./padding-md -->
 @endsection
 @section('moreScript')
+    <script src="http://cdn.bootcss.com/echarts/3.2.2/echarts.js"></script>
+    <script>
+        var queueFunc = function (func, time) {
+            setTimeout(function () {
+                func();
+            }, time);
+        };
 
+        var charVisitFunc = function () {
+            // 基于准备好的dom，初始化echarts实例
+            var myVisitChart = echarts.init(document.getElementById('visit-charts'));
+
+            // 指定图表的配置项和数据
+            var option = {
+                title: {
+                    text: '历月访问次数图表'
+                },
+                tooltip : {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data:[]
+                },
+                toolbox: {
+                    feature: {
+                        saveAsImage: {}
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis : [
+                    {
+                        type : 'category',
+                        boundaryGap : false,
+                        data : []
+                    }
+                ],
+                yAxis : [
+                    {
+                        type : 'value'
+                    }
+                ],
+                series : []
+            };
+
+            // 使用刚指定的配置项和数据显示图表。
+            myVisitChart.setOption(option);
+
+            $.get("{{ url('admin/data-before-times') }}").done(function (data) {
+                var finalVisits = {};
+                if (data.visits){
+                    finalVisits = data.visits.map(function(val){
+                        return finalVisits = {
+                            name: val.name,
+                            type:'line',
+                            stack: '总量',
+                            areaStyle: {normal: {}},
+                            data: val.data
+                        };
+                    });
+                }
+                // 填入数据
+                myVisitChart.setOption({
+                    xAxis: {
+                        type : 'category',
+                        boundaryGap : false,
+                        data: data.months
+                    },
+                    legend: {
+                        data: data.legend
+                    },
+                    series: finalVisits
+                });
+            });
+        };
+        var charUserFunc = function () {
+            // 基于准备好的dom，初始化echarts实例
+            var myUserChart = echarts.init(document.getElementById('user-charts'));
+
+            // 指定图表的配置项和数据
+            var option = {
+                title: {
+                    text: '历月访问人数图表'
+                },
+                tooltip : {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data:[]
+                },
+                toolbox: {
+                    feature: {
+                        saveAsImage: {}
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis : [
+                    {
+                        type : 'category',
+                        boundaryGap : false,
+                        data : []
+                    }
+                ],
+                yAxis : [
+                    {
+                        type : 'value'
+                    }
+                ],
+                series : []
+            };
+
+            // 使用刚指定的配置项和数据显示图表。
+            myUserChart.setOption(option);
+
+            $.get("{{ url('admin/user-before-times') }}").done(function (data) {
+                var finalVisits = {};
+                if (data.visits){
+                    finalVisits = data.visits.map(function(val){
+                        return finalVisits = {
+                            name: val.name,
+                            type:'line',
+                            stack: '总量',
+                            areaStyle: {normal: {}},
+                            data: val.data
+                        };
+                    });
+                }
+                // 填入数据
+                myUserChart.setOption({
+                    xAxis: {
+                        type : 'category',
+                        boundaryGap : false,
+                        data: data.months
+                    },
+                    legend: {
+                        data: data.legend
+                    },
+                    series: finalVisits
+                });
+            });
+        };
+
+        //访问次数
+        queueFunc(charVisitFunc, 1000);
+        //访问人数
+        queueFunc(charUserFunc, 1500);
+    </script>
 @endsection
