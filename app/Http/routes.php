@@ -71,6 +71,9 @@ Route::group(['namespace'=>'Admin','middleware' => ['web'],'prefix'=>'admin'], f
     //答疑解惑模块
     Route::resource('/answer', 'AnswerController');
     Route::get('/answer-info', 'AnswerController@info');
+    //数据统计模块
+    Route::get('/data-before-times', 'StatisticsController@visitLastTimes');
+    Route::get('/user-before-times', 'StatisticsController@userLastTimes');
 });
 
 Route::group(['middleware' => 'web'], function () {
