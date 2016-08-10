@@ -74,6 +74,8 @@ Route::group(['namespace'=>'Admin','middleware' => ['web'],'prefix'=>'admin'], f
     //数据统计模块
     Route::get('/data-before-times', 'StatisticsController@visitLastTimes');
     Route::get('/user-before-times', 'StatisticsController@userLastTimes');
+    Route::get('/data-now-times', 'StatisticsController@nowVisitTimes');
+    Route::get('/user-now-times', 'StatisticsController@nowUserTimes');
 });
 
 Route::group(['middleware' => 'web'], function () {

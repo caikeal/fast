@@ -78,4 +78,18 @@ class StatisticsAnalyse
 
         return $tplTime;
     }
+
+    public function getAnalyseDay($now)
+    {
+        $tplTime = [];
+        for ($i = 1; $i <= $now->day-1; $i++){
+            if ($i < 10) {
+                $tplTime[] = $now->format("Ym")."0".$i;
+            }else{
+                $tplTime[] = $now->format("Ym").$i;
+            }
+        }
+
+        return $tplTime;
+    }
 }
