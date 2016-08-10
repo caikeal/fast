@@ -34,6 +34,9 @@ class StatisticsController extends Controller
         $lastMonth = Carbon::now()->firstOfMonth()->subMonth();
 
         //判断是否有权限使用
+        if(\Gate::foruser(\Auth::guard('admin')->user())->denies('statistics')){
+            return \Response::json(['invalid'=>'您无权访问'])->setStatusCode(403);
+        }
 
         //===============查询每月历史缓存是否存在，存在直接用，不存在查询该月并加入往期缓存===============
         $hasCache = \Cache::store('file')->has('visitTimes:'.$lastMonth);
@@ -175,6 +178,9 @@ class StatisticsController extends Controller
         $lastMonth = Carbon::now()->firstOfMonth()->subMonth();
 
         //判断是否有权限使用
+        if(\Gate::foruser(\Auth::guard('admin')->user())->denies('statistics')){
+            return \Response::json(['invalid'=>'您无权访问'])->setStatusCode(403);
+        }
 
         //===============查询每月历史缓存是否存在，存在直接用，不存在查询该月并加入往期缓存===============
         $hasCache = \Cache::store('file')->has('userTimes:'.$lastMonth);
@@ -308,6 +314,304 @@ class StatisticsController extends Controller
 
             //缓存
             \Cache::store('file')->put('userTimes:'.$lastMonth, $userTimes, 44640);
+        }
+
+        return $userTimes;
+    }
+
+    /**
+     * 当天访问次数.
+     *
+     * @return array
+     */
+    public function nowVisitTimes()
+    {
+        $now = Carbon::now();
+        $nowMonth = Carbon::now()->firstOfMonth();
+        $lastMonth = Carbon::now()->firstOfMonth()->subMonth();
+
+        //判断是否有权限使用
+        if(\Gate::foruser(\Auth::guard('admin')->user())->denies('statistics')){
+            return \Response::json(['invalid'=>'您无权访问'])->setStatusCode(403);
+        }
+
+        //===============查询每月历史缓存是否存在，存在直接用，不存在查询该月并加入往期缓存===============
+        $hasCache = \Cache::store('file')->has('nowVisitTimes:'.$now->format("Ymd"));
+        //存在缓存
+        if ($hasCache){
+            $visitTimes = \Cache::store('file')->get('nowVisitTimes:'.$now->format("Ymd"));
+        }
+        //不存在缓存
+        else{
+            //查询
+            $visitTimesTpl = ModuleStatistics::where('created_at', '>=', $nowMonth)->groupBy(['days','module'])
+                ->orderBy('module','desc')->orderBy('days','asc')
+                ->select(\DB::raw('DATE_FORMAT(created_at,\'%Y%m%d\') days, module, count(id) count'))
+                ->get();
+
+            $allDays = $this->statistics->getAnalyseDay($now);
+
+            //初始化访问次数基础数据
+            $baseData = [];
+            $allDaysVisitsTpl = [];
+            foreach ($allDays as $v){
+                $baseData['Salary'][$v] = 0;
+                $baseData['InsuranceProgress'][$v] = 0;
+                $baseData['Insurance'][$v] = 0;
+                $baseData['Compensation'][$v] = 0;
+                $allDaysVisitsTpl[$v] = 0;
+            }
+
+            //整理数据格式，各个模块访问次数
+            foreach ($visitTimesTpl as $k=>$v) {
+                $allDaysVisitsTpl[$v['days']] += $v['count'];
+                switch ($v['module']) {
+                    case 'Salary':
+                    {
+                        $baseData['Salary'][$v['days']] = $v['count'];
+                        break;
+                    }
+                    case 'InsuranceProgress':
+                    {
+                        $baseData['InsuranceProgress'][$v['days']] = $v['count'];
+                        break;
+                    }
+                    case 'Insurance':
+                    {
+                        $baseData['Insurance'][$v['days']] = $v['count'];
+                        break;
+                    }
+                    case 'Compensation':
+                    {
+                        $baseData['Compensation'][$v['days']] = $v['count'];
+                        break;
+                    }
+                    default :
+                        break;
+                }
+            }
+
+            $visits = [];
+            $legend = [];
+
+            foreach ($baseData as $k=>$v) {
+                $tplCount = [];
+                foreach ($v as $vv){
+                    $tplCount[] = $vv;
+                }
+
+                switch ($k){
+                    case 'Salary':
+                    {
+                        $visits[] = [
+                            'name' => '薪资模块',
+                            'data' => $tplCount
+                        ];
+                        $legend[] = '薪资模块';
+                        break;
+                    }
+                    case 'InsuranceProgress':
+                    {
+                        $visits[] = [
+                            'name' => '社保进度模块',
+                            'data' => $tplCount
+                        ];
+                        $legend[] = '社保进度模块';
+                        break;
+                    }
+                    case 'Insurance':
+                    {
+                        $visits[] = [
+                            'name' => '社保模块',
+                            'data' => $tplCount
+                        ];
+                        $legend[] = '社保模块';
+                        break;
+                    }
+                    case 'Compensation':
+                    {
+                        $visits[] = [
+                            'name' => '理赔模块',
+                            'data' => $tplCount
+                        ];
+                        $legend[] = '理赔模块';
+                        break;
+                    }
+                    default :
+                        break;
+                }
+
+            }
+
+            //加入总计模块
+            $legend[] = '总访问次数';
+            $visits[] = [
+                'name' => '总访问次数',
+                'data' => array_values($allDaysVisitsTpl)
+            ];
+
+            //所有数据
+            $visitTimes = [
+                "legend" => $legend,
+                "days" => $allDays,
+                "visits" => $visits
+            ];
+
+            //缓存
+            \Cache::store('file')->put('nowVisitTimes:'.$now->format("Ymd"), $visitTimes, 1440);
+        }
+
+        return $visitTimes;
+    }
+
+    /**
+     * 当天访问人数.
+     *
+     * @return array
+     */
+    public function nowUserTimes()
+    {
+        $now = Carbon::now();
+        $nowMonth = Carbon::now()->firstOfMonth();
+        $lastMonth = Carbon::now()->firstOfMonth()->subMonth();
+
+        //判断是否有权限使用
+        if(\Gate::foruser(\Auth::guard('admin')->user())->denies('statistics')){
+            return \Response::json(['invalid'=>'您无权访问'])->setStatusCode(403);
+        }
+
+        //===============查询每月历史缓存是否存在，存在直接用，不存在查询该月并加入往期缓存===============
+        $hasCache = \Cache::store('file')->has('nowUserTimes:'.$now->format("Ymd"));
+        //存在缓存
+        if ($hasCache){
+            $userTimes = \Cache::store('file')->get('nowUserTimes:'.$now->format("Ymd"));
+        }
+        //不存在缓存
+        else{
+            //查询
+            $visitTimesTpl = ModuleStatistics::where('created_at', '>=', $nowMonth)->groupBy(['days','module'])
+                ->orderBy('module','desc')->orderBy('days','asc')
+                ->select(\DB::raw('DATE_FORMAT(created_at,\'%Y%m%d\') days, module, count(DISTINCT(user_id)) user'))
+                ->get();
+
+            //总访问人数
+            $allPerson = ModuleStatistics::where('created_at', '>=', $nowMonth)->groupBy('days')
+                ->orderBy('days','asc')
+                ->select(\DB::raw('DATE_FORMAT(created_at,\'%Y%m%d\') days, count(DISTINCT(user_id)) user'))
+                ->get();
+
+            $allDays = $this->statistics->getAnalyseDay($now);
+
+            //初始化访问次数基础数据
+            $baseData = [];
+            $allDaysVisitsTpl = [];
+            foreach ($allDays as $v){
+                $baseData['Salary'][$v] = 0;
+                $baseData['InsuranceProgress'][$v] = 0;
+                $baseData['Insurance'][$v] = 0;
+                $baseData['Compensation'][$v] = 0;
+                $allDaysVisitsTpl[$v] = 0;
+            }
+
+            //总访问人数
+            foreach ($allPerson as $vm){
+                $allDaysVisitsTpl[$vm['days']] = $vm['user'];
+            }
+
+            //整理数据格式，各个模块访问次数
+            foreach ($visitTimesTpl as $k=>$v) {
+                switch ($v['module']) {
+                    case 'Salary':
+                    {
+                        $baseData['Salary'][$v['days']] = $v['user'];
+                        break;
+                    }
+                    case 'InsuranceProgress':
+                    {
+                        $baseData['InsuranceProgress'][$v['days']] = $v['user'];
+                        break;
+                    }
+                    case 'Insurance':
+                    {
+                        $baseData['Insurance'][$v['days']] = $v['user'];
+                        break;
+                    }
+                    case 'Compensation':
+                    {
+                        $baseData['Compensation'][$v['days']] = $v['user'];
+                        break;
+                    }
+                    default :
+                        break;
+                }
+            }
+
+            $visits = [];
+            $legend = [];
+            foreach ($baseData as $k=>$v) {
+                $tplCount = [];
+                foreach ($v as $vv){
+                    $tplCount[] = $vv;
+                }
+
+                switch ($k){
+                    case 'Salary':
+                    {
+                        $visits[] = [
+                            'name' => '薪资模块',
+                            'data' => $tplCount
+                        ];
+                        $legend[] = '薪资模块';
+                        break;
+                    }
+                    case 'InsuranceProgress':
+                    {
+                        $visits[] = [
+                            'name' => '社保进度模块',
+                            'data' => $tplCount
+                        ];
+                        $legend[] = '社保进度模块';
+                        break;
+                    }
+                    case 'Insurance':
+                    {
+                        $visits[] = [
+                            'name' => '社保模块',
+                            'data' => $tplCount
+                        ];
+                        $legend[] = '社保模块';
+                        break;
+                    }
+                    case 'Compensation':
+                    {
+                        $visits[] = [
+                            'name' => '理赔模块',
+                            'data' => $tplCount
+                        ];
+                        $legend[] = '理赔模块';
+                        break;
+                    }
+                    default :
+                        break;
+                }
+
+            }
+            //加入总计模块
+            $legend[] = '总访问人数';
+            $visits[] = [
+                'name' => '总访问人数',
+                'data' => array_values($allDaysVisitsTpl)
+            ];
+
+            //所有数据
+            $userTimes = [
+                "legend" => $legend,
+                "days" => $allDays,
+                "visits" => $visits
+            ];
+
+            //缓存
+            \Cache::store('file')->put('nowUserTimes:'.$now->format("Ymd"), $userTimes, 1440);
         }
 
         return $userTimes;
