@@ -19,6 +19,12 @@ class ManagerController extends Controller
         $this->middleware('throttle');
     }
 
+    /**
+     * 管理页面.
+     *
+     * @param Request $request
+     * @return mixed
+     */
     public function super(Request $request){
         if(Gate::foruser(\Auth::guard('admin')->user())->denies('super')){
             return redirect('admin/index');
@@ -40,6 +46,37 @@ class ManagerController extends Controller
         }
         $memberRoles=Role::where('level',1)->get();
         return view('admin.super',['managers'=>$managers,'name'=>$name,'memberRoles'=>$memberRoles]);
+    }
+
+    /**
+     * 管理列表接口.
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function index(Request $request){
+        if(Gate::foruser(\Auth::guard('admin')->user())->denies('super')){
+            return \Response::json(['invalid'=>'您无权访问！'])->setStatusCode(403);
+        }
+        $name=trim($request->input('name'));
+
+        //不能查询到自己，和超管(id=1)
+        if($name){
+            $managers=Manager::with("roles")->where('id','!=',\Auth::guard('admin')->user()->id)
+                ->where('id',"!=",1)
+                ->where(function($query) use ($name){
+                    $query->where('name','like',"%".$name."%")
+                        ->orWhere('email','like',"%".$name."%")
+                        ->orWhereHas("roles",function($query) use($name){
+                            $query->where('label','like',"%".$name."%");
+                        });
+                })->select(['id','name','phone','email','pid'])->withTrashed()->paginate(15);
+        }else{
+            $managers=Manager::with("roles")->where('id','!=',\Auth::guard('admin')->user()->id)
+                ->where('id','!=',1)->select(['id','name','phone','email','pid'])->withTrashed()->paginate(15);
+        }
+
+        return $managers;
     }
 
     /**
@@ -122,10 +159,6 @@ class ManagerController extends Controller
         $result['ret_num']=0;
 
         return response()->json($result);
-    }
-
-    public function index(){
-        return view();
     }
 
     /**

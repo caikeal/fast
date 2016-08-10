@@ -88,17 +88,18 @@
             color: #0006FF;
         }
 
+        select[name=pagination]{
+            display: inline-block;
+            width: auto;
+        }
+
         [v-cloak] {
             display: none;
         }
     </style>
 @endsection
 @section('content')
-    <div class="padding-md" id="super">
-        {{--<div class="alert alert-danger alert-dismissible" role="alert" v-if="systemErrors">--}}
-            {{--<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>--}}
-            {{--<strong>Warning!</strong> @{{systemErrors}}--}}
-        {{--</div>--}}
+    <div class="padding-md" id="super" v-cloak>
         <!-- 超级管理员 -->
         <div class="row base-backcolor">
             <div class="col-sm-12 col-md-12 col-lg-12">
@@ -108,17 +109,17 @@
         <div class="seperator"></div>
         <!-- 快速搜索客服 -->
         <div class="row base-backcolor">
-            <form class="form-search" action="{{url('admin/super')}}" method="get">
+            <form class="form-search" action="#" method="get">
                 {{csrf_field()}}
                 <div class="col-xs-9 col-sm-10 col-md-10 col-lg-10">
                     <div class="pull-left poster-icon icon-search-color">
                         <i class="fa fa-search fa-lg poster-icon-height"></i>
                     </div>
                     <input type="text" class="input-medium form-control search-query" placeholder="快速搜索客服姓名"
-                           name="name" value="{{$name}}" autocomplete="off">
+                           name="name" v-model="searchInfo.name" autocomplete="off">
                 </div>
                 <div class="col-xs-3 col-sm-2 col-md-2 col-lg-2">
-                    <input type="submit" class="btn btn-primary btn-block" value="搜索">
+                    <input type="submit" class="btn btn-primary btn-block" value="搜索" @click.prevent="searchManager">
                 </div>
                 <div class="clearfix"></div>
             </form>
@@ -145,16 +146,11 @@
         </div>
         <div class="row base-backcolor page-group">
             <div class="pull-right">
-                {{--<span>共<em>{{$managers->total()}}</em>条记录</span>--}}
-                {!! $managers->appends(['name'=>$name])->links() !!}
-                {{--<select>--}}
-                    {{--@for($i=0;$i<($managers->lastPage());$i++)--}}
-                    {{--<option {{$managers->currentPage()==$i+1?"checked":""}}>--}}
-                        {{--<a href="{{$managers->url($i+1)}}">{{$i+1}}</a>--}}
-                    {{--</option>--}}
-                    {{--@endfor--}}
-                {{--</select>--}}
-                {{--<span>页</span>--}}
+                <span>共<em>@{{ searchInfo.pageInfo.total }}</em>条记录</span>
+                <select name="pagination" class="form-control" v-model="searchInfo.pageInfo.current_page" @change="moreManager">
+                    <option :value="pageItem+1" v-for="pageItem in searchInfo.pageInfo.last_page">@{{ pageItem+1 }}</option>
+                </select>
+                <span>页</span>
             </div>
         </div>
         <div class="line"></div>
@@ -174,43 +170,43 @@
                     </tr>
                     </thead>
                     <tbody id="tbody">
-                    <!--new add managers start-->
-                    <tr v-for="manager in managerList" class="new-list" v-cloak>
-                        <td>@{{manager.name}}</td>
-                        <td>@{{manager.email}}</td>
-                        <td>
-                            <span v-for="roleInfo in manager['roles']">
-                                @{{roleInfo.label}}<br>
-                            </span>
-                        </td>
-                        <td>@{{manager['roles'][0]['level']}}级管理员</td>
-                        <td>
-                            <reset-pwd-btn :manager-id="manager.id"></reset-pwd-btn>
-                        </td>
-                        <td>
-                            <toggle-manager :manager-id="manager.id" :manager-status='manager.deleted_at?"启用":"停用"'></toggle-manager>
-                        </td>
-                    </tr>
-                    <!--new add managers end-->
-
-                    @foreach($managers as $manager)
-                        <tr>
-                            <td>{{$manager->name}}</td>
-                            <td>{{$manager->email}}</td>
+                        <!--new add managers start-->
+                        <tr v-for="manager in newManagerList" class="new-list">
+                            <td>@{{manager.name}}</td>
+                            <td>@{{manager.email}}</td>
                             <td>
-                                @foreach($manager->roles as $roleInfo)
-                                    {{$roleInfo->label}}<br>
-                                @endforeach
+                                <span v-for="roleInfo in manager['roles']">
+                                    @{{roleInfo.label}}<br>
+                                </span>
                             </td>
-                            <td>{{$manager->roles->first()->level}}级管理员</td>
+                            <td>@{{manager['roles'][0]['level']}}级管理员</td>
                             <td>
-                                <reset-pwd-btn :manager-id={{$manager->id}}></reset-pwd-btn>
+                                <reset-pwd-btn :manager-id="manager.id"></reset-pwd-btn>
                             </td>
                             <td>
-                                <toggle-manager :manager-id={{$manager->id}} manager-status={{$manager->deleted_at?"启用":"停用"}}></toggle-manager>
+                                <toggle-manager :manager-id="manager.id" :manager-status='manager.deleted_at?"启用":"停用"'></toggle-manager>
                             </td>
                         </tr>
-                    @endforeach
+                        <!--new add managers end-->
+
+                        <!--managerList-->
+                        <tr v-for="manager in managerList">
+                            <td>@{{manager.name}}</td>
+                            <td>@{{manager.email}}</td>
+                            <td>
+                                <span v-for="roleInfo in manager['roles']">
+                                    @{{roleInfo.label}}<br>
+                                </span>
+                            </td>
+                            <td>@{{manager['roles'][0]['level']}}级管理员</td>
+                            <td>
+                                <reset-pwd-btn :manager-id="manager.id"></reset-pwd-btn>
+                            </td>
+                            <td>
+                                <toggle-manager :manager-id="manager.id" :manager-status='manager.deleted_at?"启用":"停用"'></toggle-manager>
+                            </td>
+                        </tr>
+                        <!--managerList-->
                     </tbody>
                 </table>
                 <!-- /table  -->
@@ -231,16 +227,16 @@
                         <div class="seperator"></div>
                         <div class="container-fluid">
                             <form>
-                                <input type="hidden" name="id" v-model="userId">
+                                <input type="hidden" name="id" v-model="userOperation.userId">
                                 <div class="row">
-                                    <div class="col-sm-12"  :class="{'has-error':is_userPhone}">
+                                    <div class="col-sm-12"  :class="{'has-error': userError.is_userPhone}">
                                         <div class="input-group">
-                                            <input type="text" class="form-control" placeholder="搜索手机号" v-model="phone">
+                                            <input type="text" class="form-control" placeholder="搜索手机号" v-model="userOperation.phone">
                                             <span class="input-group-btn">
                                                 <button class="btn btn-default" type="button" @click="searchPerson">搜索</button>
                                             </span>
                                         </div>
-                                        <p class="help-block col-lg-12" :style="{'display':is_userPhone?'block':'none'}">@{{ userPhoneErrors }}</p>
+                                        <p class="help-block col-lg-12" :style="{'display':userError.is_userPhone?'block':'none'}">@{{ userError.userPhoneErrors }}</p>
                                     </div>
                                 </div>
                                 <div class="seperator"></div>
@@ -249,14 +245,14 @@
                                         <div class="input-group">
                                             <span class="input-group-addon">姓名</span>
                                             <input type="text" class="form-control none-left-border" disabled="disabled"
-                                                   value="@{{userName}}">
+                                                   value="@{{ userOperation.userName }}">
                                         </div>
                                     </div>
                                     <div class="col-sm-6 col-xs-6">
                                         <div class="input-group">
                                             <span class="input-group-addon">手机号</span>
                                             <input type="text" class="form-control none-left-border" disabled="disabled"
-                                                   value="@{{userPhone}}">
+                                                   value="@{{userOperation.userPhone}}">
                                         </div>
                                     </div>
                                 </div>
@@ -266,7 +262,7 @@
                                         <div class="input-group">
                                             <span class="input-group-addon">企业名</span>
                                             <input type="text" class="form-control none-left-border" disabled="disabled"
-                                                   value="@{{companyName}}">
+                                                   value="@{{userOperation.companyName}}">
                                         </div>
                                     </div>
                                 </div>
@@ -301,45 +297,45 @@
                     <div class="modal-body">
                         <div class="container-fluid">
                             <form action="" class="form-horizontal">
-                                <div class="form-group" :class="{'has-error':is_managerName}">
+                                <div class="form-group" :class="{'has-error':managerError.name.is_managerName}">
                                     <label for="name" class="col-lg-2 control-label lable-xs-center">姓名:</label>
 
                                     <div class=" col-lg-10">
                                         <input type="text" class="form-control" id="name" name="name" placeholder="姓名"
-                                               v-model="managerName">
+                                               v-model="createManager.managerName">
                                     </div>
 
-                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display':is_managerName?'block':'none'}">@{{ managerNameErrors }}</p>
+                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display':managerError.name.is_managerName?'block':'none'}">@{{ managerError.name.managerNameErrors }}</p>
                                 </div>
 
-                                <div class="form-group" :class="{'has-error':is_managerAccount}">
+                                <div class="form-group" :class="{'has-error': managerError.account.is_managerAccount}">
                                     <label for="account" class="col-lg-2 control-label lable-xs-center">账号:</label>
 
                                     <div class=" col-lg-10">
                                         <input type="email" class="form-control" id="account" name="account"
-                                               placeholder="账号" v-model="managerAccount">
+                                               placeholder="账号" v-model="createManager.managerAccount">
                                     </div>
 
-                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display':is_managerAccount?'block':'none'}">@{{ managerAccountErrors }}</p>
+                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display': managerError.account.is_managerAccount?'block':'none'}">@{{ managerError.account.managerAccountErrors }}</p>
                                 </div>
 
-                                <div class="form-group" :class="{'has-error':is_managerPassword}">
+                                <div class="form-group" :class="{'has-error':managerError.password.is_managerPassword}">
                                     <label for="password" class="col-lg-2 control-label lable-xs-center">密码:</label>
 
                                     <div class=" col-lg-10">
                                         <input type="text" class="form-control" id="password" name="password"
-                                               placeholder="密码" v-model="managerPassword">
+                                               placeholder="密码" v-model="createManager.managerPassword">
                                     </div>
 
-                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display':is_managerPassword?'block':'none'}">@{{ managerPasswordErrors }}</p>
+                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display':managerError.password.is_managerPassword?'block':'none'}">@{{ managerError.password.managerPasswordErrors }}</p>
                                 </div>
-                                <div class="form-group" :class="{'has-error':is_managerRoles}">
+                                <div class="form-group" :class="{'has-error': managerError.roles.is_managerRoles}">
                                     <div class="col-lg-offset-2 col-lg-10">
                                     @foreach($memberRoles as $memberRole)
                                         <div class="checkbox inline-block">
                                             <div class="custom-checkbox">
                                                 <input type="checkbox" id="{{$memberRole->name}}" class="checkbox-blue" value={{$memberRole->id}}
-                                                        v-model="managerRoles">
+                                                        v-model="createManager.managerRoles">
                                                 <label for="{{$memberRole->name}}"></label>
                                             </div>
                                             <div class="inline-block vertical-top">
@@ -349,7 +345,7 @@
                                         &nbsp;&nbsp;&nbsp;
                                     @endforeach
                                     </div>
-                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display':is_managerRoles?'block':'none'}">@{{ managerRolesErrors }}</p>
+                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display': managerError.roles.is_managerRoles?'block':'none'}">@{{ managerError.roles.managerRolesErrors }}</p>
                                 </div>
                             </form>
                         </div>
@@ -380,23 +376,23 @@
                         <div class="seperator"></div>
                         <div class="container-fluid">
                             <form action="" class="form-horizontal">
-                                <div class="form-group" :class="{'has-error':is_newPassword}">
+                                <div class="form-group" :class="{'has-error': restPasswordError.is_newPassword}">
                                     <label for="new-pwd" class="col-lg-2 control-label" >新密码</label>
 
                                     <div class="col-lg-10">
-                                        <input type="text" class="form-control" id="new-pwd" placeholder="新密码" v-model="newPassword">
+                                        <input type="text" class="form-control" id="new-pwd" placeholder="新密码" v-model="restPassword.newPassword">
                                     </div>
 
-                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display':is_newPassword?'block':'none'}">@{{ newPasswordErrors }}</p>
+                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display':restPasswordError.is_newPassword?'block':'none'}">@{{ restPasswordError.newPasswordErrors }}</p>
                                 </div>
-                                <div class="form-group" :class="{'has-error':is_confirmPassword}">
+                                <div class="form-group" :class="{'has-error':restPasswordError.is_confirmPassword}">
                                     <label for="confirm-pwd" class="col-lg-2 control-label">确认密码</label>
 
                                     <div class="col-lg-10">
-                                        <input type="text" class="form-control" id="confirm-pwd" placeholder="确认密码" v-model="confirmPassword">
+                                        <input type="text" class="form-control" id="confirm-pwd" placeholder="确认密码" v-model="restPassword.confirmPassword">
                                     </div>
 
-                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display':is_confirmPassword?'block':'none'}">@{{ confirmPasswordErrors }}</p>
+                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display':restPasswordError.is_confirmPassword?'block':'none'}">@{{ restPasswordError.confirmPasswordErrors }}</p>
                                 </div>
                                 <div style="padding-top: 40px;"></div>
                             </form>
@@ -498,58 +494,123 @@
         var vm=new Vue({
             el: '#super',
             data: {
-                managerList:[],
-                phone: '',
-                userPhone: '',
-                userName: '',
-                userId:'',
-                companyName: '',
-                is_userPhone: 0,
-                userPhoneErrors: '',
-                managerId:'',
-                managerName: '',
-                managerAccount: '',
-                managerPassword: '',
-                managerRoles: ['{{$memberRoles->first()->id}}'],
-                is_managerName:0,
-                is_managerAccount:0,
-                is_managerPassword:0,
-                is_managerRoles:0,
-                managerNameErrors:'',
-                managerAccountErrors:'',
-                managerPasswordErrors:'',
-                managerRolesErrors:'',
-                systemErrors:'',
-                newPassword:'',
-                confirmPassword:'',
-                is_newPassword:0,
-                is_confirmPassword:0,
-                newPasswordErrors:'',
-                confirmPasswordErrors:''
+                newManagerList: [],
+                managerList: [],
+                searchInfo: {
+                    name: '',
+                    searchName: '',
+                    pageInfo: {
+                        total: 0,
+                        per_page: 15,
+                        current_page: 0,
+                        last_page: 0,
+                        next_page_url: '',
+                        prev_page_url: '',
+                        from: 0,
+                        to: 0
+                    },
+                },
+                userOperation: {
+                    phone: '',
+                    userPhone: '',
+                    userName: '',
+                    userId: '',
+                    companyName: ''
+                },
+                userError: {
+                    is_userPhone: 0,
+                    userPhoneErrors: ''
+                },
+                createManager: {
+                    managerName: '',
+                    managerAccount: '',
+                    managerPassword: '',
+                    managerRoles: ['{{$memberRoles->first()->id}}'],
+                },
+                managerError: {
+                    name: {
+                        is_managerName:0,
+                        managerNameErrors:''
+                    },
+                    account: {
+                        is_managerAccount:0,
+                        managerAccountErrors:''
+                    },
+                    password: {
+                        is_managerPassword:0,
+                        managerPasswordErrors:'',
+                    },
+                    roles: {
+                        is_managerRoles:0,
+                        managerRolesErrors:'',
+                    }
+                },
+                restPassword: {
+                    managerId:'',
+                    newPassword:'',
+                    confirmPassword:'',
+                },
+                restPasswordError: {
+                    is_newPassword:0,
+                    newPasswordErrors:'',
+                    is_confirmPassword:0,
+                    confirmPasswordErrors:''
+                }
+            },
+            ready: function () {
+                var _this = this;
+                var url = "{{ url('admin/manager') }}";
+                $.ajax({
+                        url:url,
+                        dataType:'json',
+                        headers:{
+                            'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content'),
+                        },
+                        timeout:60000,
+                        type:'GET'
+                    })
+                    .done(function(data){
+                        if(data.data.length!=0){
+                            _this.managerList = data.data;
+                            _this.searchInfo.pageInfo = {
+                                total: data.total,
+                                per_page: data.per_page,
+                                current_page: data.current_page,
+                                last_page: data.last_page,
+                                next_page_url: data.next_page_url,
+                                prev_page_url: data.prev_page_url,
+                                from: data.from,
+                                to: data.to
+                            };
+                        }
+                    })
+                    .fail(function(){
+                        alert("网络错误！");
+                    });
             },
             methods: {
                 searchPerson: function () {
                     var url = "{{url('admin/user')}}";
                     var _this=this;
-                    _this.is_userPhone=0;
-                    _this.userPhoneErrors='';
-                    _this.userPhone='';
-                    _this.userName='';
-                    _this.companyName='';
-                    _this.userId='';
-                    if(!_this.phone|| typeof _this.phone=='undefined'){
-                        _this.userPhoneErrors='手机号必填！';
-                        _this.is_userPhone=1;
+                    _this.userError.is_userPhone=0;
+                    _this.userError.userPhoneErrors='';
+                    _this.userOperation.userPhone='';
+                    _this.userOperation.userName='';
+                    _this.userOperation.companyName='';
+                    _this.userOperation.userId='';
+                    if(!_this.userOperation.phone|| typeof _this.userOperation.phone=='undefined'){
+                        _this.userError.userPhoneErrors='手机号必填！';
+                        _this.userError.is_userPhone=1;
                         return false;
                     }
-                    if(!_this.phone.match(/^1[3456789][0-9]{9}$/)){
-                        _this.userPhoneErrors='手机号格式出错！';
-                        _this.is_userPhone=1;
+                    if(!_this.userOperation.phone.match(/^1[3456789][0-9]{9}$/)){
+                        _this.userError.userPhoneErrors='手机号格式出错！';
+                        _this.userError.is_userPhone=1;
                         return false;
                     }
                     $.ajax({
                         url:url,
-                        data:{phone: _this.phone},
+                        data:{phone: _this.userOperation.phone},
                         type:'GET',
                         headers:{
                             'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content'),
@@ -559,36 +620,38 @@
                     }).done(function(data){
                         if(data.ret_num==0){
                             if(data.ret_msg) {
-                                _this.userPhone = data.ret_msg.phone;
-                                _this.userName = data.ret_msg.name;
-                                _this.companyName = data.ret_msg.company.name;
-                                _this.userId = data.ret_msg.id;
+                                _this.userOperation.userPhone = data.ret_msg.phone;
+                                _this.userOperation.userName = data.ret_msg.name;
+                                _this.userOperation.companyName = data.ret_msg.company.name;
+                                _this.userOperation.userId = data.ret_msg.id;
                             }else{
-                                _this.is_userPhone=1;
-                                _this.userPhoneErrors='不存在该手机号';
+                                _this.userError.is_userPhone=1;
+                                _this.userError.userPhoneErrors='不存在该手机号';
                             }
                         }else{
-                            _this.userPhoneErrors="网络错误";
-                            _this.is_userPhone=1;
+                            _this.userError.userPhoneErrors="网络错误";
+                            _this.userError.is_userPhone=1;
                         }
                     }).fail(function (data) {
                         var err=JSON.parse(data.responseText);
                         if(err.phone){
-                            _this.userPhoneErrors=err.phone[0];
-                            _this.is_userPhone=1;
+                            _this.userError.userPhoneErrors=err.phone[0];
+                            _this.userError.is_userPhone=1;
                         }
                     });
                 },
                 initAccount:function(){
                     var _this=this;
-                    if(_this.is_userPhone ||  !_this.userId){
-                        _this.userPhoneErrors="未知用户不能初始化！";
-                        _this.is_userPhone=1;
+                    if(_this.userError.is_userPhone ||  !_this.userOperation.userId){
+                        _this.userError.userPhoneErrors="未知用户不能初始化！";
+                        _this.userError.is_userPhone=1;
+
+                        return false;
                     }
-                    var url = "{{url('admin/user')}}"+"/"+_this.userId;
+                    var url = "{{url('admin/user')}}"+"/"+_this.userOperation.userId;
                     $.ajax({
                         url:url,
-                        data:{phone: _this.userPhone,_method:'PUT'},
+                        data:{phone: _this.userOperation.userPhone,_method:'PUT'},
                         type:'POST',
                         headers:{
                             'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content'),
@@ -597,76 +660,92 @@
                         dataType:'json'
                     }).done(function(data){
                         if(data.ret_num==0){
-                            _this.phone = '';
-                            _this.userPhone = '';
-                            _this.userName = '';
-                            _this.companyName = '';
-                            _this.userId = '';
-                            _this.is_userPhone=0;
-                            _this.userPhoneErrors='';
+                            _this.userOperation.phone = '';
+                            _this.userOperation.userPhone = '';
+                            _this.userOperation.userName = '';
+                            _this.userOperation.companyName = '';
+                            _this.userOperation.userId = '';
+                            _this.userError.is_userPhone=0;
+                            _this.userError.userPhoneErrors='';
                             $("#init-user").modal('hide');
                             alert(data.ret_msg);
+
+                            return true;
                         }else{
-                            _this.userPhoneErrors="网络错误";
-                            _this.is_userPhone=1;
+                            _this.userError.userPhoneErrors="网络错误";
+                            _this.userError.is_userPhone=1;
+
+                            return false;
                         }
                     }).fail(function (data) {
                         var err=JSON.parse(data.responseText);
                         if(err.phone){
-                            _this.userPhoneErrors=err.phone[0];
-                            _this.is_userPhone=1;
+                            _this.userError.userPhoneErrors=err.phone[0];
+                            _this.userError.is_userPhone=1;
+
+                            return false;
                         }
                     });
                 },
                 newAccount: function () {
                     var url = "{{url('admin/account')}}";
                     var _this=this;
-                    _this.is_managerName=0;
-                    _this.is_managerAccount=0;
-                    _this.is_managerPassword=0;
-                    _this.is_managerRoles=0;
-                    _this.managerNameErrors='';
-                    _this.managerAccountErrors='';
-                    _this.managerPasswordErrors='';
-                    _this.managerRolesErrors='';
-                    if(!_this.managerName || typeof _this.managerName=='undefined'){
-                        _this.managerNameErrors='姓名必填！';
-                        _this.is_managerName=1;
+                    _this.managerError = {
+                        name: {
+                            is_managerName:0,
+                            managerNameErrors:''
+                        },
+                        account: {
+                            is_managerAccount:0,
+                            managerAccountErrors:''
+                        },
+                        password: {
+                            is_managerPassword:0,
+                            managerPasswordErrors:''
+                        },
+                        roles: {
+                            is_managerRoles:0,
+                            managerRolesErrors:''
+                        }
+                    };
+                    if(!_this.createManager.managerName || typeof _this.createManager.managerName=='undefined'){
+                        _this.managerError.name.managerNameErrors='姓名必填！';
+                        _this.managerError.name.is_managerName=1;
                         return false;
                     }
-                    if(!_this.managerAccount || typeof _this.managerAccount=='undefined'){
-                        _this.managerAccountErrors='登录账户必填！';
-                        _this.is_managerAccount=1;
+                    if(!_this.createManager.managerAccount || typeof _this.createManager.managerAccount=='undefined'){
+                        _this.managerError.account.managerAccountErrors='登录账户必填！';
+                        _this.managerError.account.is_managerAccount=1;
                         return false;
                     }
-                    if(!_this.managerAccount.match(/^(\w)+(\.\w+)*@(\w)+((\.\w+)+)$/)){
-                        _this.managerAccountErrors='登录账户必为邮箱！';
-                        _this.is_managerAccount=1;
+                    if(!_this.createManager.managerAccount.match(/^(\w)+(\.\w+)*@(\w)+((\.\w+)+)$/)){
+                        _this.managerError.account.managerAccountErrors='登录账户必为邮箱！';
+                        _this.managerError.account.is_managerAccount=1;
                         return false;
                     }
-                    if(!_this.managerPassword || typeof _this.managerPassword=='undefined'){
-                        _this.managerPasswordErrors='初始密码必填！';
-                        _this.is_managerPassword=1;
+                    if(!_this.createManager.managerPassword || typeof _this.createManager.managerPassword=='undefined'){
+                        _this.managerError.password.managerPasswordErrors='初始密码必填！';
+                        _this.managerError.password.is_managerPassword=1;
                         return false;
                     }
-                    if(_this.managerPassword.length<6){
-                        _this.managerPasswordErrors='初始密码至少6位！';
-                        _this.is_managerPassword=1;
+                    if(_this.createManager.managerPassword.length<6){
+                        _this.managerError.password.managerPasswordErrors='初始密码至少6位！';
+                        _this.managerError.password.is_managerPassword=1;
                         return false;
                     }
-                    if(!_this.managerPassword.match(/=|\+|-|@|_|\*|[a-zA-Z]/g)){
-                        _this.managerPasswordErrors='"A-Z" "a-z" "+" "_" "*" "=" "-" "@"至少存在1项！';
-                        _this.is_managerPassword=1;
+                    if(!_this.createManager.managerPassword.match(/=|\+|-|@|_|\*|[a-zA-Z]/g)){
+                        _this.managerError.password.managerPasswordErrors='"A-Z" "a-z" "+" "_" "*" "=" "-" "@"至少存在1项！';
+                        _this.managerError.password.is_managerPassword=1;
                         return false;
                     }
-                    if(!_this.managerRoles.length || typeof _this.managerRoles=='undefined'){
-                        _this.managerRolesErrors='权限必选！';
-                        _this.is_managerRoles=1;
+                    if(!_this.createManager.managerRoles.length || typeof _this.createManager.managerRoles=='undefined'){
+                        _this.managerError.roles.managerRolesErrors='权限必选！';
+                        _this.managerError.roles.is_managerRoles=1;
                         return false;
                     }
-                    if(_this.managerRoles.length!=1){
-                        _this.managerRolesErrors='权限最多选1项！';
-                        _this.is_managerRoles=1;
+                    if(_this.createManager.managerRoles.length!=1){
+                        _this.managerError.roles.managerRolesErrors='权限最多选1项！';
+                        _this.managerError.roles.is_managerRoles=1;
                         return false;
                     }
                     $.ajax({
@@ -677,82 +756,94 @@
                         },
                         timeout:60000,
                         data: {
-                            name: _this.managerName,
-                            account: _this.managerAccount,
-                            pwd: _this.managerPassword,
-                            role: _this.managerRoles
+                            name: _this.createManager.managerName,
+                            account: _this.createManager.managerAccount,
+                            pwd: _this.createManager.managerPassword,
+                            role: _this.createManager.managerRoles
                         },
                         type:'POST'
                     })
                     .done(function(data){
                         if(data.ret_num==0){
-                            _this.is_managerName=0;
-                            _this.is_managerAccount=0;
-                            _this.is_managerPassword=0;
-                            _this.is_managerRoles=0;
-                            _this.managerNameErrors='';
-                            _this.managerAccountErrors='';
-                            _this.managerPasswordErrors='';
-                            _this.managerRolesErrors='';
-                            _this.managerName= '';
-                            _this.managerAccount= '';
-                            _this.managerPassword= '';
-                            _this.managerRoles= [];
-                            _this.managerList.push(data.data);
+                            _this.managerError = {
+                                name: {
+                                    is_managerName:0,
+                                    managerNameErrors:''
+                                },
+                                account: {
+                                    is_managerAccount:0,
+                                    managerAccountErrors:''
+                                },
+                                password: {
+                                    is_managerPassword:0,
+                                    managerPasswordErrors:''
+                                },
+                                roles: {
+                                    is_managerRoles:0,
+                                    managerRolesErrors:''
+                                }
+                            };
+                            _this.createManager.managerName= '';
+                            _this.createManager.managerAccount= '';
+                            _this.createManager.managerPassword= '';
+                            _this.createManager.managerRoles= [];
+                            _this.newManagerList.push(data.data);
                             $('#create-manager').modal('hide');
                             alert(data.ret_msg);
                         }else{
-                            _this.is_managerName=1;
-                            _this.managerNameErrors=data.ret_msg;
+                            _this.managerError.name.is_managerName=1;
+                            _this.managerError.name.managerNameErrors=data.ret_msg;
                         }
                     })
                     .fail(function(data){
                         var errs=JSON.parse(data.responseText);
                         if(errs.name){
-                            _this.is_managerName=1;
-                            _this.managerNameErrors=errs.name[0];
+                            _this.managerError.name.is_managerName=1;
+                            _this.managerError.name.managerNameErrors=errs.name[0];
                         }
                         if(errs.account){
-                            _this.is_managerAccount=1;
-                            _this.managerAccountErrors=errs.account[0];
+                            _this.managerError.account.is_managerAccount=1;
+                            _this.managerError.account.managerAccountErrors=errs.account[0];
                         }
                         if(errs.pwd){
-                            _this.is_managerPassword=1;
-                            _this.managerPasswordErrors=errs.pwd[0];
+                            _this.managerError.password.is_managerPassword=1;
+                            _this.managerError.password.managerPasswordErrors=errs.pwd[0];
                         }
                         if(errs['role']){
-                            _this.is_managerRoles=1;
-                            _this.managerRolesErrors=errs['role'][0];
+                            _this.managerError.roles.is_managerRoles=1;
+                            _this.managerError.roles.managerRolesErrors=errs['role'][0];
                         }
                     });
                 },
                 resetPassword: function () {
                     var _this=this;
-                    _this.is_newPassword=0;
-                    _this.is_confirmPassword=0;
-                    _this.newPasswordErrors='';
-                    _this.confirmPasswordErrors='';
-                    if(!_this.newPassword || typeof _this.newPassword=='undefined'){
-                        _this.newPasswordErrors='密码必填！';
-                        _this.is_newPassword=1;
+                    _this.restPasswordError = {
+                        is_newPassword: 0,
+                        newPasswordErrors: '',
+                        is_confirmPassword: 0,
+                        confirmPasswordErrors: ''
+                    };
+                    if(!_this.restPassword.newPassword || typeof _this.restPassword.newPassword=='undefined'){
+                        _this.restPasswordError.newPasswordErrors='密码必填！';
+                        _this.restPasswordError.is_newPassword=1;
                         return false;
                     }
-                    if(_this.newPassword.length<6){
-                        _this.newPasswordErrors='新密码至少6位！';
-                        _this.is_newPassword=1;
+                    if(_this.restPassword.newPassword.length<6){
+                        _this.restPasswordError.newPasswordErrors='新密码至少6位！';
+                        _this.restPasswordError.is_newPassword=1;
                         return false;
                     }
-                    if(!_this.newPassword.match(/=|\+|-|@|_|\*|[a-zA-Z]/g)){
-                        _this.newPasswordErrors='"A-Z" "a-z" "+" "_" "*" "=" "-" "@"至少存在1项！';
-                        _this.is_newPassword=1;
+                    if(!_this.restPassword.newPassword.match(/=|\+|-|@|_|\*|[a-zA-Z]/g)){
+                        _this.restPasswordError.newPasswordErrors='"A-Z" "a-z" "+" "_" "*" "=" "-" "@"至少存在1项！';
+                        _this.restPasswordError.is_newPassword=1;
                         return false;
                     }
-                    if((_this.newPassword)!==(_this.confirmPassword)){
-                        _this.confirmPasswordErrors='两次密码不一致！';
-                        _this.is_confirmPassword=1;
+                    if((_this.restPassword.newPassword)!==(_this.restPassword.confirmPassword)){
+                        _this.restPasswordError.confirmPasswordErrors='两次密码不一致！';
+                        _this.restPasswordError.is_confirmPassword=1;
                         return false;
                     }
-                    var url = "{{url('admin/super/reset_password')}}"+"/"+_this.managerId;
+                    var url = "{{url('admin/super/reset_password')}}"+"/"+_this.restPassword.managerId;
                     $.ajax({
                         url:url,
                         dataType:'json',
@@ -761,38 +852,103 @@
                         },
                         timeout:60000,
                         data: {
-                            pwd: _this.newPassword,
-                            pwd_confirmation: _this.confirmPassword,
+                            pwd: _this.restPassword.newPassword,
+                            pwd_confirmation: _this.restPassword.confirmPassword,
                             _method:'PUT'
                         },
                         type:'POST'
                     }).done(function (data) {
                         if(data.ret_num==0){
-                            _this.newPassword='';
-                            _this.confirmPassword='';
-                            _this.managerId='';
+                            _this.restPassword.newPassword='';
+                            _this.restPassword.confirmPassword='';
+                            _this.restPassword.managerId='';
                             $("#reset-password").modal('hide');
                             alert(data.ret_msg);
                         }else{
-                            _this.newPasswordErrors=data.ret_msg;
-                            _this.is_newPassword=1;
+                            _this.restPasswordError.newPasswordErrors=data.ret_msg;
+                            _this.restPasswordError.is_newPassword=1;
                         }
                     }).fail(function (data) {
                         var errs=JSON.parse(data.responseText);
                         if(errs.pwd){
-                            _this.is_newPassword=1;
-                            _this.newPasswordErrors=errs.pwd[0];
+                            _this.restPasswordError.is_newPassword=1;
+                            _this.restPasswordError.newPasswordErrors=errs.pwd[0];
                         }
                         if(errs.pwd_confirmation){
-                            _this.is_confirmPassword=1;
-                            _this.confirmPasswordErrors=errs.pwd_confirmation[0];
+                            _this.restPasswordError.is_confirmPassword=1;
+                            _this.restPasswordError.confirmPasswordErrors=errs.pwd_confirmation[0];
                         }
+                    });
+                },
+                searchManager: function () {
+                    var _this = this;
+                    var url = "{{ url('admin/manager') }}";
+                    _this.newManagerList = [];
+                    $.ajax({
+                        url:url,
+                        dataType:'json',
+                        headers:{
+                            'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content'),
+                        },
+                        data: {
+                            'name': _this.searchInfo.name
+                        },
+                        timeout:60000,
+                        type:'GET'
+                    }).done(function(data){
+                        _this.searchInfo.searchName = _this.searchInfo.name;
+                        _this.managerList = data.data;
+                        _this.searchInfo.pageInfo = {
+                            total: data.total,
+                            per_page: data.per_page,
+                            current_page: data.current_page,
+                            last_page: data.last_page,
+                            next_page_url: data.next_page_url,
+                            prev_page_url: data.prev_page_url,
+                            from: data.from,
+                            to: data.to
+                        };
+                    }).fail(function(){
+                        alert("网络错误！");
+                    });
+                },
+                moreManager: function () {
+                    var _this = this;
+                    var url = "{{ url('admin/manager') }}";
+                    _this.newManagerList = [];
+                    _this.searchInfo.searchName = _this.searchInfo.name;
+                    $.ajax({
+                        url:url,
+                        dataType:'json',
+                        headers:{
+                            'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content'),
+                        },
+                        data: {
+                            'name': _this.searchInfo.searchName,
+                            'page': _this.searchInfo.pageInfo.current_page
+                        },
+                        timeout:60000,
+                        type:'GET'
+                    }).done(function(data){
+                        _this.managerList = data.data;
+                        _this.searchInfo.pageInfo = {
+                            total: data.total,
+                            per_page: data.per_page,
+                            current_page: data.current_page,
+                            last_page: data.last_page,
+                            next_page_url: data.next_page_url,
+                            prev_page_url: data.prev_page_url,
+                            from: data.from,
+                            to: data.to
+                        };
+                    }).fail(function(){
+                        alert("网络错误！");
                     });
                 }
             },
             events:{
                 'mg-id': function (managerId) {
-                    this.managerId=managerId;
+                    this.restPassword.managerId=managerId;
                 }
             }
         });
