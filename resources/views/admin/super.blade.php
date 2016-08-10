@@ -664,6 +664,11 @@
                         _this.is_managerRoles=1;
                         return false;
                     }
+                    if(_this.managerRoles.length!=1){
+                        _this.managerRolesErrors='权限最多选1项！';
+                        _this.is_managerRoles=1;
+                        return false;
+                    }
                     $.ajax({
                         url:url,
                         dataType:'json',
