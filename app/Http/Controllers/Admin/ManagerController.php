@@ -22,30 +22,14 @@ class ManagerController extends Controller
     /**
      * 管理页面.
      *
-     * @param Request $request
      * @return mixed
      */
-    public function super(Request $request){
+    public function super(){
         if(Gate::foruser(\Auth::guard('admin')->user())->denies('super')){
             return redirect('admin/index');
         }
-        $name=trim($request->input('name'));
-        //不能查询到自己，和超管(id=1)
-        if($name){
-            $managers=Manager::where('id','!=',\Auth::guard('admin')->user()->id)->where('id',"!=",1)
-                ->where(function($query) use ($name){
-                    $query->where('name','like',"%".$name."%")
-                        ->orWhere('email','like',"%".$name."%")
-                        ->orWhereHas("roles",function($query) use($name){
-                            $query->where('label','like',"%".$name."%");
-                        });
-                })->withTrashed()->paginate(15);
-        }else{
-            $managers=Manager::with("roles")->where('id','!=',\Auth::guard('admin')->user()->id)
-                ->where('id','!=',1)->withTrashed()->paginate(15);
-        }
         $memberRoles=Role::where('level',1)->get();
-        return view('admin.super',['managers'=>$managers,'name'=>$name,'memberRoles'=>$memberRoles]);
+        return view('admin.super',['memberRoles'=>$memberRoles]);
     }
 
     /**

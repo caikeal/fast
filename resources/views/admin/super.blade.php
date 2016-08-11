@@ -93,6 +93,38 @@
             width: auto;
         }
 
+        .table-roles{
+            overflow-x: scroll;
+            margin-top: 30px;
+        }
+
+        .table-roles thead{
+            white-space: nowrap;
+            background-color: #c5e4f7;
+        }
+
+        .list.editing .view, .list .edit{
+            display: none;
+        }
+
+        .list.editing .edit, .list .view{
+            display: block;
+        }
+
+        .list .edit input{
+            padding: 2px 5px;
+            outline: 0;
+            border: 1px solid #b5b5b5;
+        }
+
+        .list .point{
+            cursor: pointer;
+        }
+
+        .list.editing .point{
+            border-top: none;
+        }
+
         [v-cloak] {
             display: none;
         }
@@ -132,6 +164,14 @@
             <a id="createManager" class="btn btn-link member-btn" data-toggle="modal" data-target="#create-manager">
                 <i class="fa fa-plus fa-sm poster-btn btn-add-account"></i>
                 <strong>创建帐号</strong>
+            </a>
+            <a id="identityManage" class="btn btn-link member-btn" data-toggle="modal" @click.prevent="identityList">
+                <i class="fa fa-bolt fa-sm poster-btn btn-member"></i>
+                <strong>身份管理</strong>
+            </a>
+            <a id="roleManage" class="btn btn-link member-btn" data-toggle="modal" data-target="#create-manager">
+                <i class="fa fa-lock fa-sm poster-btn btn-add-account"></i>
+                <strong>权限管理</strong>
             </a>
         </div>
         <div class="seperator"></div>
@@ -362,6 +402,125 @@
         </div>
         <!-- /modal createManager-->
 
+        <!-- modal identityManage -->
+        <div class="modal fade" id="identity-manage" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">身份管理</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <!-- 创建角色 -->
+                            <form action="" class="form-horizontal">
+                                <div class="form-group" :class="{'has-error':identityError.label.isInvalid}">
+                                    <label class="col-lg-2 control-label lable-xs-center">身份名称:</label>
+
+                                    <div class=" col-lg-10">
+                                        <input type="text" class="form-control" name="label" placeholder="身份名称"
+                                               autocomplete="off" v-model="identity.label">
+                                    </div>
+
+                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display':identityError.label.isInvalid?'block':'none'}">@{{ identityError.label.msg }}</p>
+                                </div>
+
+                                <div class="form-group" :class="{'has-error': identityError.name.isInvalid}">
+                                    <label class="col-lg-2 control-label lable-xs-center">身份类型:</label>
+
+                                    <div class=" col-lg-10">
+                                        <input type="text" class="form-control" name="account"
+                                               placeholder="身份类型（英文,如：salaryLeader）" autocomplete="off" v-model="identity.name">
+                                    </div>
+
+                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display': identityError.name.isInvalid?'block':'none'}">@{{ identityError.name.msg }}</p>
+                                </div>
+
+                                <div class="form-group" :class="{'has-error': identityError.level.isInvalid}">
+                                    <div class="col-lg-offset-2 col-lg-10">
+                                        <div class="radio inline-block">
+                                            <div class="custom-radio m-right-xs">
+                                                <input type="radio" id="inlineRadio1" name="inlineRadio" value="1" v-model="identity.level" @change="getAffiliation">
+                                                <label for="inlineRadio1"></label>
+                                            </div>
+                                            <div class="inline-block vertical-top">1级管理员</div>
+                                        </div>
+                                        <div class="radio inline-block">
+                                            <div class="custom-radio m-right-xs">
+                                                <input type="radio" id="inlineRadio2" name="inlineRadio" value="2" v-model="identity.level" @change="getAffiliation">
+                                                <label for="inlineRadio2"></label>
+                                            </div>
+                                            <div class="inline-block vertical-top">2级管理员</div>
+                                        </div>
+                                        <div class="radio inline-block">
+                                            <div class="custom-radio m-right-xs">
+                                                <input type="radio" id="inlineRadio3" name="inlineRadio" value="3" v-model="identity.level" @change="getAffiliation">
+                                                <label for="inlineRadio3"></label>
+                                            </div>
+                                            <div class="inline-block vertical-top">3级管理员</div>
+                                        </div>
+                                    </div>
+                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display': identityError.level.isInvalid?'block':'none'}">@{{ identityError.level.msg }}</p>
+                                </div>
+
+                                <div class="form-group" :class="{'has-error': identityError.relate.isInvalid}">
+                                    <label for="relate" class="col-lg-2 control-label lable-xs-center">隶属关系:</label>
+                                    <div class="col-lg-10">
+                                        <select class="form-control" name="relate" v-model="identity.relate">
+                                            <option :value="rels.id" v-for="rels in identity.relations">@{{ rels.label }}</option>
+                                        </select>
+                                    </div>
+                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display': identityError.relate.isInvalid?'block':'none'}">@{{ identityError.relate.msg }}</p>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-offset-2 col-sm-8">
+                                        <a class="btn btn-primary block m-top-md" @click.prevent="saveIdentity">保存角色</a>
+                                    </div>
+                                </div>
+                            </form>
+                            <!-- /创建角色 -->
+
+                            <!-- 角色列表 -->
+                            <div class="table-roles">
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>身份名</th>
+                                        <th>身份类型</th>
+                                        <th>管理员等级</th>
+                                        <th>隶属关系</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr :class="['list', {'editing': identity.change.label==item}]" v-for="item in identity.list">
+                                        <td class="view">@{{ item.label }}</td>
+                                        <td class="edit"><input type="text" @keyup.esc="cancelIdentity()" v-model="identity.change.cache"></td>
+                                        <td>@{{ item.name }}</td>
+                                        <td>@{{ item.level }}</td>
+                                        <td>@{{ item.father.label }}</td>
+                                        <td class="view point"><a @click.prevent="changeIdentity(item)">修改</a></td>
+                                        <td class="edit point">
+                                            <a @click.prevent="updateIdentity(item)">保存</a>
+                                            <a @click.prevent="cancelIdentity(item)">取消</a>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- /角色列表 -->
+                        </div>
+                    </div>
+                    {{--<div class="modal-footer">--}}
+
+                    {{--</div>--}}
+                </div>
+            </div>
+        </div>
+        <!-- /modal identityManage -->
+
         <!-- modal restPassword-->
         <div class="modal fade" id="reset-password" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
             <div class="modal-dialog" role="document">
@@ -555,6 +714,36 @@
                     newPasswordErrors:'',
                     is_confirmPassword:0,
                     confirmPasswordErrors:''
+                },
+                identity: {
+                    name: '',
+                    label: '',
+                    level: null,
+                    relate: null,
+                    relations: [],
+                    list: [],
+                    change: {
+                        label: null,
+                        cache: ''
+                    }
+                },
+                identityError: {
+                    name: {
+                        isInvalid: 0,
+                        msg: ''
+                    },
+                    label: {
+                        isInvalid: 0,
+                        msg: ''
+                    },
+                    level: {
+                        isInvalid: 0,
+                        msg: ''
+                    },
+                    relate: {
+                        isInvalid: 0,
+                        msg: ''
+                    }
                 }
             },
             ready: function () {
@@ -943,6 +1132,204 @@
                         };
                     }).fail(function(){
                         alert("网络错误！");
+                    });
+                },
+                getAffiliation: function () {
+                    var _this = this;
+                    var url = "{{ url('admin/affiliation') }}";
+                    _this.identity.relations = [];
+                    _this.identity.relate = 0;
+                    $.ajax({
+                        url:url,
+                        dataType:'json',
+                        headers:{
+                            'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content'),
+                        },
+                        data: {
+                            'level': _this.identity.level,
+                        },
+                        timeout:60000,
+                        type:'GET'
+                    }).done(function(data){
+                        _this.identity.relations = data.data;
+                        return false;
+                    }).fail(function(error){
+                        errs = error.responseJSON;
+                        if (errs.level.length){
+                            _this.identityError.level.isInvalid = 1;
+                            _this.identityError.level.msg = errs.level[0];
+                            return false;
+                        }else{
+                            alert("网络错误！");
+                        }
+                    });
+                },
+                saveIdentity: function () {
+                    var _this = this;
+                    var url = "{{ url('admin/role-create') }}";
+                    _this.identityError = {
+                        name: {
+                            isInvalid: 0,
+                            msg: ''
+                        },
+                        label: {
+                            isInvalid: 0,
+                            msg: ''
+                        },
+                        level: {
+                            isInvalid: 0,
+                            msg: ''
+                        },
+                        relate: {
+                            isInvalid: 0,
+                            msg: ''
+                        }
+                    };
+                    $.ajax({
+                        url:url,
+                        dataType:'json',
+                        headers:{
+                            'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content'),
+                        },
+                        data: {
+                            'name': _this.identity.name,
+                            'label': _this.identity.label,
+                            'level': _this.identity.level,
+                            'relate': _this.identity.relate,
+                        },
+                        timeout:60000,
+                        type:'POST'
+                    }).done(function(data){
+                        if (data.message == 'success' && data.hasOwnProperty('data')){
+                            _this.identity.list.push({
+                                id: data.data.id,
+                                label: _this.identity.label,
+                                name: _this.identity.name,
+                                level: _this.identity.level,
+                                pid: _this.identity.relate,
+                                father: {
+                                    id: _this.identity.relate,
+                                    label: _this.identity.relations.find(function(val){
+                                        if (val.id == _this.identity.relate){
+                                            return val.label;
+                                        }
+                                    }).label
+                                }
+                            });
+                            alert("保存成功！");
+                        }
+                        _this.identity.name = '';
+                        _this.identity.label = '';
+                        _this.identity.level = 0;
+                        _this.identity.relate = 0;
+                        _this.identity.relations = [];
+                        return true;
+                    }).fail(function(error){
+                        errs = error.responseJSON;
+                        if (errs.hasOwnProperty('name')){
+                            _this.identityError.name.isInvalid = 1;
+                            _this.identityError.name.msg = errs.name[0];
+                            return false;
+                        }
+                        if (errs.hasOwnProperty('label')){
+                            _this.identityError.label.isInvalid = 1;
+                            _this.identityError.label.msg = errs.label[0];
+                            return false;
+                        }
+                        if (errs.hasOwnProperty('level')){
+                            _this.identityError.level.isInvalid = 1;
+                            _this.identityError.level.msg = errs.level[0];
+                            return false;
+                        }
+                        if (errs.hasOwnProperty('relate')){
+                            _this.identityError.relate.isInvalid = 1;
+                            _this.identityError.relate.msg = errs.relate[0];
+                            return false;
+                        }
+                        alert("网络错误！");
+                    });
+                },
+                identityList: function () {
+                    var _this = this;
+                    var url = "{{ url('admin/role-list') }}";
+                    $.ajax({
+                        url:url,
+                        dataType:'json',
+                        headers:{
+                            'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content'),
+                        },
+                        timeout:60000,
+                        type:'GET'
+                    }).done(function(data){
+                        _this.identity.list = data.data;
+                        $("#identity-manage").modal('show');
+
+                        return true;
+                    }).fail(function(error){
+                        alert("网络错误！");
+
+                        return false;
+                    });
+                },
+                changeIdentity: function (item) {
+                    this.identity.change.label = item;
+                    this.identity.change.cache = item.label;
+                },
+                cancelIdentity: function (item) {
+                    this.identity.change.label = null;
+                    this.identity.change.cache = '';
+                },
+                updateIdentity: function (item) {
+                    var _this = this;
+                    var url = "{{ url('admin/role-update') }}";
+                    if (_this.identity.change.cache.trim() == _this.identity.change.label.label){
+                        _this.identity.change.label = null;
+                        _this.identity.change.cahce = '';
+                        return true;
+                    }
+                    if (!_this.identity.change.cache.trim()){
+                        alert("请勿输入空值！");
+                        return false
+                    }
+
+                    $.ajax({
+                        url:url,
+                        dataType:'json',
+                        headers:{
+                            'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content'),
+                        },
+                        data: {
+                            label: _this.identity.change.cache.trim(),
+                            id: _this.identity.change.label.id
+                        },
+                        timeout:60000,
+                        type:'POST'
+                    }).done(function(data){
+                        item.label = _this.identity.change.cache.trim();
+                        _this.identity.change.label = null;
+                        _this.identity.change.cahce = '';
+
+                        return true;
+                    }).fail(function(error){
+                        var err = error.responseJSON;
+                        if (err.hasOwnProperty('invalid')){
+                            alert(err.invalid);
+
+                            return false;
+                        }
+                        if (err.hasOwnProperty('id')){
+                            alert(err.id[0]);
+
+                            return false;
+                        }
+                        if (err.hasOwnProperty('label')){
+                            alert(err.label[0]);
+
+                            return false;
+                        }
+                        alert("网络错误！");
+
+                        return false;
                     });
                 }
             },
