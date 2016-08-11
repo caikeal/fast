@@ -76,6 +76,11 @@ Route::group(['namespace'=>'Admin','middleware' => ['web'],'prefix'=>'admin'], f
     Route::get('/user-before-times', 'StatisticsController@userLastTimes');
     Route::get('/data-now-times', 'StatisticsController@nowVisitTimes');
     Route::get('/user-now-times', 'StatisticsController@nowUserTimes');
+    //角色分配模块
+    Route::get('/affiliation', 'RoleController@getAffiliation');
+    Route::get('/role-list', 'RoleController@showRoles');
+    Route::post('/role-create', 'RoleController@addRoles');
+    Route::post('/role-update', 'RoleController@updateRoles');
 });
 
 Route::group(['middleware' => 'web'], function () {
