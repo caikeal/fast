@@ -24,6 +24,7 @@ class CreateRolesTable extends Migration
             $table->increments('id');
             $table->string('name');//权限名
             $table->string('label')->nullable();//具体权限名
+            $table->integer('category')->nullable()->comment("1:任务，2:人员，3:系统，4:薪资，5:理赔，6:数据分析");//权限类别
             $table->timestamps();
         });
         Schema::create('permission_role', function (Blueprint $table) {
