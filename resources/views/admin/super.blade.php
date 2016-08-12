@@ -1185,6 +1185,36 @@
                             msg: ''
                         }
                     };
+                    if (!_this.identity.name.trim()) {
+                        _this.identityError.name.isInvalid = 1;
+                        _this.identityError.name.msg = '请填写！';
+
+                        return false;
+                    }
+                    if (!_this.identity.label.trim()) {
+                        _this.identityError.label.isInvalid = 1;
+                        _this.identityError.label.msg = '请填写！';
+
+                        return false;
+                    }
+                    if (!/^(salary|compensate|welfare|system){1}[A-Z]([a-z])+/.test(_this.identity.name.trim())) {
+                        _this.identityError.name.isInvalid = 1;
+                        _this.identityError.name.msg = '必须以\'salary,compensate,welfare,system\'中任意1个开头，后面跟有意义的单词，并且首字母大写';
+
+                        return false;
+                    }
+                    if (!_this.identity.level) {
+                        _this.identityError.level.isInvalid = 1;
+                        _this.identityError.level.msg = '请选择！';
+
+                        return fasle;
+                    }
+                    if (!_this.identity.relate) {
+                        _this.identityError.relate.isInvalid = 1;
+                        _this.identityError.relate.msg = '请选择！';
+
+                        return fasle;
+                    }
                     $.ajax({
                         url:url,
                         dataType:'json',
@@ -1192,8 +1222,8 @@
                             'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content'),
                         },
                         data: {
-                            'name': _this.identity.name,
-                            'label': _this.identity.label,
+                            'name': _this.identity.name.trim(),
+                            'label': _this.identity.label.trim(),
                             'level': _this.identity.level,
                             'relate': _this.identity.relate,
                         },
