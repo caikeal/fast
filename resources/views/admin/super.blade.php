@@ -125,6 +125,19 @@
             border-top: none;
         }
 
+        .form-horizontal .form-group.permission-group{
+            border: 1px solid #ccc;
+            background-color: #fff;
+            margin-left: 0;
+            margin-right: 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .form-horizontal .form-group.permission-group .col-xs-10{
+            border-left: 1px solid #e2e2e2;
+        }
+
         [v-cloak] {
             display: none;
         }
@@ -169,7 +182,7 @@
                 <i class="fa fa-bolt fa-sm poster-btn btn-member"></i>
                 <strong>身份管理</strong>
             </a>
-            <a id="roleManage" class="btn btn-link member-btn" data-toggle="modal" data-target="#create-manager">
+            <a id="roleManage" class="btn btn-link member-btn" data-toggle="modal" @click.prevent="startPermission">
                 <i class="fa fa-lock fa-sm poster-btn btn-add-account"></i>
                 <strong>权限管理</strong>
             </a>
@@ -521,6 +534,225 @@
         </div>
         <!-- /modal identityManage -->
 
+        <!-- modal assignmentManage-->
+        <div class="modal fade" id="assignment-manage" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">权限管理</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <form action="" class="form-horizontal">
+                                <div class="form-group" :class="{'has-error':permissionError.role.isInvalid}">
+                                    <label for="name" class="col-xs-2 control-label lable-xs-center">帐号类别:</label>
+
+                                    <div class="col-xs-10">
+                                        <select class="form-control" name="relate" v-model="permission.role" @change="choosePermission">
+                                            <option :value="roleItem.id" v-for="roleItem in permission.roles">@{{ roleItem.label }}</option>
+                                        </select>
+                                    </div>
+
+                                    <p class="help-block col-xs-offset-2 col-xs-10" :style="{'display':permissionError.role.isInvalid?'block':'none'}">@{{ permissionError.role.msg }}</p>
+                                </div>
+
+                                <div class="form-group" :class="{'has-error':permissionError.level.isInvalid}">
+                                    <label for="name" class="col-xs-2 control-label lable-xs-center">所属等级:</label>
+
+                                    <div class="col-xs-10">
+                                        <input type="text" class="form-control" readonly :value="permission.level">
+                                    </div>
+
+                                    <p class="help-block col-xs-offset-2 col-xs-10" :style="{'display':permissionError.level.isInvalid?'block':'none'}">@{{ permissionError.level.msg }}</p>
+                                </div>
+
+                                <section class="permission-list">
+                                    <div class="form-group permission-group" :class="{'has-error': permissionError.task.isInvalid}">
+                                        <div class="col-xs-2">
+                                            <div class="checkbox inline-block">
+                                                <div class="custom-checkbox">
+                                                    <input type="checkbox" id="task-permission" class="checkbox-blue" value=1
+                                                            v-model="permission.task.choose" @click="togglePermission(permission.task)">
+                                                    <label for="task-permission"></label>
+                                                </div>
+                                                <div class="inline-block vertical-top">
+                                                    任务
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-10">
+                                            <div class="checkbox inline-block" v-for="op in permission.task.option">
+                                                <div class="custom-checkbox">
+                                                    <input type="checkbox" id="task-permission-@{{ op.id }}" class="checkbox-blue" :value="op.id"
+                                                                v-model="permission.task.sub">
+                                                    <label for="task-permission-@{{ op.id }}"></label>
+                                                </div>
+                                                <div class="inline-block vertical-top">
+                                                    @{{ op.label }}
+                                                </div>
+                                                &nbsp;&nbsp;&nbsp;
+                                            </div>
+                                        </div>
+                                        <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display': permissionError.task.isInvalid?'block':'none'}">@{{ permissionError.task.msg }}</p>
+                                    </div>
+                                    <div class="form-group permission-group" :class="{'has-error': permissionError.person.isInvalid}">
+                                        <div class="col-xs-2">
+                                            <div class="checkbox inline-block">
+                                                <div class="custom-checkbox">
+                                                    <input type="checkbox" id="person-permission" class="checkbox-blue" value=1
+                                                            v-model="permission.person.choose" @click="togglePermission(permission.person)">
+                                                    <label for="person-permission"></label>
+                                                </div>
+                                                <div class="inline-block vertical-top">
+                                                    人员
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-10">
+                                            <div class="checkbox inline-block" v-for="op1 in permission.person.option">
+                                                <div class="custom-checkbox">
+                                                    <input type="checkbox" id="person-permission-@{{ op1.id }}" class="checkbox-blue" :value="op1.id"
+                                                                v-model="permission.person.sub">
+                                                    <label for="person-permission-@{{ op1.id }}"></label>
+                                                </div>
+                                                <div class="inline-block vertical-top">
+                                                    @{{ op1.label }}
+                                                </div>&nbsp;&nbsp;&nbsp;
+                                            </div>
+                                        </div>
+                                        <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display': permissionError.person.isInvalid?'block':'none'}">@{{ permissionError.person.msg }}</p>
+                                    </div>
+                                    <div class="form-group permission-group" :class="{'has-error': permissionError.system.isInvalid}">
+                                        <div class="col-xs-2">
+                                            <div class="checkbox inline-block">
+                                                <div class="custom-checkbox">
+                                                    <input type="checkbox" id="system-permission" class="checkbox-blue" value=1
+                                                           v-model="permission.system.choose" @click="togglePermission(permission.system)">
+                                                    <label for="system-permission"></label>
+                                                </div>
+                                                <div class="inline-block vertical-top">
+                                                    系统
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-10">
+                                            <div class="checkbox inline-block" v-for="op2 in permission.system.option">
+                                                <div class="custom-checkbox">
+                                                    <input type="checkbox" id="system-permission-@{{ op2.id }}" class="checkbox-blue" :value="op2.id"
+                                                           v-model="permission.system.sub">
+                                                    <label for="system-permission-@{{ op2.id }}"></label>
+                                                </div>
+                                                <div class="inline-block vertical-top">
+                                                    @{{ op2.label }}
+                                                </div>
+                                                &nbsp;&nbsp;&nbsp;
+                                            </div>
+                                        </div>
+                                        <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display': permissionError.system.isInvalid?'block':'none'}">@{{ permissionError.system.msg }}</p>
+                                    </div>
+                                    <div class="form-group permission-group" :class="{'has-error': permissionError.salary.isInvalid}">
+                                        <div class="col-xs-2">
+                                            <div class="checkbox inline-block">
+                                                <div class="custom-checkbox">
+                                                    <input type="checkbox" id="salary-permission" class="checkbox-blue" value=1
+                                                           v-model="permission.salary.choose" @click="togglePermission(permission.salary)">
+                                                    <label for="salary-permission"></label>
+                                                </div>
+                                                <div class="inline-block vertical-top">
+                                                    薪资
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-10">
+                                            <div class="checkbox inline-block" v-for="op3 in permission.salary.option">
+                                                <div class="custom-checkbox">
+                                                    <input type="checkbox" id="salary-permission-@{{ op3.id }}" class="checkbox-blue" :value="op3.id"
+                                                           v-model="permission.salary.sub">
+                                                    <label for="salary-permission-@{{ op3.id }}"></label>
+                                                </div>
+                                                <div class="inline-block vertical-top">
+                                                    @{{ op3.label }}
+                                                </div>
+                                                &nbsp;&nbsp;&nbsp;
+                                            </div>
+                                        </div>
+                                        <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display': permissionError.salary.isInvalid?'block':'none'}">@{{ permissionError.salary.msg }}</p>
+                                    </div>
+                                    <div class="form-group permission-group" :class="{'has-error': permissionError.compensation.isInvalid}">
+                                        <div class="col-xs-2">
+                                            <div class="checkbox inline-block">
+                                                <div class="custom-checkbox">
+                                                    <input type="checkbox" id="compensation-permission" class="checkbox-blue" value=1
+                                                           v-model="permission.compensation.choose" @click="togglePermission(permission.compensation)">
+                                                    <label for="compensation-permission"></label>
+                                                </div>
+                                                <div class="inline-block vertical-top">
+                                                    理赔
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-10">
+                                            <div class="checkbox inline-block" v-for="op4 in permission.compensation.option">
+                                                <div class="custom-checkbox">
+                                                    <input type="checkbox" id="compensation-permission-@{{ op4.id }}" class="checkbox-blue" :value="op4.id"
+                                                           v-model="permission.compensation.sub">
+                                                    <label for="compensation-permission-@{{ op4.id }}"></label>
+                                                </div>
+                                                <div class="inline-block vertical-top">
+                                                    @{{ op4.label }}
+                                                </div>
+                                                &nbsp;&nbsp;&nbsp;
+                                            </div>
+                                        </div>
+                                        <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display': permissionError.compensation.isInvalid?'block':'none'}">@{{ permissionError.compensation.msg }}</p>
+                                    </div>
+                                    <div class="form-group permission-group" :class="{'has-error': permissionError.statistics.isInvalid}">
+                                    <div class="col-xs-2">
+                                        <div class="checkbox inline-block">
+                                            <div class="custom-checkbox">
+                                                <input type="checkbox" id="statistics-permission" class="checkbox-blue" value=1
+                                                       v-model="permission.statistics.choose" @click="togglePermission(permission.statistics)">
+                                                <label for="statistics-permission"></label>
+                                            </div>
+                                            <div class="inline-block vertical-top">
+                                                分析
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-10">
+                                        <div class="checkbox inline-block" v-for="op5 in permission.statistics.option">
+                                            <div class="custom-checkbox">
+                                                <input type="checkbox" id="statistics-permission-@{{ op5.id }}" class="checkbox-blue" :value="op5.id"
+                                                       v-model="permission.statistics.sub">
+                                                <label for="statistics-permission-@{{ op5.id }}"></label>
+                                            </div>
+                                            <div class="inline-block vertical-top">
+                                                @{{ op5.label }}
+                                            </div>
+                                            &nbsp;&nbsp;&nbsp;
+                                        </div>
+                                    </div>
+                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display': permissionError.statistics.isInvalid?'block':'none'}">@{{ permissionError.statistics.msg }}</p>
+                                </div>
+                                </section>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="row">
+                            <div class="col-sm-offset-2 col-sm-8">
+                                <a class="btn btn-primary block m-top-md" @click.prevent="updatePermission">保存</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /modal assignmentManage-->
+
         <!-- modal restPassword-->
         <div class="modal fade" id="reset-password" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
             <div class="modal-dialog" role="document">
@@ -744,7 +976,170 @@
                         isInvalid: 0,
                         msg: ''
                     }
+                },
+                permission: {
+                    roles: [],
+                    role: null,
+                    level: null,
+                    task: {
+                        choose: false,
+                        option: [
+                            {
+                                id: 1,
+                                label: '查看任务'
+                            },
+                            {
+                                id: 2,
+                                label: '新增企业'
+                            },
+                            {
+                                id: 3,
+                                label: '新增任务'
+                            },
+                            {
+                                id: 4,
+                                label: '编辑任务'
+                            },
+                            {
+                                id: 10,
+                                label: '删除任务'
+                            }
+                        ],
+                        sub: []
+                    },
+                    person: {
+                        choose: false,
+                        option: [
+                            {
+                                id: 5,
+                                label: '人员管理'
+                            },
+                            {
+                                id: 6,
+                                label: '创建账号'
+                            }
+                        ],
+                        sub: []
+                    },
+                    system: {
+                        choose: false,
+                        option: [
+                            {
+                                id: 7,
+                                label: '系统管理'
+                            }
+                        ],
+                        sub: []
+                    },
+                    salary: {
+                        choose: false,
+                        option: [
+                            {
+                                id: 8,
+                                label: '薪资管理'
+                            }
+                        ],
+                        sub: []
+                    },
+                    compensation: {
+                        choose: false,
+                        option: [
+                            {
+                                id: 9,
+                                label: '理赔管理'
+                            }
+                        ],
+                        sub: []
+                    },
+                    statistics: {
+                        choose: false,
+                        option: [
+                            {
+                                id: 11,
+                                label: '数据分析'
+                            }
+                        ],
+                        sub: []
+                    }
+                },
+                permissionError: {
+                    role: {
+                        isInvalid: 0,
+                        msg: ''
+                    },
+                    level: {
+                        isInvalid: 0,
+                        msg: ''
+                    },
+                    task: {
+                        isInvalid: 0,
+                        msg: ''
+                    },
+                    person: {
+                        isInvalid: 0,
+                        msg: ''
+                    },
+                    system: {
+                        isInvalid: 0,
+                        msg: ''
+                    },
+                    salary: {
+                        isInvalid: 0,
+                        msg: ''
+                    },
+                    compensation: {
+                        isInvalid: 0,
+                        msg: ''
+                    },
+                    statistics: {
+                        isInvalid: 0,
+                        msg: ''
+                    }
                 }
+            },
+            watch: {
+                'permission.task.sub': function (newVal, oldVal) {
+                    if (newVal.length == 0) {
+                        this.permission.task.choose = false;
+                    }else{
+                        this.permission.task.choose = true;
+                    }
+                },
+                'permission.person.sub': function (newVal, oldVal) {
+                    if (newVal.length == 0) {
+                        this.permission.person.choose = false;
+                    }else{
+                        this.permission.person.choose = true;
+                    }
+                },
+                'permission.system.sub': function (newVal, oldVal) {
+                    if (newVal.length == 0) {
+                        this.permission.system.choose = false;
+                    }else{
+                        this.permission.system.choose = true;
+                    }
+                },
+                'permission.salary.sub': function (newVal, oldVal) {
+                    if (newVal.length == 0) {
+                        this.permission.salary.choose = false;
+                    }else{
+                        this.permission.salary.choose = true;
+                    }
+                },
+                'permission.compensation.sub': function (newVal, oldVal) {
+                    if (newVal.length == 0) {
+                        this.permission.compensation.choose = false;
+                    }else{
+                        this.permission.compensation.choose = true;
+                    }
+                },
+                'permission.statistics.sub': function (newVal, oldVal) {
+                    if (newVal.length == 0) {
+                        this.permission.statistics.choose = false;
+                    }else{
+                        this.permission.statistics.choose = true;
+                    }
+                },
             },
             ready: function () {
                 var _this = this;
@@ -1361,6 +1756,210 @@
 
                         return false;
                     });
+                },
+                startPermission: function () {
+                    var _this = this;
+                    var url = "{{ url('admin/permission-list') }}";
+                    $.ajax({
+                        url:url,
+                        dataType:'json',
+                        headers:{
+                            'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content'),
+                        },
+                        timeout:60000,
+                        type:'GET'
+                    }).done(function(data){
+                        _this.permission.roles = data.data.roles;
+                        $("#assignment-manage").modal('show');
+                        return true;
+                    }).fail(function(error){
+                        var err = error.responseJSON;
+                        if (err.hasOwnProperty('invalid')){
+                            alert(err.invalid);
+
+                            return false;
+                        }
+                        alert("网络错误！");
+
+                        return false;
+                    });
+                },
+                choosePermission: function () {
+                    var _this = this;
+                    var url = "{{ url('admin/permission-own') }}";
+                    _this.permission.task.choose = false;
+                    _this.permission.task.sub = [];
+                    _this.permission.person.choose = false;
+                    _this.permission.person.sub = [];
+                    _this.permission.system.choose = false;
+                    _this.permission.system.sub = [];
+                    _this.permission.salary.choose = false;
+                    _this.permission.salary.sub = [];
+                    _this.permission.compensation.choose = false;
+                    _this.permission.compensation.sub = [];
+                    _this.permission.statistics.choose = false;
+                    _this.permission.statistics.sub = [];
+                    $.ajax({
+                        url:url,
+                        dataType:'json',
+                        headers:{
+                            'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content'),
+                        },
+                        data: {
+                            id: _this.permission.role
+                        },
+                        timeout:60000,
+                        type:'GET'
+                    }).done(function(data){
+                        if (data.data.permission_choose.hasOwnProperty('task')){
+                            _this.permission.task.sub = data.data.permission_choose.task;
+                        }
+                        if (data.data.permission_choose.hasOwnProperty('person')){
+                            _this.permission.person.sub = data.data.permission_choose.person;
+                        }
+                        if (data.data.permission_choose.hasOwnProperty('system')){
+                            _this.permission.system.sub = data.data.permission_choose.system;
+                        }
+                        if (data.data.permission_choose.hasOwnProperty('salary')){
+                            _this.permission.salary.sub = data.data.permission_choose.salary;
+                        }
+                        if (data.data.permission_choose.hasOwnProperty('compensation')){
+                            _this.permission.compensation.sub = data.data.permission_choose.compensation;
+                        }
+                        if (data.data.permission_choose.hasOwnProperty('statistics')){
+                            _this.permission.statistics.sub = data.data.permission_choose.statistics;
+                        }
+                        _this.permission.level = data.data.level;
+
+                        return true;
+                    }).fail(function(error){
+                        var err = error.responseJSON;
+                        if (err.hasOwnProperty('invalid')){
+                            alert(err.invalid);
+
+                            return false;
+                        }
+                        if (err.hasOwnProperty('id')){
+                            alert(err.id[0]);
+
+                            return false;
+                        }
+                        if (err.hasOwnProperty('level')){
+                            alert(err.level[0]);
+
+                            return false;
+                        }
+                        alert("网络错误！");
+
+                        return false;
+                    });
+                },
+                updatePermission: function () {
+                    var _this = this;
+                    var url = "{{ url('admin/permission-update') }}";
+                    _this.permissionError = {
+                        role: {
+                            isInvalid: 0,
+                            msg: ''
+                        },
+                        level: {
+                            isInvalid: 0,
+                            msg: ''
+                        },
+                        task: {
+                            isInvalid: 0,
+                            msg: ''
+                        },
+                        person: {
+                            isInvalid: 0,
+                            msg: ''
+                        },
+                        system: {
+                            isInvalid: 0,
+                            msg: ''
+                        },
+                        salary: {
+                            isInvalid: 0,
+                            msg: ''
+                        },
+                        compensation: {
+                            isInvalid: 0,
+                            msg: ''
+                        },
+                        statistics: {
+                            isInvalid: 0,
+                            msg: ''
+                        }
+                    };
+                    if (!_this.permission.role) {
+                        _this.permissionError.role.isInvalid = 1;
+                        _this.permissionError.role.msg = '必填！';
+
+                        return false;
+                    }
+                    var permissions = [];
+                    permissions = permissions.concat(
+                            _this.permission.task.sub, _this.permission.person.sub,
+                            _this.permission.system.sub, _this.permission.salary.sub,
+                            _this.permission.compensation.sub, _this.permission.statistics.sub
+                    );
+                    $.ajax({
+                        url:url,
+                        dataType:'json',
+                        headers:{
+                            'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content'),
+                        },
+                        data: {
+                            id: _this.permission.role,
+                            permissions: permissions
+                        },
+                        timeout:60000,
+                        type:'POST'
+                    }).done(function(data){
+                        if (data.message=='success'){
+                            alert('保存成功!');
+                        }else{
+                            alert('保存失败!');
+                        }
+
+                        return true;
+                    }).fail(function(error){
+                        var err = error.responseJSON;
+                        if (err.hasOwnProperty('invalid')){
+                            alert(err.invalid);
+
+                            return false;
+                        }
+                        if (err.hasOwnProperty('id')){
+                            alert(err.id[0]);
+
+                            return false;
+                        }
+                        if (err.hasOwnProperty('level')){
+                            alert(err.level[0]);
+
+                            return false;
+                        }
+                        if (err.hasOwnProperty('permissions')){
+                            alert(err.permissions[0]);
+
+                            return false;
+                        }
+                        alert("网络错误！");
+
+                        return false;
+                    });
+                },
+                togglePermission: function (val) {
+                    if (val.choose){
+                        val.sub = [];
+                    }else {
+                        var options = [];
+                        options = val.option.map(function (item) {
+                            return item['id'];
+                        });
+                        val.sub = options;
+                    }
                 }
             },
             events:{

@@ -130,10 +130,15 @@
                     trigger: 'axis'
                 },
                 legend: {
+                    icon: 'roundRect',
                     data:[]
                 },
                 toolbox: {
                     feature: {
+                        magicType: {
+                            type: ['line', 'bar']
+                        },
+                        restore: {},
                         saveAsImage: {}
                     }
                 },
@@ -168,8 +173,7 @@
                         return finalVisits = {
                             name: val.name,
                             type:'line',
-                            stack: '总量',
-                            areaStyle: {normal: {}},
+                            smooth:true,
                             data: val.data
                         };
                     });
@@ -181,6 +185,11 @@
                         boundaryGap : false,
                         data: data.months
                     },
+                    dataZoom: [{
+                        startValue: 0
+                    }, {
+                        type: 'inside'
+                    }],
                     legend: {
                         data: data.legend
                     },
@@ -201,10 +210,15 @@
                     trigger: 'axis'
                 },
                 legend: {
+                    icon: 'roundRect',
                     data:[]
                 },
                 toolbox: {
                     feature: {
+                        magicType: {
+                            type: ['line', 'bar']
+                        },
+                        restore: {},
                         saveAsImage: {}
                     }
                 },
@@ -239,8 +253,7 @@
                         return finalVisits = {
                             name: val.name,
                             type:'line',
-                            stack: '总量',
-                            areaStyle: {normal: {}},
+                            smooth:true,
                             data: val.data
                         };
                     });
@@ -252,6 +265,11 @@
                         boundaryGap : false,
                         data: data.months
                     },
+                    dataZoom: [{
+                        startValue: 0
+                    }, {
+                        type: 'inside'
+                    }],
                     legend: {
                         data: data.legend
                     },
@@ -272,10 +290,15 @@
                     trigger: 'axis'
                 },
                 legend: {
+                    icon: 'roundRect',
                     data:[]
                 },
                 toolbox: {
                     feature: {
+                        magicType: {
+                            type: ['line', 'bar']
+                        },
+                        restore: {},
                         saveAsImage: {}
                     }
                 },
@@ -310,8 +333,7 @@
                         return finalVisits = {
                             name: val.name,
                             type:'line',
-                            stack: '总量',
-                            areaStyle: {normal: {}},
+                            smooth:true,
                             data: val.data
                         };
                     });
@@ -323,6 +345,11 @@
                         boundaryGap : false,
                         data: data.days
                     },
+                    dataZoom: [{
+                        startValue: 0
+                    }, {
+                        type: 'inside'
+                    }],
                     legend: {
                         data: data.legend
                     },
@@ -343,10 +370,15 @@
                     trigger: 'axis'
                 },
                 legend: {
+                    icon: 'roundRect',
                     data:[]
                 },
                 toolbox: {
                     feature: {
+                        magicType: {
+                            type: ['line', 'bar']
+                        },
+                        restore: {},
                         saveAsImage: {}
                     }
                 },
@@ -381,8 +413,7 @@
                         return finalVisits = {
                             name: val.name,
                             type:'line',
-                            stack: '总量',
-                            areaStyle: {normal: {}},
+                            smooth:true,
                             data: val.data
                         };
                     });
@@ -394,6 +425,11 @@
                         boundaryGap : false,
                         data: data.days
                     },
+                    dataZoom: [{
+                        startValue: 0
+                    }, {
+                        type: 'inside'
+                    }],
                     legend: {
                         data: data.legend
                     },

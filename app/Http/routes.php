@@ -81,6 +81,9 @@ Route::group(['namespace'=>'Admin','middleware' => ['web'],'prefix'=>'admin'], f
     Route::get('/role-list', 'RoleController@showRoles');
     Route::post('/role-create', 'RoleController@addRoles');
     Route::post('/role-update', 'RoleController@updateRoles');
+    Route::get('/permission-list', 'RoleController@allPermission');
+    Route::get('/permission-own', 'RoleController@getPermission');
+    Route::post('/permission-update', 'RoleController@updatePermission');
 });
 
 Route::group(['middleware' => 'web'], function () {
