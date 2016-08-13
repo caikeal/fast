@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Permission;
+use App\PermissionRole;
 use App\Role;
 use Illuminate\Http\Request;
 
@@ -123,5 +125,117 @@ class RoleController extends Controller
         $roles->update();
 
         return ["msg" => "success"];
+    }
+
+    /**
+     * 获取全部角色类型.
+     *
+     * @return array|\Symfony\Component\HttpFoundation\Response
+     */
+    public function allPermission()
+    {
+        //判断是否到达相应的权限
+        if(\Gate::foruser(\Auth::guard('admin')->user())->denies('super')){
+            return \Response::json(['invalid'=>'您无权访问！'])->setStatusCode(403);
+        }
+
+        //获取角色
+        $roles = Role::where('id', '!=', 1)->get(['id','label']);
+
+        return ['data' => ['roles'=>$roles]];
+    }
+
+    /**
+     * 获取对应权限和等级.
+     *
+     * @param Requests\Admin\PermissionListRequest $request
+     * @return array|\Symfony\Component\HttpFoundation\Response
+     */
+    public function getPermission(Requests\Admin\PermissionListRequest $request)
+    {
+        //判断是否到达相应的权限
+        if(\Gate::foruser(\Auth::guard('admin')->user())->denies('super')){
+            return \Response::json(['invalid'=>'您无权访问！'])->setStatusCode(403);
+        }
+
+        $id = $request->input('id');
+        $role = Role::where('id', '!=', 1)->find($id);
+        if (!$role){
+            return \Response::json(['level'=>['等级不存在！']])->setStatusCode(422);
+        }
+
+        $permissions = $role->permissions()->get();
+        $result = [];
+        foreach ($permissions as $k=>$v){
+            switch ($v['category']){
+                case 1:
+                    $result['task'][] = $v['id'];
+                    break;
+                case 2:
+                    $result['person'][] = $v['id'];
+                    break;
+                case 3:
+                    $result['system'][] = $v['id'];
+                    break;
+                case 4:
+                    $result['salary'][] = $v['id'];
+                    break;
+                case 5:
+                    $result['compensation'][] = $v['id'];
+                    break;
+                case 6:
+                    $result['statistics'][] = $v['id'];
+                    break;
+            }
+        }
+
+        return ['data' => ['permission_choose' => $result, 'level'=>$role['level']]];
+    }
+
+    /**
+     * 更新角色权限.
+     *
+     * @param Requests\Admin\PermissionUpdateRequest $request
+     * @return array|\Symfony\Component\HttpFoundation\Response
+     */
+    public function updatePermission(Requests\Admin\PermissionUpdateRequest $request)
+    {
+        //判断是否到达相应的权限
+        if(\Gate::foruser(\Auth::guard('admin')->user())->denies('super')){
+            return \Response::json(['invalid'=>'您无权访问！'])->setStatusCode(403);
+        }
+
+        $roleId = $request->input('id');
+        $permissions = $request->input('permissions');
+
+        //检查角色是否存在
+        $role = Role::find($roleId);
+        if (!$role){
+            return \Response::json(['id' => ['该角色不存在！']])->setStatusCode(400);
+        }
+
+        //检查权限是否存在
+        $permissions = Permission::whereIn('id', $permissions)->get();
+        if ($permissions->count() != count($permissions)){
+            return \Response::json(['permissions' => ['权限不存在！']])->setStatusCode(400);
+        }
+
+        //检查与原权限是否变动
+        $originPermission = Role::where('id', $roleId)->first()->permissions()->get();
+        $increase = $permissions->diff($originPermission);
+        $decrease = $originPermission->diff($permissions);
+        if (count($decrease)==0 && count($increase)==0){
+            return \Response::json(['permissions' => ['没有变动，无需保存！']])->setStatusCode(400);
+        }
+
+        //对比权限，分出增加和减少项
+        if (count($decrease)!=0){
+            $role->deletePermission($decrease);
+        }
+        if (count($increase)!=0){
+            $role->givePermission($increase);
+        }
+
+        return ['message' => 'success'];
     }
 }
