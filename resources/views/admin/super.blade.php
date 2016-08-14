@@ -220,6 +220,7 @@
                         <th>权限</th>
                         <th>操作1</th>
                         <th>操作2</th>
+                        <th>操作3</th>
                     </tr>
                     </thead>
                     <tbody id="tbody">
@@ -239,6 +240,7 @@
                             <td>
                                 <toggle-manager :manager-id="manager.id" :manager-status='manager.deleted_at?"启用":"停用"'></toggle-manager>
                             </td>
+                            <td>编辑</td>
                         </tr>
                         <!--new add managers end-->
 
@@ -258,6 +260,7 @@
                             <td>
                                 <toggle-manager :manager-id="manager.id" :manager-status='manager.deleted_at?"启用":"停用"'></toggle-manager>
                             </td>
+                            <td>编辑</td>
                         </tr>
                         <!--managerList-->
                     </tbody>
@@ -452,7 +455,9 @@
                                 </div>
 
                                 <div class="form-group" :class="{'has-error': identityError.level.isInvalid}">
-                                    <div class="col-lg-offset-2 col-lg-10">
+                                    <label class="col-lg-2 control-label lable-xs-center">权限等级:</label>
+
+                                    <div class="col-lg-10">
                                         <div class="radio inline-block">
                                             <div class="custom-radio m-right-xs">
                                                 <input type="radio" id="inlineRadio1" name="inlineRadio" value="1" v-model="identity.level" @change="getAffiliation">
@@ -872,7 +877,7 @@
                     }).done(function (data) {
                         if(data.ret_num==0){
                             _this.managerStatus=data.ret_msg;
-                            alert("修改成功！");
+                            alert("修改成功！请您确保其上下属隶属关系正确！");
                         }else{
                             alert("修改失败！");
                         }
