@@ -138,6 +138,10 @@
             border-left: 1px solid #e2e2e2;
         }
 
+        .remind{
+            color: #df4c43;
+        }
+
         [v-cloak] {
             display: none;
         }
@@ -240,7 +244,9 @@
                             <td>
                                 <toggle-manager :manager-id="manager.id" :manager-status='manager.deleted_at?"启用":"停用"'></toggle-manager>
                             </td>
-                            <td>编辑</td>
+                            <td>
+                                <role-manage-btn :list="manager"></role-manage-btn>
+                            </td>
                         </tr>
                         <!--new add managers end-->
 
@@ -260,7 +266,9 @@
                             <td>
                                 <toggle-manager :manager-id="manager.id" :manager-status='manager.deleted_at?"启用":"停用"'></toggle-manager>
                             </td>
-                            <td>编辑</td>
+                            <td>
+                                <role-manage-btn :list="manager"></role-manage-btn>
+                            </td>
                         </tr>
                         <!--managerList-->
                     </tbody>
@@ -806,12 +814,128 @@
         </div>
         <!-- /modal restPassword-->
 
+        <!-- modal roleManage-->
+        <div class="modal fade" id="role-manage" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">权限编辑</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <!-- 权限编辑 -->
+                            <form action="" class="form-horizontal">
+                                <div class="form-group" :class="{'has-error':managerAccountError.name.isInvalid}">
+                                    <label class="col-lg-2 control-label lable-xs-center">姓名:</label>
+
+                                    <div class=" col-lg-10">
+                                        <input type="text" class="form-control" name="label" placeholder="姓名"
+                                               autocomplete="off" v-model="managerAccount.name.current">
+                                    </div>
+
+                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display':managerAccountError.name.isInvalid?'block':'none'}">@{{ managerAccountError.name.msg }}</p>
+                                </div>
+
+                                <div class="form-group" :class="{'has-error': managerAccountError.account.isInvalid}">
+                                    <label class="col-lg-2 control-label lable-xs-center">帐号:</label>
+
+                                    <div class=" col-lg-10">
+                                        <input type="text" class="form-control" name="account"
+                                               placeholder="帐号" autocomplete="off" v-model="managerAccount.account.current">
+                                    </div>
+
+                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display': managerAccountError.account.isInvalid?'block':'none'}">@{{ managerAccountError.account.msg }}</p>
+                                </div>
+
+                                <div class="form-group" :class="{'has-error': managerAccountError.level.isInvalid}">
+                                    <label class="col-lg-2 control-label lable-xs-center">权限等级:</label>
+
+                                    <div class="col-lg-10">
+                                        <div class="radio inline-block">
+                                            <div class="custom-radio m-right-xs">
+                                                <input type="radio" id="radio-account-1" name="radio-account-1" :value=1 v-model="managerAccount.level" @change="getRoles">
+                                                <label for="radio-account-1"></label>
+                                            </div>
+                                            <div class="inline-block vertical-top">1级管理员</div>
+                                        </div>
+                                        <div class="radio inline-block">
+                                            <div class="custom-radio m-right-xs">
+                                                <input type="radio" id="radio-account-2" name="radio-account-2" :value=2 v-model="managerAccount.level" @change="getRoles">
+                                                <label for="radio-account-2"></label>
+                                            </div>
+                                            <div class="inline-block vertical-top">2级管理员</div>
+                                        </div>
+                                        <div class="radio inline-block">
+                                            <div class="custom-radio m-right-xs">
+                                                <input type="radio" id="radio-account-3" name="radio-account-3" :value=3 v-model="managerAccount.level" @change="getRoles">
+                                                <label for="radio-account-3"></label>
+                                            </div>
+                                            <div class="inline-block vertical-top">3级管理员</div>
+                                        </div>
+                                    </div>
+                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display': managerAccountError.level.isInvalid?'block':'none'}">@{{ managerAccountError.level.msg }}</p>
+                                </div>
+
+                                <div class="form-group" :class="{'has-error': managerAccountError.role.isInvalid}">
+                                    <label for="role" class="col-lg-2 control-label lable-xs-center">职位:</label>
+                                    <div class="col-lg-10">
+                                        <select class="form-control" name="role" v-model="managerAccount.role.current" @change="getRelations">
+                                            <option :value="roleItem.id" v-for="roleItem in managerAccount.roleOptions">@{{ roleItem.label }}</option>
+                                        </select>
+                                    </div>
+                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display': managerAccountError.role.isInvalid?'block':'none'}">@{{ managerAccountError.role.msg }}</p>
+                                </div>
+
+                                <div class="form-group" :class="{'has-error': managerAccountError.superior.isInvalid}">
+                                    <label for="superior" class="col-lg-2 control-label lable-xs-center">隶属上级:</label>
+                                    <div class="col-lg-10">
+                                        <select class="form-control" name="superior" v-model="managerAccount.superior.current">
+                                            <option :value="sup.id" v-for="sup in managerAccount.superiorOptions">@{{ sup.name }}</option>
+                                        </select>
+                                    </div>
+                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display': managerAccountError.superior.isInvalid?'block':'none'}">@{{ managerAccountError.superior.msg }}</p>
+                                </div>
+
+                                <div class="form-group" :class="{'has-error': managerAccountError.equal.isInvalid}">
+                                    <label for="equal" class="col-lg-2 control-label lable-xs-center">下级隶属:</label>
+                                    <div class="col-lg-10">
+                                        <select class="form-control" name="equal" v-model="managerAccount.equal.current">
+                                            <option :value="equal.id" v-for="equal in managerAccount.equalOptions">@{{ equal.name }}</option>
+                                        </select>
+                                    </div>
+                                    <p class="help-block col-lg-offset-2 col-lg-10" :style="{'display': managerAccountError.equal.isInvalid?'block':'none'}">@{{ managerAccountError.equal.msg }}</p>
+                                </div>
+
+                            </form>
+                            <!-- /权限编辑 -->
+                            <div class="remind">请谨慎修改！确保<b>上下级关系</b>在<b>升职</b>或者<b>降职</b>时<b>转移</b>正确</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="row">
+                            <div class="col-sm-8 col-sm-offset-2">
+                                <a class="btn btn-primary block m-top-md" @click.prevent="saveManagerRole">保存</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /modal roleManage-->
+
         <template id="reset-btn-template"  style="display: none">
             <a class="btn btn-success" data-target="#reset-password" data-toggle="modal" @click="notify">重置密码</a>
         </template>
 
         <template id="toggle-manager-template" style="display: none">
             <a class="btn" :class="(managerStatus=='停用')?'btn-danger':'btn-info'" @click="toggleManager">@{{managerStatus}}</a>
+        </template>
+
+        <template id="role-manage-template" style="display: none">
+            <a class="btn btn-info" data-target="#role-manage" data-toggle="modal" @click="roleManageList">编辑</a>
         </template>
     </div>
     <!--/pdadding-md-->
@@ -882,6 +1006,38 @@
                             alert("修改失败！");
                         }
                     }).fail(function (data) {
+                        alert("网络错误！");
+                    });
+                }
+            }
+        });
+        Vue.component('role-manage-btn',{
+            template:'#role-manage-template',
+            props:{
+                list:{
+                    required:true
+                }
+            },
+            methods:{
+                roleManageList: function () {
+                    var _this=this;
+                    var url="{{url('admin/manager-level-list')}}";
+                    _this.$dispatch('mg-list', _this.list);
+                    $.ajax({
+                        url:url,
+                        dataType:'json',
+                        headers:{
+                            'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content')
+                        },
+                        timeout:60000,
+                        type:'GET',
+                        data:{
+                            manager_id: _this.list.id,
+                            role_id: _this.list.roles[0]['id']
+                        }
+                    }).done(function (data) {
+                        _this.$dispatch('role-manage-list', data.data);
+                    }).fail(function (err) {
                         alert("网络错误！");
                     });
                 }
@@ -1100,6 +1256,58 @@
                         isInvalid: 0,
                         msg: ''
                     }
+                },
+                managerAccount: {
+                    roleOptions: null,
+                    superiorOptions: null,
+                    equalOptions: null,
+                    name: {
+                        origin: '',
+                        current: ''
+                    },
+                    account: {
+                        origin: '',
+                        current: ''
+                    },
+                    role: {
+                        origin: '',
+                        current: ''
+                    },
+                    superior: {
+                        origin: '',
+                        current: ''
+                    },
+                    equal: {
+                        origin: '',
+                        current: ''
+                    },
+                    level: null
+                },
+                managerAccountError: {
+                    name: {
+                        isInvalid: 0,
+                        msg: ''
+                    },
+                    level: {
+                        isInvalid: 0,
+                        msg: ''
+                    },
+                    account: {
+                        isInvalid: 0,
+                        msg: ''
+                    },
+                    role: {
+                        isInvalid: 0,
+                        msg: ''
+                    },
+                    superior: {
+                        isInvalid: 0,
+                        msg: ''
+                    },
+                    equal: {
+                        isInvalid: 0,
+                        msg: ''
+                    },
                 }
             },
             watch: {
@@ -1965,11 +2173,229 @@
                         });
                         val.sub = options;
                     }
+                },
+                getRoles: function () {
+                    var _this = this;
+                    var url = "{{ url('admin/manager-role-list') }}";
+                    _this.managerAccount.roleOptions = null;
+                    _this.managerAccount.role.current = 0;
+                    $.ajax({
+                        url:url,
+                        dataType:'json',
+                        headers:{
+                            'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content'),
+                        },
+                        data: {
+                            'level': _this.managerAccount.level,
+                        },
+                        timeout:60000,
+                        type:'GET'
+                    }).done(function(data){
+                        _this.managerAccount.roleOptions = data.data;
+
+                        return true;
+                    }).fail(function(error){
+                        errs = error.responseJSON;
+                        if (errs.level.length){
+                            _this.managerAccountError.level.isInvalid = 1;
+                            _this.managerAccountError.level.msg = errs.level[0];
+                            return false;
+                        }else{
+                            alert("网络错误！");
+                        }
+                    });
+                },
+                getRelations: function () {
+                    var _this = this;
+                    var url = "{{ url('admin/manager-relation') }}";
+                    _this.managerAccount.superiorOptions = null;
+                    _this.managerAccount.equalOptions = null;
+                    _this.managerAccount.superior.current = 0;
+                    _this.managerAccount.equal.current = 0;
+                    $.ajax({
+                        url:url,
+                        dataType:'json',
+                        headers:{
+                            'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content'),
+                        },
+                        data: {
+                            'role_id': _this.managerAccount.role.current,
+                        },
+                        timeout:60000,
+                        type:'GET'
+                    }).done(function(data){
+                        _this.managerAccount.superiorOptions = data.data.superior_list;
+                        _this.managerAccount.equalOptions = data.data.equal_list;
+
+                        return true;
+                    }).fail(function(error){
+                        errs = error.responseJSON;
+                        if (errs.role_id.length){
+                            _this.managerAccountError.role.isInvalid = 1;
+                            _this.managerAccountError.role.msg = errs.role_id[0];
+                            return false;
+                        }else{
+                            alert("网络错误！");
+                        }
+                    });
+                },
+                saveManagerRole: function () {
+                    var _this = this;
+                    var url = "{{ url('admin/manager-role-save') }}";
+                    _this.managerAccountError = {
+                        name: {
+                            isInvalid: 0,
+                            msg: ''
+                        },
+                        level: {
+                            isInvalid: 0,
+                            msg: ''
+                        },
+                        account: {
+                            isInvalid: 0,
+                            msg: ''
+                        },
+                        role: {
+                            isInvalid: 0,
+                            msg: ''
+                        },
+                        superior: {
+                            isInvalid: 0,
+                            msg: ''
+                        },
+                        equal: {
+                            isInvalid: 0,
+                            msg: ''
+                        },
+                    };
+
+                    var change = {length:0, manager_id:_this.managerAccount.equal.origin};
+                    if (_this.managerAccount.name.current != _this.managerAccount.name.origin){
+                        change.name =  _this.managerAccount.name.current;
+                        change.length++;
+                    }
+                    if (_this.managerAccount.account.current != _this.managerAccount.account.origin){
+                        change.account =  _this.managerAccount.account.current;
+                        change.length++;
+                    }
+                    if (_this.managerAccount.role.current != _this.managerAccount.role.origin){
+                        change.role =  _this.managerAccount.role.current;
+                        change.length++;
+                    }
+                    if (_this.managerAccount.superior.current != _this.managerAccount.superior.origin){
+                        change.superior =  _this.managerAccount.superior.current;
+                        change.length++;
+                    }
+                    if (_this.managerAccount.equal.current != _this.managerAccount.equal.origin){
+                        change.equal =  _this.managerAccount.equal.current;
+                        change.length++;
+                    }
+                    if (change == 0){
+                        $('#role-manage').modal('hide');
+
+                        return false;
+                    }
+
+                    if (!_this.managerAccount.name.current.trim()){
+                        _this.managerAccountError.name.isInvalid = 1;
+                        _this.managerAccountError.name.msg = '不能为空！';
+                    }
+                    if (!_this.managerAccount.account.current.trim()){
+                        _this.managerAccountError.account.isInvalid = 1;
+                        _this.managerAccountError.account.msg = '不能为空！';
+                    }
+                    if (!_this.managerAccount.role.current){
+                        _this.managerAccountError.role.isInvalid = 1;
+                        _this.managerAccountError.role.msg = '不能为空！';
+                    }
+                    if (!_this.managerAccount.superior.current){
+                        _this.managerAccountError.superior.isInvalid = 1;
+                        _this.managerAccountError.superior.msg = '不能为空！';
+                    }
+                    if (!_this.managerAccount.equal.current){
+                        _this.managerAccountError.equal.isInvalid = 1;
+                        _this.managerAccountError.equal.msg = '不能为空！';
+                    }
+                    if (!_this.managerAccount.account.current.match(/^(\w)+(\.\w+)*@(\w)+((\.\w+)+)$/)){
+                        _this.managerAccountError.account.isInvalid = 1;
+                        _this.managerAccountError.account.msg = '邮箱格式错误！';
+
+                        return false;
+                    }
+
+                    $.ajax({
+                        url:url,
+                        dataType:'json',
+                        headers:{
+                            'X-CSRF-TOKEN':$("meta[name=csrf-token]").attr('content'),
+                        },
+                        data: change,
+                        timeout:60000,
+                        type:'POST'
+                    }).done(function(data){
+                        alert("保存成功！");
+                        window.location.reload();
+
+                        return true;
+                    }).fail(function(error){
+                        errs = error.responseJSON;
+                        if (errs.hasOwnProperty('role')){
+                            _this.managerAccountError.role.isInvalid = 1;
+                            _this.managerAccountError.role.msg = errs.role[0];
+                            return false;
+                        }else if(errs.hasOwnProperty('name')){
+                            _this.managerAccountError.name.isInvalid = 1;
+                            _this.managerAccountError.name.msg = errs.name[0];
+                            return false;
+                        }else if(errs.hasOwnProperty('account')){
+                            _this.managerAccountError.account.isInvalid = 1;
+                            _this.managerAccountError.account.msg = errs.account[0];
+                            return false;
+                        }else if(errs.hasOwnProperty('equal')){
+                            _this.managerAccountError.equal.isInvalid = 1;
+                            _this.managerAccountError.equal.msg = errs.equal[0];
+                            return false;
+                        }else if(errs.hasOwnProperty('superior')){
+                            _this.managerAccountError.superior.isInvalid = 1;
+                            _this.managerAccountError.superior.msg = errs.superior[0];
+                            return false;
+                        }else{
+                            alert("网络错误！");
+                        }
+                    });
                 }
             },
             events:{
                 'mg-id': function (managerId) {
                     this.restPassword.managerId=managerId;
+                },
+                'role-manage-list': function (data) {
+                    this.managerAccount.roleOptions = data.roles;
+                    this.managerAccount.equalOptions = data.equal_list;
+                    this.managerAccount.superiorOptions = data.superior_list;
+                    this.managerAccount.superior = {
+                        origin: data.leader,
+                        current: data.leader,
+                    };
+                },
+                'mg-list': function (data) {
+                    this.managerAccount.name = {
+                        origin: data.name,
+                        current: data.name
+                    };
+                    this.managerAccount.account = {
+                        origin: data.email,
+                        current: data.email,
+                    };
+                    this.managerAccount.role = {
+                        origin: data.roles[0]['id'],
+                        current: data.roles[0]['id'],
+                    };
+                    this.managerAccount.equal = {
+                        origin: data.id,
+                        current: data.id
+                    };
+                    this.managerAccount.level = data.roles[0]['level'];
                 }
             }
         });
