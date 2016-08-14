@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Manager;
 use App\Permission;
 use App\PermissionRole;
 use App\Role;
+use App\RoleManager;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -237,5 +239,176 @@ class RoleController extends Controller
         }
 
         return ['message' => 'success'];
+    }
+
+    /**
+     * 初始化人员列表.
+     *
+     * @param Request $request
+     * @return array
+     */
+    public function initManagerList(Request $request)
+    {
+        //判断是否到达相应的权限
+        if(\Gate::foruser(\Auth::guard('admin')->user())->denies('super')){
+            return \Response::json(['invalid'=>'您无权访问！'])->setStatusCode(403);
+        }
+
+        $roleId = $request->input('role_id');
+        $managerId = $request->input('manager_id');
+
+        //特殊角色不能获取
+        if ($roleId == 1){
+            return \Response::json(['invalid'=>'您无权访问！'])->setStatusCode(403);
+        }
+
+        //所属上级
+        $leader = Manager::where('id', $managerId)->first()->leader()->pluck('id');
+
+        //上级、平级人员列表
+        $list = $this->getManagerLevelList($roleId);
+
+        //权限角色列表
+        $roles = \DB::table('roles')
+            ->whereRaw('level in (select level from roles where id = '.$roleId.')')->get();
+
+        $data = array_merge(['leader' => $leader->first()],
+            ['roles' => $roles], $list);
+
+        return ['data'=>$data];
+    }
+
+    /**
+     * 获取同等级角色列表.
+     *
+     * @param Requests\Admin\AffiliationRequest $request
+     * @return array|\Symfony\Component\HttpFoundation\Response
+     */
+    public function getRole(Requests\Admin\AffiliationRequest $request)
+    {
+        //判断是否到达相应的权限
+        if(\Gate::foruser(\Auth::guard('admin')->user())->denies('super')){
+            return \Response::json(['invalid'=>'您无权访问！'])->setStatusCode(403);
+        }
+
+        $level = $request->input('level');
+
+        if ($level == 0){
+            return \Response::json(['invalid'=>'您无权访问！'])->setStatusCode(403);
+        }
+
+        $roles = Role::where('level', $level)->get();
+
+        return ["data"=>$roles];
+    }
+
+    /**
+     * 更具角色获取上级、平级人员列表
+     *
+     * @param Requests\Admin\ManagerRoleListRequest $request
+     * @return array|\Symfony\Component\HttpFoundation\Response
+     */
+    public function getManagerList(Requests\Admin\ManagerRoleListRequest $request)
+    {
+        //判断是否到达相应的权限
+        if(\Gate::foruser(\Auth::guard('admin')->user())->denies('super')){
+            return \Response::json(['invalid'=>'您无权访问！'])->setStatusCode(403);
+        }
+
+        $roleId = $request->input('role_id');
+
+        //特殊角色不能获取
+        if ($roleId == 1){
+            return \Response::json(['invalid'=>'您无权访问！'])->setStatusCode(403);
+        }
+
+        $data = $this->getManagerLevelList($roleId);
+
+        return ['data'=>$data];
+    }
+
+    /**
+     * 保存角色权限信息修改.
+     *
+     * @param Requests\Admin\ManagerRoleUpdateRequest $request
+     * @return array|\Symfony\Component\HttpFoundation\Response
+     */
+    public function saveManagerRole(Requests\Admin\ManagerRoleUpdateRequest $request)
+    {
+        //判断是否到达相应的权限
+        if(\Gate::foruser(\Auth::guard('admin')->user())->denies('super')){
+            return \Response::json(['invalid'=>'您无权访问！'])->setStatusCode(403);
+        }
+
+        $name = $request->input('name');
+        $account = $request->input('account');
+        $role = $request->input('role');
+        $equal = $request->input('equal');
+        $superior = $request->input('superior');
+        $manager_id = $request->input('manager_id');
+
+        $manager = Manager::where('id', $manager_id)->first();
+        if (!$manager_id && !$manager){
+            return \Response::json(['invalid'=>'您无权访问！'])->setStatusCode(403);
+        }
+
+        //赋予新角色,清空旧角色
+        if ($role){
+            RoleManager::where('manager_id', $manager_id)->delete();
+            $newRoleManager = new RoleManager();
+            $newRoleManager->manager_id = $manager_id;
+            $newRoleManager->role_id = $role;
+            $newRoleManager->save();
+        }
+
+        //修改基础信息，包括上级关系
+        $change = 0;
+        if ($name){
+            $manager->name = $name;
+            $change = 1;
+        }
+        if ($account){
+            $manager->email = $account;
+            $manager->is_first = 0;
+            $change = 1;
+        }
+        if ($superior){
+            $manager->pid = $superior;
+            $change = 1;
+        }
+        if ($change){
+            $manager->update();
+        }
+
+        //下级关系
+        if ($equal){
+            Manager::where('pid', $manager_id)->update(['pid' => $equal]);
+        }
+
+        return ['message'=>'success'];
+    }
+
+    /**
+     * 获取某权限的上级和平级人员列表
+     *
+     * @param $roleId
+     * @return array
+     */
+    protected function getManagerLevelList($roleId){
+        $fatherRoleId = Role::find($roleId)->father()->pluck('id');
+
+        //获取上级人员列表
+        $superiorList = Manager::whereHas('roles',function ($query) use ($fatherRoleId)
+        {
+            $query->whereIn('id', $fatherRoleId);
+        })->get();
+
+        //获取平级人员列表
+        $equalList = Manager::whereHas('roles',function ($query) use ($roleId)
+        {
+            $query->where('id', $roleId);
+        })->get();
+
+        return ['superior_list' => $superiorList, 'equal_list' => $equalList];
     }
 }
