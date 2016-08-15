@@ -25,7 +25,7 @@
                         {{ $salaryTask }}
                     </div>
 
-                    <div class="m-top-md">{{ $salaryRate*100 }}% Higher than last month</div>
+                    <div class="m-top-md">{{ number_format($salaryRate*100,2) }}% Higher than last month</div>
 
                     <div class="statistic-icon-background">
                         <i class="ion-eye"></i>
@@ -45,7 +45,7 @@
                         {{ $insuranceTask }}
                     </div>
 
-                    <div class="m-top-md">{{ $insuranceRate*100 }}% Higher than last month</div>
+                    <div class="m-top-md">{{ number_format($insuranceRate*100,2) }}% Higher than last month</div>
 
                     <div class="statistic-icon-background">
                         <i class="ion-ios7-cart-outline"></i>
