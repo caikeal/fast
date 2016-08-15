@@ -65,23 +65,23 @@
 
             <div class="am-form-group ">
                 <div class="am-u-sm-6 am-u-md-6 am-u-lg-6 am-text">
-                    <label class="am-checkbox-inline">
-                        <input type="checkbox" value="2" name="cat" minchecked="1" maxchecked="1" data-am-ucheck required> 社保公积金类
+                    <label class="am-radio-inline">
+                        <input type="radio" value="2" name="cat" minchecked="1" maxchecked="1" data-am-ucheck required> 社保公积金类
                     </label>
                 </div>
                 <div class="am-u-sm-6 am-u-md-6 am-u-lg-6 am-text">
-                    <label class="am-checkbox-inline">
-                        <input type="checkbox" value="1" data-am-ucheck name="cat"> 工资单问题
+                    <label class="am-radio-inline">
+                        <input type="radio" value="1" data-am-ucheck name="cat"> 工资单问题
                     </label>
                 </div>
                 <div class="am-u-sm-6 am-u-md-6 am-u-lg-6 am-text">
-                    <label class="am-checkbox-inline">
-                        <input type="checkbox" value="3" data-am-ucheck name="cat"> 理赔查询类
+                    <label class="am-radio-inline">
+                        <input type="radio" value="3" data-am-ucheck name="cat"> 理赔查询类
                     </label>
                 </div>
                 <div class="am-u-sm-6 am-u-md-6 am-u-lg-6 am-text">
-                    <label class="am-checkbox-inline">
-                        <input class="am-secondary" type="checkbox" data-am-ucheck value="4" name="cat"> 弹性福利类
+                    <label class="am-radio-inline">
+                        <input class="am-secondary" type="radio" data-am-ucheck value="4" name="cat"> 弹性福利类
                     </label>
                 </div>
                 <div class="am-cf"></div>
