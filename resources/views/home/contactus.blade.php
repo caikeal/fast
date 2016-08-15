@@ -54,7 +54,7 @@
     @endif
     @if($insuranceFromer['name'])
     <div class="am-u-sm-12 contact-list">
-        <h2 style="font-size: larger;margin-bottom: 0;">理赔查询联系人</h2>
+        <h2 style="font-size: larger;margin-bottom: 0;">社保查询联系人</h2>
         <hr style="margin: .5rem"></hr>
         <div class="am-u-sm-4 am-u-md-4 am-u-lg-4">
             <a href="javascript:void(0);" class="am-badge am-badge-danger am-round" style="line-height: 1.6"><i class="am-icon-user am-round"></i></a>
@@ -76,7 +76,7 @@
     @endif
     @if($compensationFromer['name'])
     <div class="am-u-sm-12 contact-list">
-        <h2 style="font-size: larger;margin-bottom: 0;">弹性福利查询联系人</h2>
+        <h2 style="font-size: larger;margin-bottom: 0;">理赔查询联系人</h2>
         <hr style="margin: .5rem"></hr>
         <div class="am-u-sm-4 am-u-md-4 am-u-lg-4">
             <a class="am-badge am-badge-danger am-round" style="line-height: 1.6"><i class="am-icon-user am-round"></i></a>
