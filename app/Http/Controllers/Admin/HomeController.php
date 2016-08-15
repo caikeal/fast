@@ -84,8 +84,8 @@ class HomeController extends Controller
         //============获取当前的答疑解惑数============
         //获取用户可以回答的问题类型
         $roleNameArr = $this->answer->canAnswerType();
-        $questionData = Question::where('creator', $manager['id'])
-            ->whereIn('type', $roleNameArr->collapse())->where('status',1)
+        $questionData = Question::whereIn('type', $roleNameArr->collapse())
+            ->where('status',1)
             ->count();
 
         return view('admin.index', [
