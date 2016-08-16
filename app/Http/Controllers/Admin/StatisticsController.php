@@ -344,7 +344,9 @@ class StatisticsController extends Controller
         //不存在缓存
         else{
             //查询
-            $visitTimesTpl = ModuleStatistics::where('created_at', '>=', $nowMonth)->groupBy(['days','module'])
+            $visitTimesTpl = ModuleStatistics::where('created_at', '>=', $nowMonth)
+                ->where('created_at', '<', $now->format('Y-m-d 00:00:00'))
+                ->groupBy(['days','module'])
                 ->orderBy('module','desc')->orderBy('days','asc')
                 ->select(\DB::raw('DATE_FORMAT(created_at,\'%Y%m%d\') days, module, count(id) count'))
                 ->get();
@@ -489,13 +491,17 @@ class StatisticsController extends Controller
         //不存在缓存
         else{
             //查询
-            $visitTimesTpl = ModuleStatistics::where('created_at', '>=', $nowMonth)->groupBy(['days','module'])
+            $visitTimesTpl = ModuleStatistics::where('created_at', '>=', $nowMonth)
+                ->where('created_at', '<', $now->format('Y-m-d 00:00:00'))
+                ->groupBy(['days','module'])
                 ->orderBy('module','desc')->orderBy('days','asc')
                 ->select(\DB::raw('DATE_FORMAT(created_at,\'%Y%m%d\') days, module, count(DISTINCT(user_id)) user'))
                 ->get();
 
             //总访问人数
-            $allPerson = ModuleStatistics::where('created_at', '>=', $nowMonth)->groupBy('days')
+            $allPerson = ModuleStatistics::where('created_at', '>=', $nowMonth)
+                ->where('created_at', '<', $now->format('Y-m-d 00:00:00'))
+                ->groupBy('days')
                 ->orderBy('days','asc')
                 ->select(\DB::raw('DATE_FORMAT(created_at,\'%Y%m%d\') days, count(DISTINCT(user_id)) user'))
                 ->get();
