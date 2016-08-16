@@ -68,6 +68,26 @@ Route::group(['namespace'=>'Admin','middleware' => ['web'],'prefix'=>'admin'], f
     Route::resource('/news', 'NewsController');
     //下属上传数据统计模块
     Route::resource('/underling', 'UnderlingController');
+    //答疑解惑模块
+    Route::resource('/answer', 'AnswerController');
+    Route::get('/answer-info', 'AnswerController@info');
+    //数据统计模块
+    Route::get('/data-before-times', 'StatisticsController@visitLastTimes');
+    Route::get('/user-before-times', 'StatisticsController@userLastTimes');
+    Route::get('/data-now-times', 'StatisticsController@nowVisitTimes');
+    Route::get('/user-now-times', 'StatisticsController@nowUserTimes');
+    //角色分配模块
+    Route::get('/affiliation', 'RoleController@getAffiliation');
+    Route::get('/role-list', 'RoleController@showRoles');
+    Route::post('/role-create', 'RoleController@addRoles');
+    Route::post('/role-update', 'RoleController@updateRoles');
+    Route::get('/permission-list', 'RoleController@allPermission');
+    Route::get('/permission-own', 'RoleController@getPermission');
+    Route::post('/permission-update', 'RoleController@updatePermission');
+    Route::get('/manager-level-list', 'RoleController@initManagerList');
+    Route::get('/manager-role-list', 'RoleController@getRole');
+    Route::get('/manager-relation', 'RoleController@getManagerList');
+    Route::post('/manager-role-save', 'RoleController@saveManagerRole');
 });
 
 Route::group(['middleware' => 'web'], function () {
@@ -104,4 +124,9 @@ Route::group(['middleware' => 'web'], function () {
     Route::post('/compensation/details','CompensationController@detail');
     //联系我们模块
     Route::get('/contactus', 'ContactController@index');
+    //答疑解惑模块
+    Route::resource('/question', 'QuestionController');
+    Route::get('question-my', 'QuestionController@myQuestion');
+    Route::get('question-new', 'QuestionController@newQuestion');
+    Route::get('question-search', 'QuestionController@searchQuestion');
 });
