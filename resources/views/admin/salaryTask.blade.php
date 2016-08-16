@@ -644,6 +644,7 @@
                     }).done(function (data) {
                         if(data.ret_num==0){
                             alert("操作成功");
+                            window.location.reload();
                         }else{
                             alert(data.ret_msg);
                         }

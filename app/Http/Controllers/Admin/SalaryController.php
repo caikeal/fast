@@ -51,6 +51,7 @@ class SalaryController extends Controller
         $next2MonthTime=strtotime($next2->year."-".$next2->month."-1");
         $tasks=SalaryTask::where("deal_time",">=",$nowMonthTime)->where("deal_time","<",$next2MonthTime)
             ->where("receive_id","=",\Auth::guard('admin')->user()->id)->where("type",1)
+            ->where('status', '!=',1)
             ->orderBy("deal_time","asc")->get();
         $data=[
             'tasks'=>$tasks,
@@ -81,6 +82,7 @@ class SalaryController extends Controller
         $next2MonthTime=strtotime($next2->year."-".$next2->month."-1");
         $tasks=SalaryTask::where("deal_time",">=",$nowMonthTime)->where("deal_time","<",$next2MonthTime)
             ->where("receive_id","=",\Auth::guard('admin')->user()->id)->where("type",2)
+            ->where('status', '!=',1)
             ->orderBy("deal_time","asc")->get();
 
         //社保进度模版

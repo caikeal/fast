@@ -47,29 +47,29 @@
                 <span class="am-navbar-label">首页</span>
             </a>
         </li>
-        {{--<li class="am-dropdown am-dropdown-up" data-am-dropdown>--}}
-            {{--<a class="am-dropdown-toggle" data-am-dropdown-toggle>--}}
-                {{--<span class="am-icon-bars"></span>--}}
-                {{--<span class="am-navbar-label">答疑解惑</span>--}}
-            {{--</a>--}}
-            {{--<ul class="am-dropdown-content" style="text-align: center;padding: 0;">--}}
-                {{--<div>--}}
-                    {{--<a href="#" style="line-height: 49px;color: #000;">我的问题</a>--}}
-                {{--</div>--}}
-                {{--<div class="am-divider"></div>--}}
-                {{--<div>--}}
-                    {{--<a href="#" style="line-height: 49px;color: #000;">最新问题</a>--}}
-                {{--</div>--}}
-                {{--<div class="am-divider"></div>--}}
-                {{--<div>--}}
-                    {{--<a href="#" style="line-height: 49px;color: #000;">编辑问题</a>--}}
-                {{--</div>--}}
-                {{--<div class="am-divider"></div>--}}
-                {{--<div>--}}
-                    {{--<a href="#" style="line-height: 49px;color: #000;">查找问题</a>--}}
-                {{--</div>--}}
-            {{--</ul>--}}
-        {{--</li>--}}
+        <li class="am-dropdown am-dropdown-up" data-am-dropdown>
+            <a class="am-dropdown-toggle" data-am-dropdown-toggle>
+                <span class="am-icon-bars"></span>
+                <span class="am-navbar-label">答疑解惑</span>
+            </a>
+            <ul class="am-dropdown-content" style="text-align: center;padding: 0;">
+                <div>
+                    <a href="{{ url('question-my') }}" style="line-height: 49px;color: #000;">我的问题</a>
+                </div>
+                <div class="am-divider"></div>
+                <div>
+                    <a href="{{ url('question-new') }}" style="line-height: 49px;color: #000;">最新问题</a>
+                </div>
+                <div class="am-divider"></div>
+                <div>
+                    <a href="{{ url('question/create') }}" style="line-height: 49px;color: #000;">编辑问题</a>
+                </div>
+                <div class="am-divider"></div>
+                <div>
+                    <a href="{{ url('question-search') }}" style="line-height: 49px;color: #000;">查找问题</a>
+                </div>
+            </ul>
+        </li>
         <li>
             <a href="{{  url('contactus') }}">
                 <span class="am-icon-commenting"></span>
@@ -104,6 +104,7 @@
     </ul>
 </div>
 <!-- 导航栏end -->
+<script src="http://cdn.bootcss.com/vue/1.0.26/vue.js"></script>
 <!--[if lt IE 9]>
 <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>
 <script src="http://cdn.staticfile.org/modernizr/2.8.3/modernizr.js"></script>

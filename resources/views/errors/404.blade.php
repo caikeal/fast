@@ -40,7 +40,7 @@
 <body>
 <div class="container">
     <div class="content">
-        <a href="{{url('admin/index')}}" style="text-decoration: none;">
+        <a href="#" onclick="javascript:history.back()" style="text-decoration: none;">
             <div class="title">404 Not Found.</div>
         </a>
     </div>
