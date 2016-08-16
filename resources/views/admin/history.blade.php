@@ -356,7 +356,7 @@
                 },
                 'max-page': function (maxPage) {
                     this.maxPage = Number(maxPage);
-                    this.p = Number(maxPage);
+                    this.p = Number(maxPage)?1:0;
                 },
                 'company-name': function (companyName) {
                     this.companyName = companyName;
