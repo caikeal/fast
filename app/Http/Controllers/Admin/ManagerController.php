@@ -57,7 +57,7 @@ class ManagerController extends Controller
                 })->select(['id','name','phone','email','pid'])->withTrashed()->paginate(15);
         }else{
             $managers=Manager::with("roles")->where('id','!=',\Auth::guard('admin')->user()->id)
-                ->where('id','!=',1)->select(['id','name','phone','email','pid'])->withTrashed()->paginate(15);
+                ->where('id','!=',1)->select(['id','name','phone','email','pid', 'updated_at', 'deleted_at'])->withTrashed()->paginate(15);
         }
 
         return $managers;
