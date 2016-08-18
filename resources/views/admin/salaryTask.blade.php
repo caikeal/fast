@@ -220,13 +220,13 @@
                         <tr>
                             <td>
                                 <img class="thumbnail thumbnail-radius" src="{{env("APP_URL")}}/{{$task->company->poster}}">
-                                <span>{{$task->company->name}}</span>
+                                <span>{{$task['company']['name']}}</span>
                             </td>
                             <td>{{date("Y-m-d",$task->deal_time)}}</td>
                             <td>
                                 {{$task->type==1?'薪资':'社保'}}
                             </td>
-                            <td>{{$task->receiver->name}}</td>
+                            <td>{{$task['receiver']['name']}}</td>
                             <td>{{$task->status?'已提交':'进行中'}}</td>
                             <td>{{$task->updated_at}}</td>
                             <td>
