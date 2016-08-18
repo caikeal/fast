@@ -237,7 +237,7 @@
                                     @{{roleInfo.label}}<br>
                                 </span>
                             </td>
-                            <td>@{{manager['roles'][0]['level']}}级管理员</td>
+                            <td>@{{manager['roles'].length ? manager['roles'][0]['level'] : ''}}级管理员</td>
                             <td>
                                 <reset-pwd-btn :manager-id="manager.id"></reset-pwd-btn>
                             </td>
@@ -259,7 +259,7 @@
                                     @{{roleInfo.label}}<br>
                                 </span>
                             </td>
-                            <td>@{{manager['roles'][0]['level']}}级管理员</td>
+                            <td>@{{manager['roles'].length?manager['roles'][0]['level']:''}}级管理员</td>
                             <td>
                                 <reset-pwd-btn :manager-id="manager.id"></reset-pwd-btn>
                             </td>
@@ -2299,22 +2299,32 @@
                     if (!_this.managerAccount.name.current.trim()){
                         _this.managerAccountError.name.isInvalid = 1;
                         _this.managerAccountError.name.msg = '不能为空！';
+
+                        return false;
                     }
                     if (!_this.managerAccount.account.current.trim()){
                         _this.managerAccountError.account.isInvalid = 1;
                         _this.managerAccountError.account.msg = '不能为空！';
+
+                        return false;
                     }
                     if (!_this.managerAccount.role.current){
                         _this.managerAccountError.role.isInvalid = 1;
                         _this.managerAccountError.role.msg = '不能为空！';
+
+                        return false;
                     }
                     if (!_this.managerAccount.superior.current){
                         _this.managerAccountError.superior.isInvalid = 1;
                         _this.managerAccountError.superior.msg = '不能为空！';
+
+                        return false;
                     }
                     if (!_this.managerAccount.equal.current){
                         _this.managerAccountError.equal.isInvalid = 1;
                         _this.managerAccountError.equal.msg = '不能为空！';
+
+                        return false;
                     }
                     if (!_this.managerAccount.account.current.match(/^(\w)+(\.\w+)*@(\w)+((\.\w+)+)$/)){
                         _this.managerAccountError.account.isInvalid = 1;
@@ -2388,14 +2398,14 @@
                         current: data.email,
                     };
                     this.managerAccount.role = {
-                        origin: data.roles[0]['id'],
-                        current: data.roles[0]['id'],
+                        origin: data.roles.length?data.roles[0]['id']:0,
+                        current: data.roles.length?data.roles[0]['id']:0,
                     };
                     this.managerAccount.equal = {
                         origin: data.id,
                         current: data.id
                     };
-                    this.managerAccount.level = data.roles[0]['level'];
+                    this.managerAccount.level = data.roles.length?data.roles[0]['level']:null;
                 }
             }
         });
