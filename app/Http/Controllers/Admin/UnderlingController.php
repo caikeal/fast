@@ -43,7 +43,7 @@ class UnderlingController extends Controller
         }else {
             $managers = Manager::whereRaw("find_in_set(id,queryChildren($manager_id))")
                 ->with(['tasks' => function ($query) {
-                    $query->groupBy('company_id');
+                    $query->groupBy('receive_id')->groupBy('company_id');
                 }])->where("id", "!=", $manager_id)->with('leader')->paginate(15);
         }
         //下级权限
