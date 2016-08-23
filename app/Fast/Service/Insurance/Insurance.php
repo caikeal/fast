@@ -68,12 +68,7 @@ class Insurance
                     if(is_array($vv)){
                         $vv=date("Y/m/d",strtotime($vv['date']));
                     }
-                    //小数需要转百分数，需要特殊处理
-                    if (is_numeric($vv)){
-                        if ($vv < 1){
-                            $vv = number_format($vv*100, 3) . '%';
-                        }
-                    }
+                   
                     $wages .= $vv . "||";
                 }
                 $wages = rtrim($wages, "||");
