@@ -62,9 +62,16 @@ class Compensation
                 //薪资数据保存
                 $wages = "";
                 foreach ($v as $kk => $vv) {
-                    if ($kk > 2) {
-                        $wages .= $vv . "||";
+                    if ($kk <= 2) {
+                        continue;
                     }
+                    //小数需要转百分数，需要特殊处理
+                    if (is_numeric($vv)){
+                        if ($vv < 1){
+                            $vv = number_format($vv*100, 3) . '%';
+                        }
+                    }
+                    $wages .= $vv . "||";
                 }
                 $wages = rtrim($wages, "||");
                 if (!$is_exist_detail) {

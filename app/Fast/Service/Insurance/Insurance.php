@@ -61,13 +61,20 @@ class Insurance
                 //薪资数据保存
                 $wages = "";
                 foreach ($v as $kk => $vv) {
-                    if ($kk > 2) {
-                        //由于是日期格式excel会以数组返回
-                        if(is_array($vv)){
-                            $vv=date("Y/m/d",strtotime($vv['date']));
-                        }
-                        $wages .= $vv . "||";
+                    if ($kk <= 2) {
+                        continue;
                     }
+                    //由于是日期格式excel会以数组返回
+                    if(is_array($vv)){
+                        $vv=date("Y/m/d",strtotime($vv['date']));
+                    }
+                    //小数需要转百分数，需要特殊处理
+                    if (is_numeric($vv)){
+                        if ($vv < 1){
+                            $vv = number_format($vv*100, 3) . '%';
+                        }
+                    }
+                    $wages .= $vv . "||";
                 }
                 $wages = rtrim($wages, "||");
                 if (!$is_exist_detail) {
