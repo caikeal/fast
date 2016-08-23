@@ -64,12 +64,7 @@ class Salary
                     if ($kk <= 2) {
                         continue;
                     }
-                    //小数需要转百分数，需要特殊处理
-                    if (is_numeric($vv)){
-                        if ($vv < 1){
-                            $vv = number_format($vv*100, 3) . '%';
-                        }
-                    }
+                    
                     $wages .= $vv . "||";
                 }
                 $wages = rtrim($wages, "||");
