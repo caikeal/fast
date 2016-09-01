@@ -52,6 +52,7 @@ class AutoTask
             $newTask->creator = $creator;
             $newTask->receiver = $receiver;
             $newTask->company_id = $company_id;
+            $newTask->by = $by;
             $newTask->type = $type;
             $newTask->deal_time = $deal_time;
             $newTask->memo = $memo;
