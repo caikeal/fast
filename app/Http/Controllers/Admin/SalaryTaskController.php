@@ -143,7 +143,7 @@ class SalaryTaskController extends Controller
             $this->taskNews->storeNews($manager_id,$receiver,4,$task2->id,$content);
 
             //创建自动任务
-            $this->autoTask->storeAutoTask($manager_id, $receiver, Null, $name, 2, strtotime($salaryDay), $memo);
+            $this->autoTask->storeAutoTask($manager_id, $receiver, 0, $name, 2, strtotime($salaryDay), $memo);
         }
         
         if($salaryDay && $insuranceDay){
