@@ -39,6 +39,6 @@ class Kernel extends ConsoleKernel
              foreach ($allNeedTask as $k=>$v){
                  $multiTask->createMulti($v, $task);
              }
-         })->dailyAt('11:28');
+         })->dailyAt('11:30');
     }
 }
