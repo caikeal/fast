@@ -16,6 +16,12 @@ class AutoMultiTask
 {
     public function createMulti($taskItem, Task $task)
     {
+        if (!$taskItem['creator'] && !$taskItem['receiver'] && !$taskItem['company_id'] && !$taskItem['type'] && !$taskItem['deal_time']){
+            return false;
+        }
+        $taskItem['by'] = $taskItem['by'] ? $taskItem['by'] : 0;
+        $taskItem['memo'] = $taskItem['memo'] ? $taskItem['memo'] : '';
+
         $salary_day = "";
         $now_day_stamp=strtotime(date("Y-m", time())."-1 0:0:0");
         if ($now_day_stamp > $taskItem['deal_time']){
@@ -26,7 +32,7 @@ class AutoMultiTask
         $specificDay = date("d", $taskItem['deal_time']);
 
         //判断当月任务是否重复创建
-        $saveDay = strtotime(Carbon::createFromTimestamp($days)->format("Y-m").$specificDay." 0:0:0");
+        $saveDay = strtotime(Carbon::createFromTimestamp($days)->format("Y-m")."-".$specificDay." 0:0:0");
         $salary_day = Carbon::createFromTimestamp($days)->format("Ym");
         $noNeed = $task->isRepeat($taskItem['creator'], $taskItem['receiver'], $taskItem['by'], $taskItem['company_id'], $taskItem['type'], $salary_day);
         //创建任务
