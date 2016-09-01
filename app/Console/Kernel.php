@@ -40,9 +40,5 @@ class Kernel extends ConsoleKernel
                  $multiTask->createMulti($v, $task);
              }
          })->monthly();
-
-        $schedule->call(function(){
-            AutoTask::where('id', 1)->update(['memo' => 'kealTest']);
-        })->everyMinute();
     }
 }
