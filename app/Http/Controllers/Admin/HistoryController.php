@@ -125,7 +125,7 @@ class HistoryController extends Controller
             $users = User::where('id_card', 'like', '%'.$name.'%')
                 ->orWhere('name', 'like', '%'.$name.'%')->get(['id_card']);
             foreach($users as $v){
-                $indentity[] = $v['id_card'];
+                $indentity[] = strtolower($v['id_card']);
             }
         }
 
