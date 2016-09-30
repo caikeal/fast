@@ -110,13 +110,15 @@ class History
                 continue;
             }
 
-            $allIdentities[$id.":".$v[1]][] = $k;
+            //获取身份证
+            $lowerIdentity = $v[1] ? strtolower($v[1]) : '';
+            $allIdentities[$id.":".$lowerIdentity][] = $k;
 
-            if (!in_array($v[1].":".$k, $turn)){
-                $turn[] = $v[1].":".$k;
+            if (!in_array($lowerIdentity.":".$k, $turn)){
+                $turn[] = $lowerIdentity.":".$k;
             }
             //缓存所有数据；上传凭证：身份凭证：序列号=》数据内容
-            \Cache::store('redis')->put("history:".$id.':'.$v[1].':'.$k, $v, 720);
+            \Cache::store('redis')->put("history:".$id.':'.$lowerIdentity.':'.$k, $v, 720);
         }
 
         //缓存序列号；上传凭证：身份凭证=》序列号；
