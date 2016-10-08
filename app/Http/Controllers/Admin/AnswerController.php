@@ -76,9 +76,14 @@ class AnswerController extends Controller
         $roleNameArr = $this->answer->canAnswerType();
 
         //查询对应类型的问题
-        $allQuestion = Question::with(['user'=>function ($query) {
-            $query->select(['name', 'phone', 'id_card', 'id']);
-        }])->whereIn('type', $roleNameArr->collapse())
+        $allQuestion = Question::with([
+            'user'=>function ($query) {
+                $query->select(['name', 'phone', 'id_card', 'id', 'company_id']);
+            },
+            'user.company'=>function ($query) {
+                $query->select(['name', 'id']);
+            }
+        ])->whereIn('type', $roleNameArr->collapse())
             ->where('status', 1)->where('id',$id)->first();
 
         if (!$allQuestion){
