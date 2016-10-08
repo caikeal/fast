@@ -135,9 +135,15 @@
                             </div>
                             <!-- 提问人信息 -->
                             <div class="ask-user-info">
-                                <div>
-                                    <strong class="text-muted">提问人:</strong>
-                                    <span>@{{ questionDetail.user.name }}</span>
+                                <div class="row">
+                                    <div class="col-md-6 col-sm-6">
+                                        <strong class="text-muted">提问人:</strong>
+                                        <span>@{{ questionDetail.user.name }}</span>
+                                    </div>
+                                    <div class="col-md-6 col-sm-6">
+                                        <strong class="text-muted">所在公司:</strong>
+                                        <span>@{{ questionDetail.user.company?questionDetail.user.company.name:'' }}</span>
+                                    </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6 col-sm-6">
