@@ -293,7 +293,7 @@
                                         <span class="help-block" style="color: red">
                                             <span style="font-weight: 800">*</span>
                                             模版中自动包含
-                                            <span style="font-weight: 800">'姓名'、'身份证'、'发薪日'</span>，
+                                            <span style="font-weight: 800">'姓名'、'身份证'、'查询日'</span>，
                                             <span style="font-weight: 800"> 请勿</span>
                                             再次
                                             <span style="font-weight: 800">创建</span>
@@ -724,7 +724,7 @@
                     solidInclude: [
                         {id: 0, text: '姓名'},
                         {id: 0, text: '身份证'},
-                        {id: 0, text: '发薪日'}
+                        {id: 0, text: '查询日'}
                     ]
                 }
             },
