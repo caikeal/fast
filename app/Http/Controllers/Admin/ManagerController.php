@@ -54,7 +54,7 @@ class ManagerController extends Controller
                         ->orWhereHas("roles",function($query) use($name){
                             $query->where('label','like',"%".$name."%");
                         });
-                })->select(['id','name','phone','email','pid'])->withTrashed()->paginate(15);
+                })->select(['id','name','phone','email','pid', 'updated_at', 'deleted_at'])->withTrashed()->paginate(15);
         }else{
             $managers=Manager::with("roles")->where('id','!=',\Auth::guard('admin')->user()->id)
                 ->where('id','!=',1)->select(['id','name','phone','email','pid', 'updated_at', 'deleted_at'])->withTrashed()->paginate(15);
