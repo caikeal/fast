@@ -3,10 +3,12 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SalaryBase extends Model
 {
     protected $table='salary_base';
+    use SoftDeletes;
 
     protected $fillable=[
         'title','manager_id','memo'
