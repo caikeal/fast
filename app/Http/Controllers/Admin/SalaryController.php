@@ -211,8 +211,12 @@ class SalaryController extends Controller
             $data=array();
             if ($base['type'] == 3){
                 $datum=array("姓名","身份证号","查询日（格式如：20160102）");
-            }else{
+            }elseif($base['type'] == 1){
                 $datum=array("姓名","身份证号","发薪日（格式如：201601）");
+            }elseif($base['type'] == 2){
+                $datum=array("姓名","身份证号","社保日期（格式如：201601）");
+            }else{
+                $datum=array("姓名","身份证号","查询日（格式如：201601）");
             }
             foreach($cats as $cat) {
                 $datum[]=$cat['name'];
