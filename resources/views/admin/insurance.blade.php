@@ -23,7 +23,7 @@
             vertical-align: middle;
             text-align: center;
         }
-        
+
         .union-date .checkbox{
             display: inline-block;
             vertical-align: middle;
