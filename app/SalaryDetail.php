@@ -9,7 +9,7 @@ class SalaryDetail extends Model
     protected $table='salary_details';
 
     protected $fillable=[
-        'user_id','base_id','company_id','wages','salary_day','memo','manager_id'
+        'user_id','base_id','company_id','wages','salary_day','memo','manager_id','meta'
     ];
 
     public function baseCategory(){
