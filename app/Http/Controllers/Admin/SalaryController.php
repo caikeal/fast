@@ -190,13 +190,19 @@ class SalaryController extends Controller
 
         $ua = strtolower($_SERVER["HTTP_USER_AGENT"]);
         $base_id=$request->get('bid');
+        $is_union = $request->get('isUnion');
         $base=SalaryBase::find($base_id);
         $cats=$base->categories()->where("level",2)->orderBy('place','asc')->get();
 
         //解决不同浏览器下载excel时标题解析乱码问题
-        $base_title = $this->beautyFileName($base['title'], $ua);
+        if ($is_union) {
+            $fileTitle = $base['title']."(月份需要合并版本)";
+        } else {
+            $fileTitle = $base['title'];
+        }
+        $base_title = $this->beautyFileName($fileTitle, $ua);
 
-        Excel::create($base_title, function($excel) use($cats,$base) {
+        Excel::create($base_title, function($excel) use($cats,$base,$is_union) {
 
             // Set the title
             $excel->setTitle($base->id."");
@@ -209,6 +215,7 @@ class SalaryController extends Controller
             $excel->setDescription('A Base For Salary Made By Keal');
 
             $data=array();
+            // 默认基础项目
             if ($base['type'] == 3){
                 $datum=array("姓名","身份证号","查询日（格式如：20160102）");
             }elseif($base['type'] == 1){
@@ -218,8 +225,14 @@ class SalaryController extends Controller
             }else{
                 $datum=array("姓名","身份证号","查询日（格式如：201601）");
             }
+            // 模版项目
             foreach($cats as $cat) {
                 $datum[]=$cat['name'];
+            }
+
+            // 合并项目
+            if ($is_union) {
+                $datum[]="isUnion(需要合并的填1)";
             }
             $data=array($datum);
 
