@@ -23,6 +23,23 @@
             vertical-align: middle;
             text-align: center;
         }
+        
+        .union-date .checkbox{
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .union-date .custom-checkbox{
+            top: 5px;
+        }
+        .union-date .checkbox-help{
+            display: inline-block;
+            vertical-align: sub;
+            cursor: help;
+        }
+        .union-date .custom-checkbox input[type=checkbox]:checked + label {
+            border-color: #00b7ee;
+            background-color: #00b7ee;
+        }
     </style>
 @endsection
 @section('content')
@@ -144,6 +161,19 @@
                                                 <see-base-btn company-id="c{{$task->company_id}}"></see-base-btn>
 
                                                 <new-base-btn :company-id={{ $task->company_id }} type="2" @click="initModal"></new-base-btn>
+
+                                                <div class="union-date">
+                                                        <div class="checkbox">
+                                                            <div class="custom-checkbox">
+                                                                <input type="checkbox" class="union-checker" id="inlineFormCheckbox{{$k}}">
+                                                                <label for="inlineFormCheckbox{{$k}}"></label>
+                                                            </div>
+                                                            合并不同月份
+                                                        </div>
+                                                        <div class="checkbox-help" title="将同一个人的不同月份数据合并到同一月份显示，合并方式采用合并到最大日期">
+                                                            <i class="fa fa-question-circle"></i>
+                                                        </div>
+                                                    </div>
                                             </div>
                                         </div><!-- ./timeline-body -->
                                     </div><!-- ./timeline-item-inner -->
@@ -202,6 +232,19 @@
                                                 <see-base-btn company-id="c{{$task->company_id}}"></see-base-btn>
 
                                                 <new-base-btn :company-id={{ $task->company_id }} type="2" @click="initModal"></new-base-btn>
+
+                                                <div class="union-date">
+                                                        <div class="checkbox">
+                                                            <div class="custom-checkbox">
+                                                                <input type="checkbox" class="union-checker" id="inlineFormCheckbox{{$k}}">
+                                                                <label for="inlineFormCheckbox{{$k}}"></label>
+                                                            </div>
+                                                            合并不同月份
+                                                        </div>
+                                                        <div class="checkbox-help" title="将同一个人的不同月份数据合并到同一月份显示，合并方式采用合并到最大日期">
+                                                            <i class="fa fa-question-circle"></i>
+                                                        </div>
+                                                    </div>
                                             </div>
                                         </div>
                                         <!-- ./timeline-body -->
