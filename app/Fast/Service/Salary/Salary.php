@@ -35,6 +35,7 @@ class Salary
         foreach ($all_content as $k => $v) {
             if ($k > 0 && $v[0]) {
                 $v1_type = is_string($v[1]) ? $v[1] : sprintf('%0.0f', $v[1]);
+                $v1_type = trim($v1_type);
                 $is_exist_user = User::where("id_card", "=", $v1_type)->first();
                 $is_exist_detail = "";
                 if ($is_exist_user) {
