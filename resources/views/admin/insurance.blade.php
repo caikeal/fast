@@ -573,12 +573,12 @@
         //下载
         $(".download-base").on("click", function () {
             var bid = $(this).prev().children("select").val();
+            var unionChecker = $($(this).siblings('.union-date')[0]).find('.union-checker').prop('checked') ? 1 : 0;
             if (bid == null) {
                 alert("未选择模版！");
                 return false;
             }
-            var url = "{{url('admin/salary/download')}}?bid=" + bid;
-            window.location.href = "{{url('admin/salary/download')}}?bid=" + bid;
+            window.location.href = "{{url('admin/salary/download')}}?bid=" + bid + "&isUnion=" + unionChecker;
         });
 
         $(".download-progress-base").on("click", function () {
