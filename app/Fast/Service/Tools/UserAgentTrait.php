@@ -15,7 +15,7 @@ trait UserAgentTrait
         //解决不同浏览器下载excel时标题解析乱码问题
         if (preg_match("/chrome/", $ua)) {
             $base_title=$fileName;
-        } else if (preg_match("/msie|edge|safari|firefox/", $ua)) {
+        } else if (preg_match("/net|trident|msie|edge|safari|firefox/", $ua)) {
             $base_title=urlencode($fileName);
         }else{
             $base_title=$fileName;
