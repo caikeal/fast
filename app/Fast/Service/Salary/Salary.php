@@ -31,7 +31,9 @@ class Salary
     public function storeSalary($base_id,$company_id,$type,$manager_id,$all_content)
     {
         $now = Carbon::now();
-
+        $flagUnion = $this->getFlagUnionPlace($all_content); // 判断 k=0 时的最后一个值是否存在isUnion
+        $unionArr = []; // 存放合并的数据
+        $unionUser = []; // 临时存放以保存的userId
         foreach ($all_content as $k => $v) {
             if ($k > 0 && $v[0]) {
                 $v1_type = is_string($v[1]) ? $v[1] : sprintf('%0.0f', $v[1]);
@@ -62,38 +64,144 @@ class Salary
                 //薪资数据保存
                 $wages = "";
                 foreach ($v as $kk => $vv) {
-                    if ($kk <= 2) {
+                    if ($kk <= 2 || ($flagUnion && $kk == $flagUnion)) {
                         continue;
                     }
                     
                     $wages .= $vv . "||";
                 }
                 $wages = rtrim($wages, "||");
-                if (!$is_exist_detail) {
-                    DB::table('salary_details')->insert([
-                        'user_id' => $user_id,
-                        'base_id' => $base_id,
-                        'company_id' => $company_id,
-                        'wages' => $wages,
-                        'salary_day' => $v[2],
-                        'manager_id' => $manager_id,
-                        'type' => $type,
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ]);
+
+                // 判断数据是否需要合并
+                if ($flagUnion && $v[$flagUnion] == 1) {
+                    // 合并数据处理
+                    if (in_array($user_id, $unionUser)) {    // 已经存在
+                        foreach ($unionArr as $uk => $uv) {
+                            if ($uv['userId'] == $user_id) {
+                                // 最大时间是否有变
+                                if ($uv['maxDate']<$v[2]) {
+                                    $unionArr[$uk]['maxDate'] = $v[2];
+                                    $unionArr[$uk]['isExist'] = $is_exist_detail;//对应数据是否已经保存过
+                                }
+                                $unionArr[$uk]['data'][] = [
+                                    "date" => $v[2],
+                                    "wages" => $wages
+                                ];
+                            }
+                        }
+                    } else {    // 未保存过
+                        $unionUser[] = $user_id;
+                        $unionArr[] = [
+                            'userId' => $user_id,
+                            'maxDate' => $v[2],
+                            'isExist' => $is_exist_detail,
+                            'data' => [
+                                [
+                                    "date" => $v[2],
+                                    "wages" => $wages
+                                ]
+                            ]
+                        ];
+                    }
                 } else {
-                    DB::table('salary_details')->where('company_id', "=", $company_id)
-                        ->where('salary_day', "=", $v[2])
-                        ->where('user_id', "=", $user_id)->update([
+                    // 不需要合并的数据先行保存
+                    if (!$is_exist_detail) {
+                        DB::table('salary_details')->insert([
+                            'user_id' => $user_id,
                             'base_id' => $base_id,
+                            'company_id' => $company_id,
                             'wages' => $wages,
+                            'salary_day' => $v[2],
                             'manager_id' => $manager_id,
+                            'type' => $type,
+                            'meta' => '',
                             'created_at' => $now,
                             'updated_at' => $now,
                         ]);
+                    } else {
+                        DB::table('salary_details')->where('company_id', "=", $company_id)
+                            ->where('salary_day', "=", $v[2])
+                            ->where('user_id', "=", $user_id)->update([
+                                'base_id' => $base_id,
+                                'wages' => $wages,
+                                'manager_id' => $manager_id,
+                                'meta' => '',
+                                'created_at' => $now,
+                                'updated_at' => $now,
+                            ]);
+                    }
                 }
+
             }
         }
 
+        // 对于合并数据统一进行插入或更新操作
+        if ($flagUnion) {
+            foreach ($unionArr as $tk=>$tv) {
+                $sqlInfo = [];    // 临时数据保存
+                $metaInfo = [];   // 临时元数据保存
+                if ($tv['isExist']) {
+                    $sqlInfo = [
+                        'base_id' => $base_id,
+                        'wages' => '',
+                        'manager_id' => $manager_id,
+                        'meta' => '',
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }  else {
+                    $sqlInfo = [
+                        'user_id' => $tv['userId'],
+                        'base_id' => $base_id,
+                        'company_id' => $company_id,
+                        'wages' => '',
+                        'salary_day' => $tv['maxDate'],
+                        'manager_id' => $manager_id,
+                        'type' => $type,
+                        'meta' => '',
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
+                foreach ($tv['data'] as $dk=>$dv) {
+                    if ($tv['maxDate'] == $dv['date']) {
+                        $sqlInfo['wages'] = $dv['wages'];
+                    } else {
+                        $metaInfo[] = [
+                            'date' => $dv['date'],
+                            'wages' => $dv['wages']
+                        ];
+                    }
+                }
+                $metaInfoT['balance'] = collect($metaInfo)->sortBy('date')->values()->all();
+                $sqlInfo['meta'] = empty($metaInfoT['balance']) ? '' : json_encode($metaInfoT);
+
+                if ($tv['isExist']) {  // 更新操作
+                    DB::table('salary_details')->where('company_id', "=", $company_id)
+                        ->where('salary_day', "=", $tv['maxDate'])
+                        ->where('user_id', "=", $tv['userId'])->update($sqlInfo);
+                } else {
+                    DB::table('salary_details')->insert($sqlInfo);
+                }
+            }
+        }
+    }
+
+    /**
+     * 判断是否需要合并.需要合并，返回合并位数
+     *
+     * @param array $allContent
+     * @return int
+     */
+    protected function getFlagUnionPlace(array $allContent)
+    {
+        $firstVal = collect($allContent)->first();
+        $val = collect($firstVal)->last();
+        if (stripos($val, 'isUnion') !== false) {
+            $flagUnion = count($firstVal)-1;
+        } else {
+            $flagUnion = 0;
+        }
+        return $flagUnion;
     }
 }
