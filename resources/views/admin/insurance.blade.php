@@ -168,7 +168,7 @@
                                                                 <input type="checkbox" class="union-checker" id="inlineFormCheckbox{{$k}}">
                                                                 <label for="inlineFormCheckbox{{$k}}"></label>
                                                             </div>
-                                                            合并不同月份
+                                                            合并不同月份（用于模版下载）
                                                         </div>
                                                         <div class="checkbox-help" title="将同一个人的不同月份数据合并到同一月份显示，合并方式采用合并到最大日期">
                                                             <i class="fa fa-question-circle"></i>
@@ -239,7 +239,7 @@
                                                                 <input type="checkbox" class="union-checker" id="inlineFormCheckbox{{$k}}">
                                                                 <label for="inlineFormCheckbox{{$k}}"></label>
                                                             </div>
-                                                            合并不同月份
+                                                            合并不同月份（用于模版下载）
                                                         </div>
                                                         <div class="checkbox-help" title="将同一个人的不同月份数据合并到同一月份显示，合并方式采用合并到最大日期">
                                                             <i class="fa fa-question-circle"></i>
