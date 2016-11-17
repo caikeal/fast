@@ -79,6 +79,8 @@
 
                     if (meta instanceof Array) {
                         $(".meta-info-list").hide();
+                    } else {
+                        $(".meta-info-list").show();
                     }
                     if ((meta instanceof Object) && meta.hasOwnProperty('balance')){
                         createMetaBalance(meta.balance);
@@ -107,6 +109,8 @@
                     $(".meta-info-list ul>li").remove();
                     if (meta instanceof Array) {
                         $(".meta-info-list").hide();
+                    } else {
+                        $(".meta-info-list").show();
                     }
                     if ((meta instanceof Object) && meta.hasOwnProperty('balance')){
                         createMetaBalance(meta.balance);
