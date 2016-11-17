@@ -87,7 +87,7 @@ class SalaryController extends Controller
 
         $result['status']=1;
         $result['data']=$data;
-        $result['meta']=$balance?$balance:[];
+        $result['meta']=$detail->meta?(!empty($balance['balance'])?$balance:[]):[];
         return $result;
     }
 
