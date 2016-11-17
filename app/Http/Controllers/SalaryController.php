@@ -69,17 +69,64 @@ class SalaryController extends Controller
         foreach($cats as $k=>$v){
             $catsName[]=SalaryCategory::where("id","=",$v['category_id'])->first();
         }
-        //组织数据
+        //组织主干数据
+        $data = $this->organizeDetail($catsName, $detail->wages);
+
+        //组织附加数据
+        if ($detail->meta) {
+            $balanceTpl = json_decode($detail->meta, true);
+            $balance['balance'] = [];
+            if ($balanceTpl['balance']) {
+                $balance['balance'] = collect($balanceTpl['balance'])->map(function ($item, $index) use ($catsName){
+                    $item['details'] = $this->organizeDetail($catsName, $item['wages']);
+                    unset($item['wages']);
+                    return $item;
+                })->values()->all();
+            }
+        }
+
+        $result['status']=1;
+        $result['data']=$data;
+        $result['meta']=$detail->meta?(!empty($balance['balance'])?$balance:[]):[];
+        return $result;
+    }
+
+    /**
+     * 组织详情返回数据结构.
+     * @param $catsName
+     * @param $wagesStr
+     * @return array|mixed
+     */
+    protected function organizeDetail ($catsName, $wagesStr) {
         $data=array();
         $tpl_detail=array();
+        $data = $this->getFirstDetail($catsName)[0];
+        $tpl_detail = $this->getFirstDetail($catsName)[1];
+
+        $wages=explode("||", $wagesStr);
+        $main_sub_detail = $this->getSubDetail($tpl_detail, $wages);
+        foreach($data as $kkd=>$vvd){
+            $data[$kkd]['details']=$main_sub_detail[$vvd['cid']];
+        }
+        return $data;
+    }
+
+    /**
+     * 获取一级类型的值.
+     * @param $catsName
+     * @return array
+     */
+    protected function getFirstDetail ($catsName) {
         $flag_id=0;
+        $data=array();
+        $tpl_detail=array();
         foreach($catsName as $kk=>$vv){
             if($vv['level']==1){
                 $flag_id=$vv['id'];
                 $data[]=array(
                     'category'=>$vv['name'],
                     'cid'=>$vv['id'],
-                    );
+                );
             }else{
                 $tpl_detail[$flag_id][]=array(
                     "name"=>$vv['name'],
@@ -87,19 +134,25 @@ class SalaryController extends Controller
                 );
             }
         }
+
+        return [$data, $tpl_detail];
+    }
+
+    /**
+     * 获取二级类型的值.
+     * @param $tpl_detail
+     * @param $wages
+     * @return mixed
+     */
+    protected function getSubDetail ($tpl_detail, $wages) {
         $count_arr=0;
-        $wages=explode("||",$detail->wages);
         foreach($tpl_detail as $kt=>$vt){
             foreach($vt as $kd=>$vd){
                 $tpl_detail[$kt][$kd]['v']=key_exists($count_arr,$wages)?($wages[$count_arr]?$wages[$count_arr]:""):"";
                 $count_arr++;
             }
         }
-        foreach($data as $kkd=>$vvd){
-            $data[$kkd]['details']=$tpl_detail[$vvd['cid']];
-        }
-        $result['status']=1;
-        $result['data']=$data;
-        return $result;
+
+        return $tpl_detail;
     }
 }

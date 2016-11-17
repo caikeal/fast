@@ -112,6 +112,8 @@ class History
 
             //获取身份证
             $lowerIdentity = $v[1] ? strtolower($v[1]) : '';
+            $lowerIdentity = trim($lowerIdentity);
+
             $allIdentities[$id.":".$lowerIdentity][] = $k;
 
             if (!in_array($lowerIdentity.":".$k, $turn)){

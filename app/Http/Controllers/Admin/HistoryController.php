@@ -112,7 +112,7 @@ class HistoryController extends Controller
     public function show($id, Request $request)
     {
         $p = $request->input('page',1);
-        $name = $request->input('name');
+        $name = trim($request->input('name'));
 
         $managerId = \Auth::guard('admin')->user()->id;
 
