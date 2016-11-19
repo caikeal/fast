@@ -22,6 +22,7 @@ class CreateSalaryDetailsTable extends Migration
             $table->text('memo');
             $table->integer('salary_day');
             $table->integer('manager_id')->unsigned();
+            $table->text('meta')->comment('额外元信息');
             $table->softDeletes();
             $table->timestamps();
         });
