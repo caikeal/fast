@@ -112,6 +112,7 @@
                     <div class="timeline-year">
                         {{$now->year.".".$now->month}}
                     </div>
+                    <?php $timeCounter = 0;?>
                     @foreach($tasks as $k=>$task)
                         @if($task->deal_time<$nextMonthTime)
                             <div class="timeline-row alt">
@@ -179,7 +180,8 @@
                                     </div><!-- ./timeline-item-inner -->
                                 </div><!-- ./timeline-item -->
                             </div><!-- ./timeline-row -->
-                        @elseif($task->deal_time>=$nextMonthTime)
+                        @elseif($task->deal_time>=$nextMonthTime && $timeCounter==0)
+                            <?php $timeCounter++;?>
                             <div class="timeline-year bg-purple">
                                 {{$next->year.".".$next->month}}
                             </div>
