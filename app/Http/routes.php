@@ -100,6 +100,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::post('/reset','AuthController@reset');
     //首页
     Route::get('/index','HomeController@index');
+    Route::get('system/info', 'InfoController@index');
     //薪资模块
     Route::get('/salary','SalaryController@index');
     Route::post('/salary/details','SalaryController@detail');
