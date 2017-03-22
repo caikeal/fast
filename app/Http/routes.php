@@ -88,6 +88,12 @@ Route::group(['namespace'=>'Admin','middleware' => ['web'],'prefix'=>'admin'], f
     Route::get('/manager-role-list', 'RoleController@getRole');
     Route::get('/manager-relation', 'RoleController@getManagerList');
     Route::post('/manager-role-save', 'RoleController@saveManagerRole');
+    //系统消息模块
+    Route::get('/system/info', 'InfoController@index');
+    Route::post('/system/info/create', 'InfoController@sendSystemInfo');
+    Route::post('/system/info/delete/{id}', 'InfoController@delete');
+    Route::post('/system/info/close/{id}', 'InfoController@close');
+    Route::post('/system/info/open/{id}', 'InfoController@open');
 });
 
 Route::group(['middleware' => 'web'], function () {
@@ -100,6 +106,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::post('/reset','AuthController@reset');
     //首页
     Route::get('/index','HomeController@index');
+    Route::get('system/info', 'InfoController@index');
     //薪资模块
     Route::get('/salary','SalaryController@index');
     Route::post('/salary/details','SalaryController@detail');

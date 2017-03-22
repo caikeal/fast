@@ -1,9 +1,9 @@
 /vendor
 /node_modules
 /public/log.txt
-/storage
 Homestead.yaml
 Homestead.json
 .env
 /.idea
 _ide_helper.php
+/public/system_info/*
