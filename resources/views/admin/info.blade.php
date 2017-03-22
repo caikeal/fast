@@ -191,12 +191,12 @@
                 <table class="table table-striped" id="dataTable">
                     <thead>
                     <tr>
-                        <th width="10%">序号</th>
+                        <th width="5%">序号</th>
                         <th width="20%">标题</th>
                         <th width="30%">内容</th>
                         <th width="20%">图片</th>
                         <th width="10%">显示情况</th>
-                        <th width="10%">操作</th>
+                        <th width="15%">操作</th>
                     </tr>
                     </thead>
                     <tbody id="tbody">
