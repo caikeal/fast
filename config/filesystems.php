@@ -62,6 +62,10 @@ return [
             'bucket' => 'your-bucket',
         ],
 
+        'img' => [
+            'driver' => 'local',
+            'root' => public_path('system_info')
+        ]
     ],
 
 ];
