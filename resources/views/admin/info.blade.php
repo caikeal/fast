@@ -160,6 +160,9 @@
             padding: 10px 10px 0;
             margin-right: 8px;
         }
+        .breakword{
+            word-break: break-all;
+        }
     </style>
 @endsection
 @section('content')
@@ -188,19 +191,19 @@
                 <table class="table table-striped" id="dataTable">
                     <thead>
                     <tr>
-                        <th>序号</th>
-                        <th>标题</th>
-                        <th>内容</th>
-                        <th>图片</th>
-                        <th>显示情况</th>
-                        <th>操作</th>
+                        <th width="10%">序号</th>
+                        <th width="20%">标题</th>
+                        <th width="30%">内容</th>
+                        <th width="20%">图片</th>
+                        <th width="10%">显示情况</th>
+                        <th width="10%">操作</th>
                     </tr>
                     </thead>
                     <tbody id="tbody">
                         <tr v-if="additionList.length" v-for="addItem in additionList" v-cloak>
                             <td>@{{ addItem['id'] }}</td>
-                            <td>@{{ addItem['title'] }}</td>
-                            <td>@{{ addItem['content'] }}</td>
+                            <td class="breakword">@{{ addItem['title'] }}</td>
+                            <td class="breakword">@{{ addItem['content'] }}</td>
                             <td>
                                 <img :src="addItem['img']" width="100" v-if="addItem['img']">
                             </td>
@@ -213,8 +216,8 @@
                     @foreach($infos as $k=>$info)
                         <tr>
                             <td>{{ $k+1 }}</td>
-                            <td>{{ $info->title }}</td>
-                            <td>{{ $info->p }}</td>
+                            <td class="breakword">{{ $info->title }}</td>
+                            <td class="breakword">{{ $info->p }}</td>
                             <td>
                                 @if($info->img)
                                     <img src="{{url($info->img)}}" width="100">
