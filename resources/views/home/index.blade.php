@@ -95,8 +95,8 @@
         <div class="am-modal-bd">
             <article id="remind-info" style="height:250px; overflow-y: scroll;" data-am-widget="paragraph" class="am-paragraph am-paragraph-default" data-am-paragraph="{ tableScrollable: true, pureview: true }">
                 <div v-for="contentItem in content">
-                    <img v-if="contentItem.img" :src="contentItem.img">
                     <p v-for="pItem in contentItem.p">@{{ pItem }}</p>
+                    <img v-if="contentItem.img" :src="contentItem.img">
                 </div>
             </article>
         </div>
