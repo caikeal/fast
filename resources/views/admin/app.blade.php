@@ -333,18 +333,32 @@
                     </li>
                     @endif
                     @if(\Auth::guard('admin')->user()->can('compensation'))
-                    <li class="bg-palette3 lock-place10">
-                        <a href="{{url('admin/compensation')}}">
+                        <li class="bg-palette3 lock-place10">
+                            <a href="{{url('admin/compensation')}}">
                             <span class="menu-content block">
                                 <span class="menu-icon"><i class="block fa fa-lock fa-lg"></i></span>
                                 <span class="text m-left-sm">理赔上传</span>
                                 {{--<small class="badge badge-warning badge-square bounceIn animation-delay6 m-left-xs pull-right">7</small>--}}
                             </span>
-                            <span class="menu-content-hover block">
+                                <span class="menu-content-hover block">
                                 理赔上传
                             </span>
-                        </a>
-                    </li>
+                            </a>
+                        </li>
+                    @endif
+                    @if(\Auth::guard('admin')->user()->can('systemInfo'))
+                        <li class="bg-palette3 lock-place11">
+                            <a href="{{url('admin/system/info')}}">
+                            <span class="menu-content block">
+                                <span class="menu-icon"><i class="block fa fa-lock fa-lg"></i></span>
+                                <span class="text m-left-sm">系统消息</span>
+                                {{--<small class="badge badge-warning badge-square bounceIn animation-delay6 m-left-xs pull-right">7</small>--}}
+                            </span>
+                                <span class="menu-content-hover block">
+                                系统消息
+                            </span>
+                            </a>
+                        </li>
                     @endif
                     {{--<li class="menu-header">--}}
                         {{--Others--}}
