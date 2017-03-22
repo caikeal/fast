@@ -4,6 +4,6 @@
 Homestead.yaml
 Homestead.json
 .env
-/.idea
 _ide_helper.php
 /public/system_info/*
+.idea
