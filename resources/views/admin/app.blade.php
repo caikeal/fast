@@ -856,7 +856,7 @@
                     type:'POST'
                 }).done(function (data) {
                     if(data.ret_num === 0){
-                        $("#completeDetail").modal("hide");
+                        $("#resetOwnPwd").modal("hide");
                         if (data.reLogin == 1){
                             alert("保存成功！请重新登录！");
                             window.location.href = data.reUrl;
