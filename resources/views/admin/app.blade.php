@@ -120,10 +120,12 @@
                                         <a href="#" data-toggle="modal" data-target="#completeDetail">
                                             <i class="fa fa-edit fa-lg"></i><span class="m-left-xs">个人信息</span>
                                         </a>
+                                    </li>
                                     <li>
                                         <a href="#" data-toggle="modal" data-target="#resetOwnPwd">
                                             <i class="fa fa-inbox fa-lg"></i><span class="m-left-xs">修改密码</span>
                                         </a>
+                                    </li>
                                     <li>
                                         <a href="{{url('admin/logout')}}">
                                             <i class="fa fa-power-off fa-lg"></i><span class="m-left-xs">退出</span>
