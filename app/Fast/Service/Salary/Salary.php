@@ -190,10 +190,10 @@ class Salary
     /**
      * 判断是否需要合并.需要合并，返回合并位数
      *
-     * @param array $allContent
+     * @param $allContent
      * @return int
      */
-    protected function getFlagUnionPlace(array $allContent)
+    protected function getFlagUnionPlace($allContent=[])
     {
         $firstVal = collect($allContent)->first();
         $val = collect($firstVal)->last();
