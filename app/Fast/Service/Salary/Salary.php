@@ -203,6 +203,9 @@ class Salary
         } else {
             $flagUnion = 0;
         }
+        logger('isUion:'.$flagUnion);
+        logger('isUionL:'.json_encode(['last'=>$val]));
+        logger('isUionF:'.json_encode(['first'=>$firstVal]));
         return $flagUnion;
     }
 }
