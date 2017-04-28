@@ -31,7 +31,6 @@ class Salary
     public function storeSalary($base_id,$company_id,$type,$manager_id,$all_content)
     {
         $now = Carbon::now();
-        logger('allcontent: '.json_encode($all_content));
         $flagUnion = $this->getFlagUnionPlace($all_content); // 判断 k=0 时的最后一个值是否存在isUnion
         $unionArr = []; // 存放合并的数据
         $unionUser = []; // 临时存放以保存的userId
