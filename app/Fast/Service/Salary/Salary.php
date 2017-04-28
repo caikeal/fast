@@ -137,6 +137,7 @@ class Salary
 
         // 对于合并数据统一进行插入或更新操作
         if ($flagUnion) {
+            logger('hehe:'.json_encode($unionArr)); // 获取元数据的
             foreach ($unionArr as $tk=>$tv) {
                 $sqlInfo = [];    // 临时数据保存
                 $metaInfo = [];   // 临时元数据保存
