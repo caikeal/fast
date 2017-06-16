@@ -1038,6 +1038,7 @@
                     }).done(function (data) {
                         _this.$dispatch('role-manage-list', data.data);
                     }).fail(function (err) {
+                        console.log(err);
                         alert("网络错误！");
                     });
                 }
