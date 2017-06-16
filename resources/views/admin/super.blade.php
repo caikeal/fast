@@ -2392,7 +2392,8 @@
                             _this.managerAccountError.superior.msg = errs.superior[0];
                             return false;
                         }else if (errs.hasOwnProperty('invalid')) {
-                            alert(err.responseJSON.invalid);
+                            alert(errs.invalid);
+                            return false;
                         } else {
                             alert("网络错误！");
                         }
