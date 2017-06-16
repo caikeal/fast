@@ -1038,8 +1038,13 @@
                     }).done(function (data) {
                         _this.$dispatch('role-manage-list', data.data);
                     }).fail(function (err) {
-                        console.log(err);
-                        alert("网络错误！");
+                        if (err.hasOwnProperty('responseJSON')) {
+                            if (err.responseJSON.hasOwnProperty('invalid')) {
+                                alert(err.responseJSON.invalid);
+                            }
+                        } else {
+                            alert("网络错误！");
+                        }
                     });
                 }
             }
