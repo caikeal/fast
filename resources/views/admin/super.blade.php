@@ -1005,7 +1005,13 @@
                         }else{
                             alert("修改失败！");
                         }
-                    }).fail(function (data) {
+                    }).fail(function (err) {
+                        if (err.hasOwnProperty('responseJSON')) {
+                            if (err.responseJSON.hasOwnProperty('invalid')) {
+                                alert(err.responseJSON.invalid);
+                                return false;
+                            }
+                        }
                         alert("网络错误！");
                     });
                 }
@@ -1041,10 +1047,10 @@
                         if (err.hasOwnProperty('responseJSON')) {
                             if (err.responseJSON.hasOwnProperty('invalid')) {
                                 alert(err.responseJSON.invalid);
+                                return false;
                             }
-                        } else {
-                            alert("网络错误！");
                         }
+                        alert("网络错误！");
                     });
                 }
             }
@@ -1391,8 +1397,14 @@
                             };
                         }
                     })
-                    .fail(function(){
-                        alert("网络错误！");
+                    .fail(function(err){
+                        if (err.hasOwnProperty('responseJSON')) {
+                            if (err.responseJSON.hasOwnProperty('invalid')) {
+                                alert(err.responseJSON.invalid);
+                            }
+                        } else {
+                            alert("网络错误！");
+                        }
                     });
             },
             methods: {
@@ -2379,7 +2391,9 @@
                             _this.managerAccountError.superior.isInvalid = 1;
                             _this.managerAccountError.superior.msg = errs.superior[0];
                             return false;
-                        }else{
+                        }else if (errs.hasOwnProperty('invalid')) {
+                            alert(err.responseJSON.invalid);
+                        } else {
                             alert("网络错误！");
                         }
                     });
