@@ -196,6 +196,7 @@ class Salary
     protected function getFlagUnionPlace($allContent=[])
     {
         $firstVal = collect($allContent)->first();
+        logger('firstCol:'.json_encode($firstVal));
         $val = collect($firstVal)->last();
         if (stripos($val, 'isUnion') !== false) {
             $flagUnion = count($firstVal)-1;
