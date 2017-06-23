@@ -196,14 +196,14 @@ class Salary
     protected function getFlagUnionPlace($allContent=[])
     {
         $firstVal = collect($allContent)->first();
-        logger('firstCol:'.json_encode($firstVal));
+//        logger('firstCol:'.json_encode($firstVal));
         $val = collect($firstVal)->last();
         if (stripos($val, 'isUnion') !== false) {
             $flagUnion = count($firstVal)-1;
         } else {
             $flagUnion = 0;
         }
-        logger('isUnion: '.$flagUnion);
+//        logger('isUnion: '.$flagUnion);
         return $flagUnion;
     }
 }
