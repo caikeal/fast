@@ -11,6 +11,12 @@ use App\Http\Controllers\Controller;
 
 class ContactController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('binding');
+    }
+
     public function index()
     {
         $user_id = \Auth::user()->id;

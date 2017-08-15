@@ -262,8 +262,13 @@ class RoleController extends Controller
             return \Response::json(['invalid'=>'您无权访问！'])->setStatusCode(403);
         }
 
+        $manager = Manager::where('id', $managerId)->first();
+        if (!$manager) {
+            return \Response::json(['invalid'=>'该用户已经被禁用！如需使用请联系管理员解禁'])->setStatusCode(400);
+        }
+
         //所属上级
-        $leader = Manager::where('id', $managerId)->first()->leader()->pluck('id');
+        $leader = $manager->leader()->pluck('id');
 
         //上级、平级人员列表
         $list = $this->getManagerLevelList($roleId);
@@ -350,6 +355,10 @@ class RoleController extends Controller
         $manager = Manager::where('id', $manager_id)->first();
         if (!$manager_id && !$manager){
             return \Response::json(['invalid'=>'您无权访问！'])->setStatusCode(403);
+        }
+
+        if (!$manager) {
+            return \Response::json(['invalid'=>'该用户已经被禁用！如需使用请联系管理员解禁'])->setStatusCode(400);
         }
 
         //赋予新角色,清空旧角色

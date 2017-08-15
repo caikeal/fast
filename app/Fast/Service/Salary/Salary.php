@@ -190,18 +190,20 @@ class Salary
     /**
      * 判断是否需要合并.需要合并，返回合并位数
      *
-     * @param array $allContent
+     * @param $allContent
      * @return int
      */
-    protected function getFlagUnionPlace(array $allContent)
+    protected function getFlagUnionPlace($allContent=[])
     {
         $firstVal = collect($allContent)->first();
+//        logger('firstCol:'.json_encode($firstVal));
         $val = collect($firstVal)->last();
         if (stripos($val, 'isUnion') !== false) {
             $flagUnion = count($firstVal)-1;
         } else {
             $flagUnion = 0;
         }
+//        logger('isUnion: '.$flagUnion);
         return $flagUnion;
     }
 }

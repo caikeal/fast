@@ -91,6 +91,9 @@
                         <div class="statistic-title">
                             @{{ questionItem.title }}
                         </div>
+                        <div class="statistic-time">
+                            @{{ questionItem.updated_at }}
+                        </div>
                         <div class="m-top-md">
                             <div data-toggle="modal" type="button" class="btn btn-primary btn-answer" @click="openQuestion(questionItem.id)">解答</div>
                         </div>
