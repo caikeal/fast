@@ -3,13 +3,12 @@
 namespace App\Jobs;
 
 use App\Fast\Service\Salary\Salary;
-use App\Jobs\Job;
 use App\ReuploadApplication;
-use Carbon\Carbon;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use DB;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class ReuploadSalary extends Job implements ShouldQueue
 {
@@ -47,9 +46,8 @@ class ReuploadSalary extends Job implements ShouldQueue
      */
     public function handle()
     {
-        DB::reconnect();
-        $now = Carbon::now();
-        $contents=\Cache::store('file')->get('admin_salaryReUp:' . $this->base_id . "|" . $this->company_id."|".$this->reupload_id."|".$this->upload_id);
+        $contents = Cache::store('file')
+            ->get('admin_salaryReUp:' . $this->base_id . "|" . $this->company_id."|".$this->reupload_id."|".$this->upload_id);
         //开启事务
         DB::beginTransaction();
         try {
@@ -66,7 +64,6 @@ class ReuploadSalary extends Job implements ShouldQueue
             DB::rollBack();
             throw $e;
         }
-        DB::disconnect();
     }
 
     /**

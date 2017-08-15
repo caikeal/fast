@@ -4,16 +4,17 @@ namespace App\Http\Controllers;
 
 use App\SmsRecord;
 use App\User;
-use Illuminate\Foundation\Auth\ThrottlesLogins;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use App\Http\Requests\LoginRequest;
-use App\Http\Requests;
-use App\Http\Controllers\Controller;
+use App\Http\Requests\ResetRequest;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    use ThrottlesLogins;
+    use AuthenticatesUsers;
+
+    protected $redirectTo = '/';
 
     public function __construct()
     {
@@ -30,14 +31,8 @@ class AuthController extends Controller
      * 高频访问1分钟限制
      * 处理登录（将初始登录密码迁移到登录阶段）
      */
-    public function login(LoginRequest $request){
-        $throttles=$this->isUsingThrottlesLoginsTrait();
-        if ($throttles && $lockedOut = $this->hasTooManyLoginAttempts($request)) {
-            $this->fireLockoutEvent($request);
-
-            return $this->sendLockoutResponse($request);
-        }
-
+    public function login (LoginRequest $request)
+    {
         $account=$request->input('account');
         $password=$request->input('password');
         //手机号和身份证登录区分
@@ -68,10 +63,10 @@ class AuthController extends Controller
             }
         }
 
-        if (Auth::attempt($credentials)) {
-            if ($throttles) {
-                $this->clearLoginAttempts($request);
-            }
+        if (Auth::attempt($credentials, $request->has('remember'))) {
+            $request->session()->regenerate();
+            $this->clearLoginAttempts($request);
+
             if(Auth::user()->is_first==1) {
                 return redirect('index');
             }else{
@@ -79,23 +74,27 @@ class AuthController extends Controller
             }
         }
 
-        if ($throttles && ! $lockedOut) {
-            $this->incrementLoginAttempts($request);
-        }
+        $this->incrementLoginAttempts($request);
 
         return redirect()->back()
             ->withInput($request->only("account"))
             ->withErrors([
-                $this->loginUsername() => $this->getFailedLoginMessage(),
+                $this->username() => $this->getFailedLoginMessage(),
             ]);
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * 退出登录
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function logout(){
-        Auth::logout();
+    public function logout(Request $request){
+        $this->guard()->logout();
+
+        $request->session()->flush();
+
+        $request->session()->regenerate();
+
         return redirect('login');
     }
 
@@ -103,7 +102,12 @@ class AuthController extends Controller
         return view('home.reset');
     }
 
-    public function reset(Requests\ResetRequest $request){
+    /**
+     * 重置密码
+     * @param ResetRequest $request
+     * @return $this|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function reset(ResetRequest $request){
         $is_exist=SmsRecord::where("phone","=",$request->input('phone'))->where("code","=",$request->input('valid'))->count();
         if(!$is_exist){
             return redirect()->back()
@@ -121,22 +125,16 @@ class AuthController extends Controller
                 ]);
         }
         $password=bcrypt($request->input('password'));
-        if(\Auth::check()){
-            $userId=\Auth::user()->id;
-            User::where("id","=",$userId)->update(["password"=>$password]);
-            \Auth::logout();
+        if(Auth::check()){
+            $userId=Auth::user()->id;
+            User::where("id", "=", $userId)->update(["password" => $password]);
+            Auth::logout();
             return redirect('login');
         }else{
-            User::where("phone","=",$request->input("phone"))->update(["password"=>$password]);
+            User::where("phone", "=", $request->input("phone"))
+                ->update(["password" => $password]);
             return redirect('login');
         }
-    }
-
-    protected function isUsingThrottlesLoginsTrait()
-    {
-        return in_array(
-            ThrottlesLogins::class, class_uses_recursive(get_class($this))
-        );
     }
 
     /**
@@ -144,9 +142,9 @@ class AuthController extends Controller
      *
      * @return string
      */
-    public function loginUsername()
+    public function username()
     {
-        return property_exists($this, 'username') ? $this->username : 'account';
+        return 'account';
     }
 
     /**

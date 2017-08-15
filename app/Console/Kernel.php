@@ -28,12 +28,12 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-         $schedule->call(function(){
+         $schedule->call(function () {
              $now = Carbon::now();
-             $nextMonthDay = $now->addMonth();
-             $nowTime = strtotime(($nextMonthDay->format("Y-m"))."-1");
+             $nextMonthDay = $now->addMonth()->startOfMonth();
+             $nowTime = $nextMonthDay->timestamp;
              //取出适当的自动任务
-             $allNeedTask = AutoTask::where('deal_time',"<",$nowTime)->get();
+             $allNeedTask = AutoTask::where('deal_time', '<', $nowTime)->get();
              $task = new Task();
              $multiTask = new AutoMultiTask();
              foreach ($allNeedTask as $k=>$v){

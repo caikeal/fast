@@ -175,12 +175,13 @@ class SalaryController extends Controller
 
     /**
      * 下载模板。
-     * 
+     *
      * type=1表示工资模板，
      * type=2表示社保模板，
      * type=3表示理赔模板，
      * type=4表示社保进度模版
      * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function download(Request $request){
         if(\Gate::foruser(\Auth::guard('admin')->user())->denies('salary')
@@ -234,10 +235,9 @@ class SalaryController extends Controller
             if ($is_union) {
                 $datum[]="isUnion(需要合并的填1)";
             }
-            $data=array($datum);
 
-            $excel->sheet($base['company_id']."", function($sheet) use($data) {
-                $sheet->fromArray($data);
+            $excel->sheet($base['company_id']."", function($sheet) use($datum) {
+                $sheet->fromArray($datum);
             });
         })->download('xlsx');
     }

@@ -3,16 +3,13 @@
 namespace App\Jobs;
 
 use App\Fast\Service\Salary\Salary;
-use App\Jobs\Job;
-use App\SalaryDetail;
 use App\SalaryTask;
-use App\User;
 use Carbon\Carbon;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Cache;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class SaveUploadSalary extends Job implements ShouldQueue
 {
@@ -47,9 +44,9 @@ class SaveUploadSalary extends Job implements ShouldQueue
      */
     public function handle()
     {
-        DB::reconnect();
         $now = Carbon::now();
-        $contents=Cache::store('file')->get('admin_salaryUp:' . $this->base_id . "|" . $this->company_id."|".$this->task_id);
+        $contents = Cache::store('file')
+            ->get('admin_salaryUp:' . $this->base_id . "|" . $this->company_id."|".$this->task_id);
         //开启事务
         DB::beginTransaction();
         try {
@@ -63,7 +60,7 @@ class SaveUploadSalary extends Job implements ShouldQueue
             //设置任务已提交成功
             DB::table('salary_task')->where("company_id", "=", $this->company_id)->where("type", $this->type)
                 ->where("receive_id", "=", $this->manager_id)->where("id", "=", $this->task_id)
-                ->update(["status" => 1,"updated_at"=>$now]);
+                ->update(["status" => 1, "updated_at"=>$now]);
 
             //提交事务
             DB::commit();
@@ -71,7 +68,6 @@ class SaveUploadSalary extends Job implements ShouldQueue
             DB::rollBack();
             throw $e;
         }
-        DB::disconnect();
     }
     /**
      * 处理失败任务

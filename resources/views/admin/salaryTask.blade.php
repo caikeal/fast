@@ -630,6 +630,8 @@
                     if (!isConfirm){
                         return false;
                     }
+                    var furtherConfirm = window.confirm("你需要删除每月自动任务吗？");
+                    var deleting = furtherConfirm ? 1 : 0;
                     $.ajax({
                         url:url,
                         dataType:'json',
@@ -639,6 +641,7 @@
                         timeout:60000,
                         data: {
                             _method : "delete",
+                            deleting: deleting
                         },
                         type:'POST'
                     }).done(function (data) {

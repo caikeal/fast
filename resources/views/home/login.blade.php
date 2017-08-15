@@ -2,7 +2,7 @@
 @section('moreCss')
     <style>
         body{
-            background-color: #e2e2e2;
+            background-color: #e9ecf5;
         }
         .am-form input[type=text]{
             border-top-left-radius: 8px !important;
@@ -32,6 +32,17 @@
             left: 20%;
             vertical-align: middle;
             border: 0;
+        }
+        .am-btn-default {
+            color: #444;
+            background-color: #e9ecf5;
+            border-color: #e9ecf5;
+        }
+        .am-active .am-btn-default.am-dropdown-toggle, .am-btn-default.am-active, .am-btn-default:active {
+            background-color: #e9ecf5;
+        }
+        .am-btn-default:focus, .am-btn-default:hover {
+            background-color: #e9ecf5;
         }
     </style>
 @endsection

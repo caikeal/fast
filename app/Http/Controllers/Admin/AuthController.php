@@ -2,17 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Foundation\Auth\ThrottlesLogins;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
-
-use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\LoginRequest;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    use ThrottlesLogins;
+    use AuthenticatesUsers;
+
+    protected $redirectTo = 'admin/index';
 
     public function __construct()
     {
@@ -27,72 +26,57 @@ class AuthController extends Controller
     }
 
     /**
-     * @param LoginRequest $request
-     * @return $this|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     * 高频访问1分钟限制
-     * 处理登录
+     * 登录
+     * @param Request $request
+     * @return mixed
      */
-    public function login(LoginRequest $request){
-        $throttles=$this->isUsingThrottlesLoginsTrait();
-        if ($throttles && $lockedOut = $this->hasTooManyLoginAttempts($request)) {
-            $this->fireLockoutEvent($request);
-
-            return $this->sendLockoutResponse($request);
-        }
-
-        $credentials = $request->only('email', 'password');
-
-        if (Auth::guard('admin')->attempt($credentials, $request->has('remember'))) {
-            if ($throttles) {
-                $this->clearLoginAttempts($request);
-            }
-            return redirect('admin/index');
-        }
-
-        if ($throttles && ! $lockedOut) {
-            $this->incrementLoginAttempts($request);
-        }
-
-        return redirect()->back()
-            ->withInput($request->only($this->loginUsername(), 'remember'))
-            ->withErrors([
-                $this->loginUsername() => $this->getFailedLoginMessage(),
-            ]);
-    }
-
-    /**
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     * 退出登录
-     */
-    public function logout(){
-        Auth::guard('admin')->logout();
-        return redirect('admin/login');
-    }
-
-    protected function isUsingThrottlesLoginsTrait()
+    public function attemptLogin(Request $request)
     {
-        return in_array(
-            ThrottlesLogins::class, class_uses_recursive(get_class($this))
+        return $this->guard()->attempt(
+            $this->credentials($request), $request->has('remember')
         );
     }
 
     /**
-     * Get the login username to be used by the controller.
-     *
-     * @return string
+     * 登录权限
+     * @return mixed
      */
-    public function loginUsername()
+    protected function guard()
     {
-        return property_exists($this, 'username') ? $this->username : 'email';
+        return Auth::guard('admin');
     }
 
     /**
-     * Get the failed login message.
-     *
-     * @return string
+     * 数据验证
+     * @param Request $request
      */
-    protected function getFailedLoginMessage()
+    protected function validateLogin(Request $request)
     {
-        return '账号密码错误！';
+        $this->validate($request, [
+            $this->username() => 'required', 'password' => 'required',
+        ], [
+            'email.required'=>'账户必填',
+            'email.email'=>'邮箱格式不正确',
+            'email.max'=>'账户格式不正确',
+            'password.required'=>'密码必填',
+            'password.min'=>'密码格式不正确',
+        ]);
+    }
+
+    /**
+     * Log the user out of the application.
+     *
+     * @param \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function logout(Request $request)
+    {
+        $this->guard()->logout();
+
+        $request->session()->flush();
+
+        $request->session()->regenerate();
+
+        return redirect('admin/login');
     }
 }
